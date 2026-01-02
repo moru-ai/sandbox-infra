@@ -32,21 +32,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # each domain is a different cluster
-        moru-domain:
-          - "moru-test.io"
-          - "moru-staging.io"
-          - "moru-dev.io"
-        include:
-          - moru-domain: "moru-test.io"
-            api_key: MORU_API_KEY
-            access_token: MORU_ACCESS_TOKEN
-          - moru-domain: "moru-staging.io"
-            api_key: MORU_API_KEY_JULIETT
-            access_token: MORU_ACCESS_TOKEN_JULIETT
-          - moru-domain: "moru-dev.io"
-            api_key: MORU_API_KEY
-            access_token: MORU_ACCESS_TOKEN
         test-command:
           - command: "tests/periodic-test/internet-works.ts"
             name: "internet connectivity inside of sandbox"
@@ -82,70 +67,9 @@ jobs:
         working-directory: tests/periodic-test
         run: bun install --frozen-lockfile
 
-      - name: Set env variables from secrets
-        if: always()
-        run: |
-          echo "MORU_API_KEY=${{ secrets[format('{0}', matrix.api_key)] }}" >> $GITHUB_ENV
-          echo "MORU_ACCESS_TOKEN=${{ secrets[format('{0}', matrix.access_token)] }}" >> $GITHUB_ENV
-
       - name: ${{ matrix.test-command.name }}
         run: bun run ${{ matrix.test-command.command }}
-        working-directory: ${{ matrix.test-command.dir }}
         env:
-          MORU_API_KEY: ${{ env.MORU_API_KEY }}
-          MORU_ACCESS_TOKEN: ${{ env.MORU_ACCESS_TOKEN }}
-          MORU_DOMAIN: ${{ matrix.moru-domain }}
-
-      - name: Send Grafana OnCall webhook
-        if: always()
-        env:
-          JOB_STATUS: ${{ job.status }}
-          DOMAIN: ${{ matrix.moru-domain }}
-          RUN_LINK: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          WEBHOOK_URL: ${{ secrets.GRAFANA_ALERT_WEBHOOK }}
-          TEST_NAME: ${{ matrix.test-command.name }}
-        run: |
-          sudo apt-get update -qq && sudo apt-get install -y -qq jq  # jq for JSON assembly
-
-          # Map GH status → Grafana state
-          STATE=$([ "$JOB_STATUS" = "success" ] && echo ok || echo alerting)
-          STATUS=$([ "$JOB_STATUS" = "success" ] && echo resolved || echo firing)
-
-          # slug-ify the test name (lowercase, a–z/0–9, hyphens)
-          TEST_SLUG=$(echo "$TEST_NAME" \
-                      | tr '[:upper:]' '[:lower:]' \
-                      | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')
-
-          # Unique per (domain + test) – same UID for state so OnCall auto-resolves
-          ALERT_UID="periodic-tests-${DOMAIN//./-}-${TEST_SLUG}"
-
-          TITLE="Periodic tests | ${DOMAIN} | ${TEST_NAME}"
-          MESSAGE="${TEST_NAME} on ${DOMAIN} finished. Link: ${RUN_LINK}"
-
-          # Attach a branch-status badge.
-          BADGE_COLOR=$([ "$JOB_STATUS" = "success" ] && echo brightgreen || echo CB2431)
-          BADGE_LABEL_ESCAPED=$(echo "$ALERT_UID" | sed 's/-/--/g')
-          IMAGE_URL="https://img.shields.io/badge/${BADGE_LABEL_ESCAPED}-${JOB_STATUS}-${BADGE_COLOR}"
-
-          jq -n \
-            --arg alert_uid "$ALERT_UID" \
-            --arg title "$TITLE" \
-            --arg state "$STATE" \
-            --arg status "$STATUS" \
-            --arg link_to_upstream_details "$RUN_LINK" \
-            --arg message "$MESSAGE" \
-            --arg image_url "$IMAGE_URL" \
-            --arg domain "$DOMAIN" \
-            --arg dev "${{ inputs.dev }}" \
-            '{alert_uid: $alert_uid,
-              title: $title,
-              state: $state,
-              link_to_upstream_details: $link_to_upstream_details,
-              message: $message,
-              severity: "warning",
-              status: $status,
-              domain: $domain,
-              dev: ($dev == "true"),
-              annotations: {Project: $domain},
-              image_url: $image_url}' \
-          | curl -s -X POST -H 'Content-Type: application/json' -d @- "$WEBHOOK_URL"
+          MORU_API_KEY: ${{ secrets.MORU_API_KEY }}
+          MORU_ACCESS_TOKEN: ${{ secrets.MORU_ACCESS_TOKEN }}
+          MORU_DOMAIN: moru.io
