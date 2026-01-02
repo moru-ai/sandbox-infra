@@ -172,7 +172,7 @@ lint:
 
 .PHONY: generate-mocks
 generate-mocks:
-	go run github.com/vektra/mockery/v3@v3.5.0
+	GOTOOLCHAIN=local go run github.com/vektra/mockery/v3@v3.5.0
 
 .PHONY: tidy
 tidy:

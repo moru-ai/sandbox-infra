@@ -181,6 +181,24 @@ The codebase uses several code generators:
 4. **Mocks** (`mockery`)
    - Config: `.mockery.yaml`
    - Run: `make generate-mocks`
+   - Uses `GOTOOLCHAIN=local` to ensure mockery runs with local Go version
+
+### Go Toolchain
+
+This project requires **Go 1.25.4** (specified in `go.work` and `.tool-versions`).
+
+**Local development:** Use [mise](https://mise.jdx.dev/) to manage exact Go version from `.tool-versions`:
+```bash
+brew install mise
+mise install  # installs all tools from .tool-versions
+# Add to ~/.zshrc: eval "$(mise activate zsh)"
+```
+
+**Why `GOTOOLCHAIN=local` in Makefile?**
+- Go's auto-toolchain feature may download older Go versions for dependencies
+- mockery's go.mod requires `go >= 1.23.7`, which can trigger Go 1.24 download
+- Go 1.24 can't parse Go 1.25 code → mockery fails
+- `GOTOOLCHAIN=local` forces use of local Go 1.25.4 → works
 
 ### Testing Patterns
 
