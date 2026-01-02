@@ -6,8 +6,8 @@ replace github.com/moru-ai/sandbox-infra/packages/shared => ../shared
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.37.2
-	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0-20250811171846-d1cdc9527dec
 	github.com/google/uuid v1.6.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0-20250811171846-d1cdc9527dec
 	go.uber.org/zap v1.27.0
 )
 

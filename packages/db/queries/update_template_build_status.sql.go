@@ -9,8 +9,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/moru-ai/sandbox-infra/packages/db/types"
 	"github.com/google/uuid"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
 )
 
 const updateEnvBuildStatus = `-- name: UpdateEnvBuildStatus :exec

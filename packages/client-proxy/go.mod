@@ -26,8 +26,6 @@ replace (
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
-	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-contrib/size v1.0.2
 	github.com/gin-contrib/zap v1.1.5
@@ -36,6 +34,8 @@ require (
 	github.com/grafana/loki v0.0.0-20250609195516-7b805ba7c843
 	github.com/hashicorp/nomad/api v0.0.0-20231208134655-099ee06a607c
 	github.com/miekg/dns v1.1.63
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/soheilhy/cmux v0.1.5
 	github.com/stretchr/testify v1.11.1

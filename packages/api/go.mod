@@ -33,9 +33,6 @@ require (
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/bsm/redislock v0.9.4
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
-	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
-	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/flowchartsman/retry v1.2.0
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-contrib/cors v1.7.5
@@ -49,6 +46,9 @@ require (
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/launchdarkly/go-sdk-common/v3 v3.3.0
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/oapi-codegen/gin-middleware v1.0.2
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/orcaman/concurrent-map/v2 v2.0.1

@@ -15,10 +15,10 @@ tool (
 
 require (
 	connectrpc.com/connect v1.18.1
+	github.com/google/uuid v1.6.0
 	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
 	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
 	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
-	github.com/google/uuid v1.6.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/net v0.47.0

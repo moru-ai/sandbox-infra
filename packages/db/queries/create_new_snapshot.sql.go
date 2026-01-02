@@ -8,9 +8,9 @@ package queries
 import (
 	"context"
 
-	"github.com/moru-ai/sandbox-infra/packages/db/types"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
 )
 
 const upsertSnapshot = `-- name: UpsertSnapshot :one
