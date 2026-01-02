@@ -25,6 +25,7 @@ locals {
     BASE_HUGEPAGES_PERCENTAGE    = var.orchestrator_base_hugepages_percentage
     CACHE_DISK_COUNT             = var.client_cluster_cache_disk_count
     LOCAL_SSD                    = local.client_has_local_ssd ? "true" : "false"
+    ENABLE_OPS_AGENT             = var.enable_ops_agent
   })
 }
 
@@ -65,7 +66,8 @@ resource "google_compute_region_autoscaler" "client" {
     }
 
     dynamic "metric" {
-      for_each = var.client_cluster_autoscaling_memory_target < 100 ? [1] : []
+      # Memory-based autoscaling requires ops-agent to be enabled
+      for_each = var.enable_ops_agent && var.client_cluster_autoscaling_memory_target < 100 ? [1] : []
       content {
         name   = "agent.googleapis.com/memory/percent_used"
         type   = "GAUGE"
@@ -128,7 +130,7 @@ resource "google_compute_instance_template" "client" {
 
   labels = merge(
     var.labels,
-    (var.environment != "dev" ? {
+    (var.enable_ops_agent && var.environment != "dev" ? {
       goog-ops-agent-policy = "v2-x86-template-1-2-0-${var.gcp_zone}"
     } : {})
   )

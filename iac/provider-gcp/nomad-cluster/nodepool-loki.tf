@@ -17,6 +17,7 @@ locals {
     CONSUL_GOSSIP_ENCRYPTION_KEY = google_secret_manager_secret_version.consul_gossip_encryption_key.secret_data
     CONSUL_DNS_REQUEST_TOKEN     = google_secret_manager_secret_version.consul_dns_request_token.secret_data
     NODE_POOL                    = var.loki_node_pool
+    ENABLE_OPS_AGENT             = var.enable_ops_agent
   })
 }
 
@@ -84,7 +85,7 @@ resource "google_compute_instance_template" "loki" {
 
   labels = merge(
     var.labels,
-    (var.environment != "dev" ? {
+    (var.enable_ops_agent && var.environment != "dev" ? {
       goog-ops-agent-policy = "v2-x86-template-1-2-0-${var.gcp_zone}"
     } : {})
   )
