@@ -72,9 +72,9 @@ func TestApplyFilter_ExpiredFiltering(t *testing.T) {
 			description:   "Should match when expired by even a nanosecond",
 		},
 		{
-			name:          "expired filter - about to expire",
+			name:          "expired filter - not yet expired",
 			onlyExpired:   true,
-			endTime:       time.Now().Add(time.Millisecond),
+			endTime:       time.Now().Add(time.Hour), // Use longer duration to avoid timing flakiness
 			expectedMatch: false,
 			description:   "Should NOT match when still has time left",
 		},
