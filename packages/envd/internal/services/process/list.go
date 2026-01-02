@@ -5,8 +5,8 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/services/process/handler"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/process/handler"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 )
 
 func (s *Service) List(context.Context, *connect.Request[rpc.ListRequest]) (*connect.Response[rpc.ListResponse], error) {

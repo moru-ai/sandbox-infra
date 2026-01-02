@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 func (c *Checks) getHealth(ctx context.Context, timeout time.Duration) (bool, error) {

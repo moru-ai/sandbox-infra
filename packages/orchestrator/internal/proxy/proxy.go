@@ -12,13 +12,13 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	reverseproxy "github.com/e2b-dev/infra/packages/shared/pkg/proxy"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	reverseproxy "github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 	// https://cloud.google.com/load-balancing/docs/https#timeouts_and_retries%23:~:text=The%20load%20balancer%27s%20backend%20keepalive,is%20greater%20than%20600%20seconds
 	idleTimeout = 620 * time.Second
 
-	trafficAccessTokenHeader = "e2b-traffic-access-token"
+	trafficAccessTokenHeader = "moru-traffic-access-token"
 )
 
 type SandboxProxy struct {

@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
 func main() {

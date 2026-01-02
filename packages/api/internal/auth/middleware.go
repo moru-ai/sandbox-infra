@@ -14,15 +14,15 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/cfg"
-	"github.com/e2b-dev/infra/packages/api/internal/db"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/api/internal/auth")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/api/internal/auth")
 
 type AuthorizationHeaderMissingError struct{}
 
@@ -146,23 +146,23 @@ func CreateAuthenticationFunc(
 			securitySchemeName: "ApiKeyAuth",
 			headerKey: headerKey{
 				name:         "X-API-Key",
-				prefix:       "e2b_",
+				prefix:       "moru_",
 				removePrefix: "",
 			},
 			validationFunction: teamValidationFunction,
 			contextKey:         TeamContextKey,
-			errorMessage:       "Invalid API key, please visit https://e2b.dev/docs/api-key for more information.",
+			errorMessage:       "Invalid API key, please visit https://moru.io/docs/api-key for more information.",
 		},
 		&commonAuthenticator[uuid.UUID]{
 			securitySchemeName: "AccessTokenAuth",
 			headerKey: headerKey{
 				name:         "Authorization",
-				prefix:       "sk_e2b_",
+				prefix:       "sk_moru_",
 				removePrefix: "Bearer ",
 			},
 			validationFunction: userValidationFunction,
 			contextKey:         UserIDContextKey,
-			errorMessage:       "Invalid Access token, try to login again by running `e2b auth login`.",
+			errorMessage:       "Invalid Access token, try to login again.",
 		},
 		&commonAuthenticator[uuid.UUID]{
 			securitySchemeName: "Supabase1TokenAuth",

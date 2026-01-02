@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
 )
 
 func createFilterTestSandbox(state sandbox.State, endTime time.Time) sandbox.Sandbox {

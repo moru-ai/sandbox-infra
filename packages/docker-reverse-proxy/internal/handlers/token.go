@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/auth"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/auth"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 type DockerToken struct {
@@ -21,14 +21,14 @@ type DockerToken struct {
 }
 
 // The scope is in format "repository:<project>/<repo>/<templateID>:<action>"
-var scopeRegex = regexp.MustCompile(`^repository:e2b/custom-envs/(?P<templateID>[^:]+):(?P<action>[^:]+)$`)
+var scopeRegex = regexp.MustCompile(`^repository:moru/custom-envs/(?P<templateID>[^:]+):(?P<action>[^:]+)$`)
 
 // GetToken validates if user has access to template and then returns a new token for the required scope
 func (a *APIStore) GetToken(w http.ResponseWriter, r *http.Request) error {
 	ctx := r.Context()
 
 	// To get the token, the docker CLI uses Basic Auth in format "username:password",
-	// where username should be "_e2b_access_token" and password is the actual access token
+	// where username should be "_moru_access_token" and password is the actual access token
 	authHeader := r.Header.Get("Authorization")
 
 	accessToken, err := auth.ExtractAccessToken(authHeader, "Basic ")

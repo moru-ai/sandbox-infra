@@ -8,9 +8,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
 func CreateTeam(t *testing.T, db *client.Client, teamName string) uuid.UUID {
@@ -31,7 +31,7 @@ func CreateTeamWithUser(
 	err := db.TestsRawSQL(t.Context(), `
 INSERT INTO teams (id, email, name, tier, is_blocked)
 VALUES ($1, $2, $3, $4, $5)
-`, teamID, fmt.Sprintf("test-integration-%s@e2b.dev", teamID), teamName, "base_v1", false)
+`, teamID, fmt.Sprintf("test-integration-%s@moru.io", teamID), teamName, "base_v1", false)
 	require.NoError(t, err)
 
 	if userID != "" {

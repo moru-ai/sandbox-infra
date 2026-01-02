@@ -1,9 +1,9 @@
 package config
 
 import (
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci/auth"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci/auth"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
 const (

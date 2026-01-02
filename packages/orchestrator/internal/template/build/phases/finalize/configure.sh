@@ -4,7 +4,7 @@ set -euo pipefail
 
 echo "Starting configuration script"
 
-cat <<EOF > /.e2b
+cat <<EOF > /.moru
 ENV_ID={{ .TemplateID }}
 TEMPLATE_ID={{ .TemplateID }}
 BUILD_ID={{ .BuildID }}

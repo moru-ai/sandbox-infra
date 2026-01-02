@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	sharedUtils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	envdapi "github.com/e2b-dev/infra/tests/integration/internal/envd/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
-	"github.com/e2b-dev/infra/tests/integration/internal/utils"
+	sharedUtils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	envdapi "github.com/moru-ai/sandbox-infra/tests/integration/internal/envd/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/utils"
 )
 
 func TestSandboxAutoPausePauseResume(t *testing.T) {
@@ -98,7 +98,7 @@ func TestSandboxAutoPauseResumePersisted(t *testing.T) {
 	require.Equal(t, http.StatusOK, fileResponse.StatusCode())
 	require.Equal(t, content, string(fileResponse.Body))
 
-	content = "Hello, E2B!"
+	content = "Hello, Moru!"
 	utils.UploadFile(t, t.Context(), sbx, envdClient, path, content)
 
 	// Set timeout to 0 to force sandbox to be stopped

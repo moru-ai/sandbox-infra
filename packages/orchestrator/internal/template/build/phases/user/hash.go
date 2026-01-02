@@ -3,8 +3,8 @@ package user
 import (
 	"context"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache"
 )
 
 const prefix = "DEFAULT USER"

@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type Analytics struct {

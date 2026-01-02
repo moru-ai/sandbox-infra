@@ -7,7 +7,7 @@ import (
 	"connectrpc.com/connect"
 	"github.com/creack/pty"
 
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 )
 
 func (s *Service) Update(_ context.Context, req *connect.Request[rpc.UpdateRequest]) (*connect.Response[rpc.UpdateResponse], error) {

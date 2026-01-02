@@ -14,16 +14,16 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/uffd/fdexit"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/uffd/memory"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/uffd/userfaultfd"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/uffd/fdexit"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/uffd/memory"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/uffd/userfaultfd"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/uffd")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/uffd")
 
 const (
 	uffdMsgListenerTimeout = 10 * time.Second

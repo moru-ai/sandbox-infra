@@ -7,8 +7,8 @@ import (
 
 	"go.uber.org/zap"
 
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type ServiceInfo struct {

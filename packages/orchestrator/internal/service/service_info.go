@@ -7,11 +7,11 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/service/machineinfo"
-	orchestratorinfo "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/service/machineinfo"
+	orchestratorinfo "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type Server struct {

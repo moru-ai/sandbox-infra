@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox/storage/memory"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox/storage/memory"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 // =============================================================================

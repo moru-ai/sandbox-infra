@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	e2borchestrators "github.com/e2b-dev/infra/packages/proxy/internal/edge/pool"
-	e2bgrpcorchestratorinfo "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	moruorchestrators "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/pool"
+	morugrpcorchestratorinfo "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 func (a *APIStore) V1ServiceDiscoveryGetOrchestrators(c *gin.Context) {
@@ -52,13 +52,13 @@ func (a *APIStore) V1ServiceDiscoveryGetOrchestrators(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func getOrchestratorStatusResolved(ctx context.Context, s e2borchestrators.OrchestratorStatus) api.ClusterNodeStatus {
+func getOrchestratorStatusResolved(ctx context.Context, s moruorchestrators.OrchestratorStatus) api.ClusterNodeStatus {
 	switch s {
-	case e2borchestrators.OrchestratorStatusHealthy:
+	case moruorchestrators.OrchestratorStatusHealthy:
 		return api.Healthy
-	case e2borchestrators.OrchestratorStatusDraining:
+	case moruorchestrators.OrchestratorStatusDraining:
 		return api.Draining
-	case e2borchestrators.OrchestratorStatusUnhealthy:
+	case moruorchestrators.OrchestratorStatusUnhealthy:
 		return api.Unhealthy
 	default:
 		logger.L().Error(ctx, "Unknown orchestrator status", zap.String("status", string(s)))
@@ -67,14 +67,14 @@ func getOrchestratorStatusResolved(ctx context.Context, s e2borchestrators.Orche
 	}
 }
 
-func getOrchestratorRolesResolved(ctx context.Context, r []e2bgrpcorchestratorinfo.ServiceInfoRole) []api.ClusterOrchestratorRole {
+func getOrchestratorRolesResolved(ctx context.Context, r []morugrpcorchestratorinfo.ServiceInfoRole) []api.ClusterOrchestratorRole {
 	roles := make([]api.ClusterOrchestratorRole, 0)
 
 	for _, role := range r {
 		switch role {
-		case e2bgrpcorchestratorinfo.ServiceInfoRole_Orchestrator:
+		case morugrpcorchestratorinfo.ServiceInfoRole_Orchestrator:
 			roles = append(roles, api.ClusterOrchestratorRoleOrchestrator)
-		case e2bgrpcorchestratorinfo.ServiceInfoRole_TemplateBuilder:
+		case morugrpcorchestratorinfo.ServiceInfoRole_TemplateBuilder:
 			roles = append(roles, api.ClusterOrchestratorRoleTemplateBuilder)
 		default:
 			logger.L().Error(ctx, "Unknown orchestrator role", zap.String("role", string(role)))

@@ -12,14 +12,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (a *APIStore) PostSandboxesSandboxIDPause(c *gin.Context, sandboxID api.SandboxID) {

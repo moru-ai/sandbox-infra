@@ -1,4 +1,4 @@
-# Self-hosting E2B on Google Cloud
+# Self-hosting Moru Sandbox Infrastructure on Google Cloud
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ Check if you can use config for terraform state management
     
     > Your Postgres database needs to have enabled IPv4 access. You can do that in Connect screen
 3. Run `make set-env ENV={prod,staging,dev}` to start using your env
-4. Run `make login-gcloud` to login to `gcloud`
+4. Run `make provider-login` to login to `gcloud`
 5. Run `make init`. If this errors, run it a second time--it's due to a race condition on Terraform enabling API access for the various GCP services; this can take several seconds. A full list of services that will be enabled for API access:
    - [Secret Manager API](https://console.cloud.google.com/apis/library/secretmanager.googleapis.com)
    - [Certificate Manager API](https://console.cloud.google.com/apis/library/certificatemanager.googleapis.com)
@@ -64,16 +64,17 @@ Check if you can use config for terraform state management
    - [OS Config API](https://console.cloud.google.com/apis/library/osconfig.googleapis.com)
    - [Stackdriver Monitoring API](https://console.cloud.google.com/apis/library/monitoring.googleapis.com)
    - [Stackdriver Logging API](https://console.cloud.google.com/apis/library/logging.googleapis.com)
+   - If Packer fails with `The zone ... does not have enough resources available to fulfill the request`, change `GCP_ZONE` to another zone in the same region (e.g. `asia-northeast3-b`) and rerun `make init`.
 6. Run `make build-and-upload`
 7. Run `make copy-public-builds`. This will copy kernel and rootfs builds for Firecracker to your bucket. You can [build your own](#building-firecracker-and-uffd-from-source) kernel and Firecracker roots.
-8. Secrets are created and stored in GCP Secrets Manager. Once created, that is the source of truth--you will need to update values there to make changes. Create a secret value for the following secrets:
-  - e2b-cloudflare-api-token
+8. Secrets are created and stored in GCP Secrets Manager. Once created, that is the source of truth--you will need to update values there to make changes. Create a secret value (add a new secret version) for the following secrets:
+  - `${PREFIX}cloudflare-api-token`
       > Get Cloudflare API Token: go to the [Cloudflare dashboard](https://dash.cloudflare.com/) -> Manage Account -> Account API Tokens -> Create Token -> Edit Zone DNS -> in "Zone Resources" select your domain and generate the token
   - Posthog API keys for monitoring (optional)
 9. Run `make plan-without-jobs` and then `make apply`
-10. Fill out the following secret in the GCP Secrets Manager:
-  - e2b-postgres-connection-string
-  - e2b-supabase-jwt-secrets (optional / required to self-host the [E2B dashboard](https://github.com/e2b-dev/dashboard))
+10. Fill out the following secrets in the GCP Secrets Manager (these secret containers are created by Terraform in Step 9; you need to add new secret versions with the real values):
+  - `${PREFIX}postgres-connection-string`
+  - `${PREFIX}supabase-jwt-secrets` (optional / required for dashboard authentication)
       > Get Supabase JWT Secret: go to the [Supabase dashboard](https://supabase.com/dashboard) -> Select your Project -> Project Settings -> Data API -> JWT Settings
 11. Run `make plan` and then `make apply`. Note: This will work after the TLS certificates was issued. It can take some time; you can check the status in the Google Cloud Console
 12. Setup data in the cluster by running `make prep-cluster` in `packages/shared` to create an initial user, team, and build a base template.
@@ -83,27 +84,19 @@ Check if you can use config for terraform state management
 ### Interacting with the cluster
 
 #### SDK
-When using SDK pass domain when creating new `Sandbox` in JS/TS SDK
-```js
-import { Sandbox } from "@e2b/sdk";
+When using SDK pass domain when creating new `Sandbox`. The SDK client should be configured to use your Moru instance domain.
 
+```js
+// Example with custom domain configuration
 const sandbox = new Sandbox({
   domain: "<your-domain>",
 });
 ```
 
-or in Python SDK
-
-```python
-from e2b import Sandbox
-
-sandbox = Sandbox(domain="<your-domain>")
-```
-
 #### CLI
 When using CLI you can pass domain as well
 ```sh
-E2B_DOMAIN=<your-domain> e2b <command>
+MORU_DOMAIN=<your-domain> moru <command>
 ```
 
 #### Monitoring and logging jobs
@@ -114,13 +107,13 @@ To update jobs running in the cluster look inside packages/nomad for config file
 
 ### Troubleshooting
 
-If any problems arise, open [a Github Issue on the repo](https://github.com/e2b-dev/infra/issues) and we'll look into it.
+If any problems arise, open [a Github Issue on the repo](https://github.com/moru-ai/sandbox-infra/issues) and we'll look into it.
 
 ---
 
 ### Building Firecracker and UFFD from source
 
-E2B is using [Firecracker](https://github.com/firecracker-microvm/firecracker) for Sandboxes.
+Moru uses [Firecracker](https://github.com/firecracker-microvm/firecracker) for sandboxes.
 You can build your own kernel and Firecracker version from source by running `make build-and-upload-fc-components`
 
 - Note: This needs to be done on a Linux machine due to case-sensitive requirements for the file system--you'll error out during the automated git section with a complaint about unsaved changes. Kernel and versions could alternatively be sourced elsewhere.

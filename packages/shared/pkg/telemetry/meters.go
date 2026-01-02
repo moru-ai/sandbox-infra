@@ -23,7 +23,7 @@ const (
 	ApiOrchestratorCreatedSandboxes CounterType = "api.orchestrator.created_sandboxes"
 	SandboxCreateMeterName          CounterType = "api.env.instance.started"
 
-	TeamSandboxCreated CounterType = "e2b.team.sandbox.created"
+	TeamSandboxCreated CounterType = "moru.team.sandbox.created"
 
 	EnvdInitCalls CounterType = "orchestrator.sandbox.envd.init.calls"
 )
@@ -54,7 +54,7 @@ const (
 )
 
 const (
-	SandboxCpuUsedGaugeName GaugeFloatType = "e2b.sandbox.cpu.used"
+	SandboxCpuUsedGaugeName GaugeFloatType = "moru.sandbox.cpu.used"
 )
 
 const (
@@ -85,14 +85,14 @@ const (
 	ApiOrchestratorCountMeterName GaugeIntType = "api.orchestrator.status"
 
 	// Sandbox metrics
-	SandboxRamUsedGaugeName   GaugeIntType = "e2b.sandbox.ram.used"
-	SandboxRamTotalGaugeName  GaugeIntType = "e2b.sandbox.ram.total"
-	SandboxCpuTotalGaugeName  GaugeIntType = "e2b.sandbox.cpu.total"
-	SandboxDiskUsedGaugeName  GaugeIntType = "e2b.sandbox.disk.used"
-	SandboxDiskTotalGaugeName GaugeIntType = "e2b.sandbox.disk.total"
+	SandboxRamUsedGaugeName   GaugeIntType = "moru.sandbox.ram.used"
+	SandboxRamTotalGaugeName  GaugeIntType = "moru.sandbox.ram.total"
+	SandboxCpuTotalGaugeName  GaugeIntType = "moru.sandbox.cpu.total"
+	SandboxDiskUsedGaugeName  GaugeIntType = "moru.sandbox.disk.used"
+	SandboxDiskTotalGaugeName GaugeIntType = "moru.sandbox.disk.total"
 
 	// Team metrics
-	TeamSandboxRunningGaugeName GaugeIntType = "e2b.team.sandbox.running"
+	TeamSandboxRunningGaugeName GaugeIntType = "moru.team.sandbox.running"
 
 	// Build resource metrics
 	BuildRootfsSizeHistogramName HistogramType = "template.build.rootfs.size"

@@ -8,7 +8,7 @@ import (
 	"context"
 
 	"connectrpc.com/connect"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
 	mock "github.com/stretchr/testify/mock"
 )
 

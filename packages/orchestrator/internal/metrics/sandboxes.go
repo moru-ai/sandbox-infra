@@ -16,11 +16,11 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	sbxlogger "github.com/e2b-dev/infra/packages/shared/pkg/logger/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	sbxlogger "github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (

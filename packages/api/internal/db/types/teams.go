@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/e2b-dev/infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 )
 
 type Team struct {

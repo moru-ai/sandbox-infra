@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/constants"
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/utils"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/constants"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 func (a *APIStore) Proxy(w http.ResponseWriter, req *http.Request) {
@@ -17,8 +17,8 @@ func (a *APIStore) Proxy(w http.ResponseWriter, req *http.Request) {
 
 	// Validate the token by checking if the generated token is in the cache
 	authHeader := req.Header.Get("Authorization")
-	e2bToken := strings.TrimPrefix(authHeader, "Bearer ")
-	token, err := a.AuthCache.Get(e2bToken)
+	moruToken := strings.TrimPrefix(authHeader, "Bearer ")
+	token, err := a.AuthCache.Get(moruToken)
 	if err != nil {
 		log.Printf("Error while getting token for %s: %s, header: %s\n", path, err, authHeader)
 		utils.SetDockerUnauthorizedHeaders(w)
@@ -39,7 +39,7 @@ func (a *APIStore) Proxy(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	repoPrefix := "/v2/e2b/custom-envs/"
+	repoPrefix := "/v2/moru/custom-envs/"
 	realRepoPrefix := fmt.Sprintf("/v2/%s/%s/", consts.GCPProject, consts.DockerRegistry)
 	if !strings.HasPrefix(path, repoPrefix) && !strings.HasPrefix(path, realRepoPrefix) {
 		// The request shouldn't need any other endpoints, we deny access

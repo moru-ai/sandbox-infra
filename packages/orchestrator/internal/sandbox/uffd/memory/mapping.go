@@ -3,8 +3,8 @@ package memory
 import (
 	"fmt"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	"github.com/e2b-dev/infra/packages/shared/pkg/fc/models"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/fc/models"
 )
 
 type AddressNotFoundError struct {

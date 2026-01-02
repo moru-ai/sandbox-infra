@@ -1,8 +1,8 @@
 package builderrors
 
 import (
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	template_manager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	template_manager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
 )
 
 func UnwrapUserError(err error) *template_manager.TemplateBuildStatusReason {

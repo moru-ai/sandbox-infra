@@ -8,14 +8,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/cache"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/template"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/cache"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/template"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/server")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/server")
 
 func (s *ServerStore) TemplateBuildDelete(ctx context.Context, in *templatemanager.TemplateBuildDeleteRequest) (*emptypb.Empty, error) {
 	ctx, childSpan := tracer.Start(ctx, "template-delete-request", trace.WithAttributes(

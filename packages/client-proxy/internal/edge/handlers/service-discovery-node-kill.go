@@ -8,8 +8,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (a *APIStore) V1ServiceDiscoveryNodeKill(c *gin.Context) {

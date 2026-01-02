@@ -11,11 +11,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	dbtypes "github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
-	"github.com/e2b-dev/infra/packages/shared/pkg/templates"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	dbtypes "github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/templates"
 )
 
 type SeedData struct {
@@ -56,8 +56,8 @@ func run(ctx context.Context) int {
 	defer db.Close()
 
 	data := SeedData{
-		AccessToken: os.Getenv("TESTS_E2B_ACCESS_TOKEN"),
-		APIKey:      os.Getenv("TESTS_E2B_API_KEY"),
+		AccessToken: os.Getenv("TESTS_MORU_ACCESS_TOKEN"),
+		APIKey:      os.Getenv("TESTS_MORU_API_KEY"),
 		EnvID:       os.Getenv("TESTS_SANDBOX_TEMPLATE_ID"),
 		BuildID:     uuid.MustParse(os.Getenv("TESTS_SANDBOX_BUILD_ID")),
 		TeamID:      uuid.MustParse(os.Getenv("TESTS_SANDBOX_TEAM_ID")),
@@ -83,7 +83,7 @@ func seed(ctx context.Context, db *client.Client, data SeedData) error {
 	err := db.TestsRawSQL(ctx, `
 INSERT INTO auth.users (id, email)
 VALUES ($1, $2)
-`, data.UserID, "user-test-integration@e2b.dev")
+`, data.UserID, fmt.Sprintf("user-test-integration-%s@moru.io", data.UserID.String()[:8]))
 	if err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
 	}
@@ -120,7 +120,7 @@ VALUES ($1, $2)
 	err = db.TestsRawSQL(ctx, `
 INSERT INTO teams (id, email, name, tier, is_blocked)
 VALUES ($1, $2, $3, $4, $5)
-`, data.TeamID, "test-integration@e2b.dev", "E2B", "base_v1", false)
+`, data.TeamID, fmt.Sprintf("test-integration-%s@moru.io", data.TeamID.String()[:8]), "Moru", "base_v1", false)
 	if err != nil {
 		return fmt.Errorf("failed to create team: %w", err)
 	}
@@ -194,7 +194,7 @@ INSERT INTO env_builds (
 	total_disk_size_mb, kernel_version, firecracker_version, envd_version,
 	cluster_node_id, version, created_at, updated_at
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, CURRENT_TIMESTAMP)
-`, build.id, data.EnvID, "FROM e2bdev/base:latest", dbtypes.BuildStatusUploaded,
+`, build.id, data.EnvID, "FROM moru/base:latest", dbtypes.BuildStatusUploaded,
 				2, 512, 512, 1982, "vmlinux-6.1.102", "v1.12.1_d990331", "0.2.4",
 				"integration-test-node", templates.TemplateV1Version, build.createdAt)
 		} else {
@@ -204,7 +204,7 @@ INSERT INTO env_builds (
 	total_disk_size_mb, kernel_version, firecracker_version, envd_version,
 	cluster_node_id, version, updated_at
 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP)
-`, build.id, data.EnvID, "FROM e2bdev/base:latest", dbtypes.BuildStatusUploaded,
+`, build.id, data.EnvID, "FROM moru/base:latest", dbtypes.BuildStatusUploaded,
 				2, 512, 512, 1982, "vmlinux-6.1.102", "v1.12.1_d990331", "0.2.4",
 				"integration-test-node", templates.TemplateV1Version)
 		}

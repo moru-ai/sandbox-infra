@@ -16,11 +16,11 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sys/unix"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/filesystem")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/filesystem")
 
 const (
 	// creates an inode for every bytes-per-inode byte of space on the disk

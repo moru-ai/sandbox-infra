@@ -11,16 +11,16 @@ import (
 	"github.com/posthog/posthog-go"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	dbapi "github.com/e2b-dev/infra/packages/api/internal/db"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	templatemanager "github.com/e2b-dev/infra/packages/api/internal/template-manager"
-	apiutils "github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	dbtypes "github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/templates"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	dbapi "github.com/moru-ai/sandbox-infra/packages/api/internal/db"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/api/internal/template-manager"
+	apiutils "github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	dbtypes "github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/templates"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // CheckAndCancelConcurrentBuilds checks for concurrent builds and cancels them if found

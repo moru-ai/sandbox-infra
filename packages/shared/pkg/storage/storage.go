@@ -9,13 +9,13 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	"github.com/e2b-dev/infra/packages/shared/pkg/limit"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/limit"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 var (
-	tracer = otel.Tracer("github.com/e2b-dev/infra/packages/shared/pkg/storage")
+	tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage")
 	meter  = otel.GetMeterProvider().Meter("shared.pkg.storage")
 )
 

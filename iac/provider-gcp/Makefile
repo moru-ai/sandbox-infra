@@ -78,6 +78,32 @@ tf_vars := 	TF_VAR_environment=$(TERRAFORM_ENVIRONMENT) \
 	$(call tfvar, CLICKHOUSE_BOOT_DISK_TYPE) \
 	$(call tfvar, LOKI_BOOT_DISK_TYPE)
 
+# Extra root-module resources that must exist before deploying Nomad jobs.
+# `plan-without-jobs` uses Terraform `-target` to avoid applying Nomad jobs too early, but that also skips
+# non-module resources in this directory (e.g. secrets in api.tf). These targets ensure Step 9 produces
+# the secret containers you populate in Step 10.
+PRE_JOBS_TARGETS := \
+	-target=google_artifact_registry_repository.custom_environments_repository \
+	-target=google_artifact_registry_repository_iam_member.custom_environments_repository_member \
+	-target=google_secret_manager_secret.postgres_connection_string \
+	-target=google_secret_manager_secret.supabase_jwt_secrets \
+	-target=google_secret_manager_secret_version.supabase_jwt_secrets \
+	-target=google_secret_manager_secret.redis_cluster_url \
+	-target=google_secret_manager_secret_version.redis_cluster_url \
+	-target=google_secret_manager_secret.posthog_api_key \
+	-target=google_secret_manager_secret_version.posthog_api_key \
+	-target=google_secret_manager_secret.api_secret \
+	-target=google_secret_manager_secret_version.api_secret_value \
+	-target=google_secret_manager_secret.api_admin_token \
+	-target=google_secret_manager_secret_version.api_admin_token_value \
+	-target=google_secret_manager_secret.sandbox_access_token_hash_seed \
+	-target=google_secret_manager_secret_version.sandbox_access_token_hash_seed \
+	-target=google_secret_manager_secret.edge_api_secret \
+	-target=google_secret_manager_secret_version.edge_api_secret \
+	-target=google_service_account.docker_registry_service_account \
+	-target=google_artifact_registry_repository_iam_member.orchestration_repository_member \
+	-target=google_service_account_key.google_service_key
+
 .PHONY: init
 init:
 	@ printf "Initializing Terraform for env: `tput setaf 2``tput bold`$(ENV)`tput sgr0`\n\n"
@@ -143,7 +169,8 @@ plan-without-jobs:
 	-input=false \
 	-compact-warnings \
 	-parallelism=20 \
-	$(TARGET)
+	$(TARGET) \
+	$(PRE_JOBS_TARGETS)
 
 .PHONY: apply
 apply:

@@ -13,7 +13,7 @@ ifeq ($(PROVIDER),aws)
 	aws s3 cp builds/ "s3://${AWS_BUCKET_PREFIX}fc-versions/" --recursive --cache-control "no-cache, max-age=0"
 else
 	gsutil -h "Cache-Control:no-cache, max-age=0" cp -r "builds/*" "gs://${GCP_PROJECT_ID}-fc-versions"
-	@if [ "$$GCP_PROJECT_ID" = "e2b-prod" ]; then \
+	@if [ "$$GCP_PROJECT_ID" = "moru-479500" ]; then \
 	  echo "Uploading to public builds bucket..."; \
 	  gsutil -h "Cache-Control:no-cache, max-age=0" cp -r "builds/*" "gs://$$GCP_PROJECT_ID-public-builds/firecrackers/"; \
 	fi

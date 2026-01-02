@@ -1,7 +1,7 @@
 ENV := $(shell cat ../../../.last_used_env || echo "not-set")
 -include ../../../.env.${ENV}
 
-NETWORK_NAME := "e2b-build-cluster-disk-image"
+NETWORK_NAME := "moru-build-cluster-disk-image"
 
 tf_vars := TF_VAR_gcp_project_id=$(GCP_PROJECT_ID) \
 	TF_VAR_gcp_region=$(GCP_REGION) \

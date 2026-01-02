@@ -9,7 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 func StreamToChannel[Res any](ctx context.Context, stream *connect.ServerStreamForClient[Res]) (<-chan *Res, <-chan error) {
@@ -44,7 +44,7 @@ func SetSandboxHeader(header http.Header, hostname string, sandboxID string) err
 	if err != nil {
 		return fmt.Errorf("failed to extract domain from hostname: %w", err)
 	}
-	// Construct the host (<port>-<sandbox id>-<old client id>.e2b.app)
+	// Construct the host (<port>-<sandbox id>-<old client id>.moru.app)
 	host := fmt.Sprintf("%d-%s-00000000.%s", consts.DefaultEnvdServerPort, sandboxID, domain)
 
 	header.Set("Host", host)

@@ -9,11 +9,11 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	ut "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	ut "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 func (n *Node) GetSandboxes(ctx context.Context) ([]sandbox.Sandbox, error) {

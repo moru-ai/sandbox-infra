@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
 )
 
 func GetTeamsByUser(ctx context.Context, db *sqlcdb.Client, userID uuid.UUID) ([]*types.TeamWithDefault, error) {

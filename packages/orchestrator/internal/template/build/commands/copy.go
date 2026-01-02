@@ -15,14 +15,14 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/sandboxtools"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/paths"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/sandboxtools"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/paths"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type Copy struct {

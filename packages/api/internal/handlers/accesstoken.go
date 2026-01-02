@@ -9,11 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (a *APIStore) PostAccessTokens(c *gin.Context) {

@@ -11,9 +11,9 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sys/unix"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const (

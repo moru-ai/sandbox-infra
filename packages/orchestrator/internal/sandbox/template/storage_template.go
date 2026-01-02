@@ -8,15 +8,15 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	blockmetrics "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/build"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	blockmetrics "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/build"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type storageTemplate struct {

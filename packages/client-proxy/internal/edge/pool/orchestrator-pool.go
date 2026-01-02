@@ -10,10 +10,10 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	sd "github.com/e2b-dev/infra/packages/proxy/internal/service-discovery"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
-	"github.com/e2b-dev/infra/packages/shared/pkg/synchronization"
+	sd "github.com/moru-ai/sandbox-infra/packages/proxy/internal/service-discovery"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/synchronization"
 )
 
 type OrchestratorsPool struct {

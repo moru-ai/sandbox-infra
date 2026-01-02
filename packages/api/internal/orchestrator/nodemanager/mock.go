@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	grpclient "github.com/e2b-dev/infra/packages/api/internal/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	grpclient "github.com/moru-ai/sandbox-infra/packages/api/internal/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
 )
 
 // TestNode is an alias for Node used in testing

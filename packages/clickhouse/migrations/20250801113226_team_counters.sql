@@ -50,7 +50,7 @@ TO team_metrics_sum AS SELECT
  MetricName AS metric_name,
  Value AS value
 FROM metrics_sum
-WHERE MetricName LIKE 'e2b.team.%';
+WHERE MetricName LIKE 'moru.team.%';
 
 -- +goose Down
 DROP TABLE IF EXISTS "metrics_sum";

@@ -12,7 +12,7 @@ import (
 	containerregistry "github.com/google/go-containerregistry/pkg/v1"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 type GCPRemoteRepository struct {

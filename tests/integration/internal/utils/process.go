@@ -7,9 +7,9 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/process"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/process"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
 func ExecCommand(tb testing.TB, ctx context.Context, sbx *api.Sandbox, envdClient *setup.EnvdClient, command string, args ...string) error {

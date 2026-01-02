@@ -5,9 +5,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/launchdarkly/go-sdk-common/v3/ldcontext"
 
-	"github.com/e2b-dev/infra/packages/api/internal/auth"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/auth"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
 )
 
 func InitLaunchDarklyContext(c *gin.Context) {

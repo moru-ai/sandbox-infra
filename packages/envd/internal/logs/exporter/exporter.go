@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/host"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
 )
 
 const ExporterTimeout = 10 * time.Second

@@ -6,9 +6,9 @@ import (
 	"io"
 	"path/filepath"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	"github.com/e2b-dev/infra/packages/shared/pkg/id"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 type DiffType string

@@ -3,9 +3,9 @@ package buildcontext
 import (
 	"golang.org/x/sync/errgroup"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/config"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/config"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 type BuildContext struct {

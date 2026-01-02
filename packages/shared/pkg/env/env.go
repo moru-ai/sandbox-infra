@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 var environment = GetEnv("ENVIRONMENT", "prod")
@@ -18,7 +18,7 @@ func IsDevelopment() bool {
 }
 
 func IsDebug() bool {
-	return GetEnv("E2B_DEBUG", "false") == "true"
+	return GetEnv("MORU_DEBUG", "false") == "true"
 }
 
 func GetEnv(key, defaultValue string) string {

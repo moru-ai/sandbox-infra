@@ -17,11 +17,11 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	"github.com/e2b-dev/infra/packages/shared/pkg/limit"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/limit"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (

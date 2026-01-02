@@ -13,18 +13,18 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/metadata"
 
-	templatecache "github.com/e2b-dev/infra/packages/api/internal/cache/templates"
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	templatemanagergrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	templatecache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/templates"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	templatemanagergrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/api/internal/template-manager")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/api/internal/template-manager")
 
 var _ templateManagerClient = (*TemplateManager)(nil)
 

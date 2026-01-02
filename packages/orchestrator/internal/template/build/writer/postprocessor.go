@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 // postProcessor prints out "..." 5 seconds after every log

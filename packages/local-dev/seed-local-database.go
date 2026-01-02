@@ -11,9 +11,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
 )
 
 var (
@@ -160,7 +160,7 @@ ON CONFLICT (id) DO UPDATE SET
 	email = EXCLUDED.email,
 	name = EXCLUDED.name,
 	tier = EXCLUDED.tier
-`, teamID, "team@e2b-dev.local", "local-dev team", "base_v1", false)
+`, teamID, "team@moru.local", "local-dev team", "base_v1", false)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("failed to upsert team: %w", err)
 	}
@@ -174,7 +174,7 @@ INSERT INTO auth.users (id, email)
 VALUES ($1, $2)
 ON CONFLICT (id) DO UPDATE SET
 	email = EXCLUDED.email
-`, userID, "user@e2b-dev.local")
+`, userID, "user@moru.local")
 	if err != nil {
 		return fmt.Errorf("failed to upsert user: %w", err)
 	}

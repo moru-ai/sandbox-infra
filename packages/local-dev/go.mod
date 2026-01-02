@@ -1,14 +1,14 @@
-module github.com/e2b-dev/infra/packages/local-dev
+module github.com/moru-ai/sandbox-infra/packages/local-dev
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/shared v0.0.0 => ../shared
+replace github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
 
-replace github.com/e2b-dev/infra/packages/db v0.0.0 => ../db
+replace github.com/moru-ai/sandbox-infra/packages/db v0.0.0 => ../db
 
 require (
-	github.com/e2b-dev/infra/packages/db v0.0.0
-	github.com/e2b-dev/infra/packages/shared v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/stretchr/testify v1.11.1

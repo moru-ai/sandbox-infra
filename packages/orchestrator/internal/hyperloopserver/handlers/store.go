@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/hyperloop"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/hyperloop"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const CollectorExporterTimeout = 10 * time.Second

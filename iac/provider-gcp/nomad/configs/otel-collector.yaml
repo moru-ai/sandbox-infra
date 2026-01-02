@@ -239,7 +239,7 @@ processors:
       include:
         match_type: regexp
         metric_names:
-          - "e2b.*"
+          - "moru.*"
 
   metricstransform/single_cpu:
     transforms:

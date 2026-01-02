@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
 func TestList(t *testing.T) {

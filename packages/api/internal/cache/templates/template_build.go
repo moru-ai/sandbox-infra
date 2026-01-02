@@ -11,12 +11,12 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	sharedUtils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	sharedUtils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type TemplateBuildInfo struct {

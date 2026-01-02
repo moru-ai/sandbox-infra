@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	sbxtemplate "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	sbxtemplate "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 var _ SourceTemplateProvider = (*CacheSourceTemplateProvider)(nil)

@@ -10,9 +10,9 @@ import (
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	redis_utils "github.com/e2b-dev/infra/packages/shared/pkg/redis"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	redis_utils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/redis"
 )
 
 // Add stores a sandbox in Redis

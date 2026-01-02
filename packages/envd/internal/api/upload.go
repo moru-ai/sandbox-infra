@@ -15,10 +15,10 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
 )
 
 var ErrNoDiskSpace = fmt.Errorf("not enough disk space available")

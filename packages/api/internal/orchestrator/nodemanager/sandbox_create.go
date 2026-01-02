@@ -3,7 +3,7 @@ package nodemanager
 import (
 	"context"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
 )
 
 func (n *Node) SandboxCreate(ctx context.Context, sbxRequest *orchestrator.SandboxCreateRequest) error {

@@ -8,8 +8,8 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
 )
 
 func (s Service) Move(ctx context.Context, req *connect.Request[rpc.MoveRequest]) (*connect.Response[rpc.MoveResponse], error) {

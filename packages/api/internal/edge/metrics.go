@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	apiedge "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	apiedge "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
 )
 
 func GetClusterSandboxMetrics(ctx context.Context, pool *Pool, sandboxID string, teamID string, clusterID uuid.UUID, qStart *int64, qEnd *int64) ([]api.SandboxMetric, *api.APIError) {

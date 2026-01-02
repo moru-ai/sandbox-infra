@@ -12,10 +12,10 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (
@@ -24,7 +24,7 @@ const (
 )
 
 var (
-	meter = otel.Meter("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/network")
+	meter = otel.Meter("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/network")
 
 	newSlotsAvailableCounter = utils.Must(meter.Int64UpDownCounter("orchestrator.network.slots_pool.new",
 		metric.WithDescription("Number of new network slots ready to be used."),

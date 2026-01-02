@@ -14,15 +14,15 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const fileCopyTimeout = 10 * time.Minute
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/sandboxtools")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/sandboxtools")
 
 func CopyFile(
 	ctx context.Context,

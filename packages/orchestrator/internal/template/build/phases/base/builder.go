@@ -14,28 +14,28 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/fc"
-	sbxtemplate "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/config"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/filesystem"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/layer"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/sandboxtools"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	artifactsregistry "github.com/e2b-dev/infra/packages/shared/pkg/artifacts-registry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/dockerhub"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	"github.com/e2b-dev/infra/packages/shared/pkg/id"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/fc"
+	sbxtemplate "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/config"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/layer"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/sandboxtools"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	artifactsregistry "github.com/moru-ai/sandbox-infra/packages/shared/pkg/artifacts-registry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/dockerhub"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (
@@ -46,7 +46,7 @@ const (
 	defaultUser = "root"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases/base")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases/base")
 
 type BaseBuilder struct {
 	buildcontext.BuildContext

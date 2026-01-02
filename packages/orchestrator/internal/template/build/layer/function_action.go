@@ -3,8 +3,8 @@ package layer
 import (
 	"context"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
 )
 
 type FunctionActionFn func(ctx context.Context, sbx *sandbox.Sandbox, cmdMeta metadata.Template) (metadata.Template, error)

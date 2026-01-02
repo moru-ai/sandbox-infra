@@ -31,14 +31,13 @@ jobs:
         working-directory: tests
         run: |
           npm install
-          npm install -g @e2b/cli
 
       - name: Test build
         working-directory: tests
         run: make test
         env:
-          E2B_API_KEY: ${{ secrets.E2B_API_KEY }}
-          E2B_ACCESS_TOKEN: ${{ secrets.E2B_ACCESS_TOKEN }}
+          MORU_API_KEY: ${{ secrets.MORU_API_KEY }}
+          MORU_ACCESS_TOKEN: ${{ secrets.MORU_ACCESS_TOKEN }}
 
       - name: Release Failed - Slack Notification
         uses: rtCamp/action-slack-notify@v2

@@ -77,7 +77,7 @@ async function getOrgVerifiedEmail(username) {
     );
 
     const emails = data.user?.organizationVerifiedDomainEmails || [];
-    const verified = emails.find((email) => email.endsWith("@e2b.dev"));
+    const verified = emails.find((email) => email.endsWith("@moru.io"));
     if (verified) {
       console.log(`Found org-verified email ${verified} for ${username}`);
     }
@@ -94,8 +94,8 @@ async function getSlackUserId(githubUsername) {
   }
 
   const email = await getGitHubUserEmail(githubUsername);
-  if (!email || !email.endsWith("@e2b.dev")) {
-    console.log(`No @e2b.dev email found for ${githubUsername}`);
+  if (!email || !email.endsWith("@moru.io")) {
+    console.log(`No @moru.io email found for ${githubUsername}`);
     return null;
   }
 

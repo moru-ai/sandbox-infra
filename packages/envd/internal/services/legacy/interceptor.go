@@ -10,7 +10,7 @@ import (
 
 const brokenUserAgent = "connect-python"
 
-const notifyHeader = "X-E2B-Legacy-SDK"
+const notifyHeader = "X-Moru-Legacy-SDK"
 
 func shouldHideChanges(request http.Header, response http.Header) bool {
 	if request.Get("user-agent") != brokenUserAgent {

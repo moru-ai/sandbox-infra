@@ -13,22 +13,22 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	teamtypes "github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/placement"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	feature_flags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/machineinfo"
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	ut "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	teamtypes "github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/placement"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	feature_flags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/machineinfo"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	ut "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // buildNetworkConfig constructs the orchestrator network configuration from the input parameters
@@ -119,8 +119,8 @@ func (o *Orchestrator) CreateSandbox(
 			return sandbox.Sandbox{}, &api.APIError{
 				Code: http.StatusTooManyRequests,
 				ClientMsg: fmt.Sprintf(
-					"you have reached the maximum number of concurrent E2B sandboxes (%d). If you need more, "+
-						"please contact us at 'https://e2b.dev/docs/getting-help'", totalConcurrentInstances),
+					"you have reached the maximum number of concurrent sandboxes (%d). If you need more, "+
+						"please contact us at 'https://moru.io/docs/getting-help'", totalConcurrentInstances),
 				Err: fmt.Errorf("team '%s' has reached the maximum number of instances (%d)", team.ID, totalConcurrentInstances),
 			}
 		default:

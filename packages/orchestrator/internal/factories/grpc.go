@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/keepalive"
 
-	e2bgrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	morugrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func NewGRPCServer(tel *telemetry.Client) *grpc.Server {
@@ -38,7 +38,7 @@ func NewGRPCServer(tel *telemetry.Client) *grpc.Server {
 			Time:    15 * time.Second, // Server sends keepalive pings every 15s
 			Timeout: 5 * time.Second,  // Wait 5s for response before considering dead
 		}),
-		grpc.StatsHandler(e2bgrpc.NewStatsWrapper(otelgrpc.NewServerHandler(
+		grpc.StatsHandler(morugrpc.NewStatsWrapper(otelgrpc.NewServerHandler(
 			otelgrpc.WithTracerProvider(tel.TracerProvider),
 			otelgrpc.WithMeterProvider(tel.MeterProvider),
 		))),

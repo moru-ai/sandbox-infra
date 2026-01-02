@@ -12,10 +12,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/template"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/tracking"
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/template"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/tracking"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
 )
 
 type ProxyClient struct {

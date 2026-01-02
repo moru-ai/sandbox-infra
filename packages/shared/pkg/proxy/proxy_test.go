@@ -18,9 +18,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // testBackend represents a test backend server
@@ -756,7 +756,7 @@ func TestChangeResponseHeader(t *testing.T) {
 	// create request
 	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, proxyURL.String(), nil)
 	req.Header.Set("Host", fmt.Sprintf("localhost:%d", proxyPort))
-	req.Header.Set("e2b-testing", "test123")
+	req.Header.Set("moru-testing", "test123")
 	require.NoError(t, err)
 
 	var rsp *http.Response
@@ -792,6 +792,6 @@ func TestChangeResponseHeader(t *testing.T) {
 
 	assert.Equal(t, "internal", data.Tag)
 	assert.Equal(t, fmt.Sprintf("127.0.0.1:%d", maskedPort), data.Host)
-	assert.Equal(t, "test123", data.Headers.Get("E2b-Testing"))
+	assert.Equal(t, "test123", data.Headers.Get("Moru-Testing"))
 	assert.Equal(t, fmt.Sprintf("127.0.0.1:%d", proxyPort), data.Headers.Get("X-Forwarded-Host"))
 }

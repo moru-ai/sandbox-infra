@@ -9,7 +9,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/name"
 	containerregistry "github.com/google/go-containerregistry/pkg/v1"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
 )
 
 type RemoteRepositoryProvider string

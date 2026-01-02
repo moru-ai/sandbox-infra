@@ -7,7 +7,7 @@ import (
 
 	"connectrpc.com/connect"
 
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 )
 
 func (s *Service) SendSignal(

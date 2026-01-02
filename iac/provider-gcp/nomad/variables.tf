@@ -317,7 +317,7 @@ variable "clickhouse_resources_cpu_count" {
 
 variable "clickhouse_username" {
   type    = string
-  default = "e2b"
+  default = "moru"
 }
 
 variable "clickhouse_database" {

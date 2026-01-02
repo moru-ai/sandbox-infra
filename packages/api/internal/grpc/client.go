@@ -5,9 +5,9 @@ import (
 
 	"google.golang.org/grpc"
 
-	orchestratorgrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	templatemanagergrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
+	orchestratorgrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	templatemanagergrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
 )
 
 type GRPCClient struct {

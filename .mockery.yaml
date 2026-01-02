@@ -1,5 +1,5 @@
 packages:
-  github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem/filesystemconnect:
+  github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem/filesystemconnect:
     interfaces:
       FilesystemHandler:
         config:
@@ -7,7 +7,7 @@ packages:
           filename: mocks.go
           pkgname: filesystemconnectmocks
 
-  github.com/e2b-dev/infra/packages/shared/pkg/storage:
+  github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage:
     interfaces:
       ObjectProvider:
         config:

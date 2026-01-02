@@ -9,9 +9,10 @@ terraform.tfvars
 terraform.tfstate
 terraform.tfstate.backup
 **/.tfplan.*
-tests/periodic-test/build-template/e2b.toml
+tests/periodic-test/build-template/moru.toml
 .air
 go.work.sum
 .infisical.json
 .vscode/mise-tools
+.claude/settings.local.json
 /packages/fc-kernels

@@ -12,11 +12,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/rootfs")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/rootfs")
 
 type Provider interface {
 	Start(ctx context.Context) error

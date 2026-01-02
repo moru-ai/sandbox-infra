@@ -9,9 +9,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
 )
 
 func CreateUser(t *testing.T, db *client.Client) uuid.UUID {
@@ -22,7 +22,7 @@ func CreateUser(t *testing.T, db *client.Client) uuid.UUID {
 	err := db.TestsRawSQL(t.Context(), `
 INSERT INTO auth.users (id, email)
 VALUES ($1, $2)
-`, userID, fmt.Sprintf("user-test-integration-%s@e2b.dev", userID))
+`, userID, fmt.Sprintf("user-test-integration-%s@moru.io", userID))
 	require.NoError(t, err)
 
 	t.Cleanup(func() {

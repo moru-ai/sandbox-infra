@@ -6,10 +6,10 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	sbxlogger "github.com/e2b-dev/infra/packages/shared/pkg/logger/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	sbxlogger "github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger/sandbox"
 )
 
 func (o *Orchestrator) RemoveSandbox(ctx context.Context, sbx sandbox.Sandbox, stateAction sandbox.StateAction) error {

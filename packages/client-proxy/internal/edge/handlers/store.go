@@ -9,25 +9,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 
-	clickhouse "github.com/e2b-dev/infra/packages/clickhouse/pkg"
-	"github.com/e2b-dev/infra/packages/proxy/internal/cfg"
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/info"
-	loggerprovider "github.com/e2b-dev/infra/packages/proxy/internal/edge/logger-provider"
-	metricsprovider "github.com/e2b-dev/infra/packages/proxy/internal/edge/metrics-provider"
-	e2borchestrators "github.com/e2b-dev/infra/packages/proxy/internal/edge/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	catalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/info"
+	loggerprovider "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/logger-provider"
+	metricsprovider "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/metrics-provider"
+	moruorchestrators "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	catalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/client-proxy/internal/edge/handlers")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/client-proxy/internal/edge/handlers")
 
 type APIStore struct {
 	logger                      logger.Logger
 	info                        *info.ServiceInfo
-	orchestratorPool            *e2borchestrators.OrchestratorsPool
+	orchestratorPool            *moruorchestrators.OrchestratorsPool
 	sandboxes                   catalog.SandboxesCatalog
 	queryLogsProvider           loggerprovider.LogsQueryProvider
 	querySandboxMetricsProvider clickhouse.SandboxQueriesProvider
@@ -41,7 +41,7 @@ func NewStore(
 	ctx context.Context,
 	l logger.Logger,
 	info *info.ServiceInfo,
-	orchestratorsPool *e2borchestrators.OrchestratorsPool,
+	orchestratorsPool *moruorchestrators.OrchestratorsPool,
 	catalog catalog.SandboxesCatalog,
 	config cfg.Config,
 ) (*APIStore, error) {

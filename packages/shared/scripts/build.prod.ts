@@ -1,4 +1,4 @@
-import { Template } from "e2b";
+import { Template } from "@moru-ai/core";
 import { template } from "./template.js";
 
 async function main() {

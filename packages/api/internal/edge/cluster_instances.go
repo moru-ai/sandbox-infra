@@ -13,11 +13,11 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/machineinfo"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/machineinfo"
 )
 
 type ClusterInstance struct {

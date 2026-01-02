@@ -6,9 +6,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	e2bcatalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	morucatalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
 )
 
 func (o *Orchestrator) addSandboxToRoutingTable(ctx context.Context, sandbox sandbox.Sandbox) {
@@ -16,7 +16,7 @@ func (o *Orchestrator) addSandboxToRoutingTable(ctx context.Context, sandbox san
 	if node == nil {
 		logger.L().Error(ctx, "failed to get node", logger.WithNodeID(sandbox.NodeID))
 	} else {
-		info := e2bcatalog.SandboxInfo{
+		info := morucatalog.SandboxInfo{
 			OrchestratorID: node.Metadata().ServiceInstanceID,
 			OrchestratorIP: node.IPAddress,
 			ExecutionID:    sandbox.ExecutionID,

@@ -12,12 +12,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
 
-	grpclient "github.com/e2b-dev/infra/packages/api/internal/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	orchestratorgrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	templatemanagergrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	grpclient "github.com/moru-ai/sandbox-infra/packages/api/internal/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	orchestratorgrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	templatemanagergrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 type clientAuthorization struct {

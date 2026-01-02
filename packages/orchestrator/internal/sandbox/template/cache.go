@@ -12,14 +12,14 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	blockmetrics "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/build"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	blockmetrics "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/build"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // How long to keep the template in the cache since the last access.
@@ -32,7 +32,7 @@ const (
 )
 
 var (
-	tracer     = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template")
+	tracer     = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template")
 	meter      = otel.GetMeterProvider().Meter("orchestrator.internal.sandbox.template")
 	hitsMetric = utils.Must(meter.Int64Counter("orchestrator.templates.cache.hits",
 		metric.WithDescription("Requests for templates that were already cached")))

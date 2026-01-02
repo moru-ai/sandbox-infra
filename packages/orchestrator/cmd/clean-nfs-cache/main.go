@@ -17,13 +17,13 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/cmd/clean-nfs-cache/ex"
-	"github.com/e2b-dev/infra/packages/orchestrator/cmd/clean-nfs-cache/pkg"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/cmd/clean-nfs-cache/ex"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/cmd/clean-nfs-cache/pkg"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (

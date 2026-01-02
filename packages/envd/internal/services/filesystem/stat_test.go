@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
 )
 
 func TestStat(t *testing.T) {

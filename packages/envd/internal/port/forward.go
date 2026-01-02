@@ -15,7 +15,7 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/services/cgroups"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/cgroups"
 )
 
 type PortState string

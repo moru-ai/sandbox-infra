@@ -10,7 +10,7 @@ SEARCH_DIR="packages/"
 processed=0
 skipped=0
 
-readonly prefix="github.com/e2b-dev/infra/packages"
+readonly prefix="github.com/moru-ai/sandbox-infra/packages"
 readonly search_pattern='var tracer = otel\.Tracer(.*'
 
 echo "Starting tracer replacement in directory: $SEARCH_DIR"

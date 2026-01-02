@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
 )
 
 func GetTestDBClient(tb testing.TB) *client.Client {

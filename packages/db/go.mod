@@ -1,8 +1,8 @@
-module github.com/e2b-dev/infra/packages/db
+module github.com/moru-ai/sandbox-infra/packages/db
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/shared => ../shared
+replace github.com/moru-ai/sandbox-infra/packages/shared => ../shared
 
 tool (
 	github.com/pressly/goose/v3/cmd/goose
@@ -10,7 +10,7 @@ tool (
 )
 
 require (
-	github.com/e2b-dev/infra/packages/shared v0.0.0-20250324174051-3fb806938dc1
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0-20250324174051-3fb806938dc1
 	github.com/exaring/otelpgx v0.9.3
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.4

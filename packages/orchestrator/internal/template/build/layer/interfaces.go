@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	sbxtemplate "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	sbxtemplate "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
 )
 
 const (

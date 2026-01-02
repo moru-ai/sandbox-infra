@@ -11,16 +11,16 @@ import (
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc/metadata"
 
-	grpclient "github.com/e2b-dev/infra/packages/api/internal/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
-	"github.com/e2b-dev/infra/packages/shared/pkg/synchronization"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	grpclient "github.com/moru-ai/sandbox-infra/packages/api/internal/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/synchronization"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/api/internal/edge")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/api/internal/edge")
 
 type Cluster struct {
 	ID uuid.UUID

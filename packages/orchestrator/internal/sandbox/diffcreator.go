@@ -4,8 +4,8 @@ import (
 	"context"
 	"io"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/rootfs"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/rootfs"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
 type DiffCreator interface {

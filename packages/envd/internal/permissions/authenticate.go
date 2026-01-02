@@ -8,7 +8,7 @@ import (
 	"connectrpc.com/authn"
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
 )
 
 func AuthenticateUsername(_ context.Context, req authn.Request) (any, error) {

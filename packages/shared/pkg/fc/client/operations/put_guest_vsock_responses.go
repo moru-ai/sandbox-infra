@@ -13,7 +13,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/strfmt"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/fc/models"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/fc/models"
 )
 
 // PutGuestVsockReader is a Reader for the PutGuestVsock structure.

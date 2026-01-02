@@ -4,7 +4,7 @@ import (
 	"github.com/launchdarkly/go-sdk-common/v3/ldcontext"
 	"github.com/launchdarkly/go-sdk-common/v3/ldvalue"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
 )
 
 // kinds
@@ -70,8 +70,8 @@ func newBoolFlag(name string, fallback bool) BoolFlag {
 }
 
 var (
-	MetricsWriteFlagName               = newBoolFlag("sandbox-metrics-write", env.IsDevelopment())
-	MetricsReadFlagName                = newBoolFlag("sandbox-metrics-read", env.IsDevelopment())
+	MetricsWriteFlagName               = newBoolFlag("sandbox-metrics-write", true)
+	MetricsReadFlagName                = newBoolFlag("sandbox-metrics-read", true)
 	SnapshotFeatureFlagName            = newBoolFlag("use-nfs-for-snapshots", env.IsDevelopment())
 	TemplateFeatureFlagName            = newBoolFlag("use-nfs-for-templates", env.IsDevelopment())
 	BestOfKCanFit                      = newBoolFlag("best-of-k-can-fit", true)

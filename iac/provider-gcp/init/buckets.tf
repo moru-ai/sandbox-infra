@@ -193,7 +193,7 @@ resource "google_storage_bucket_iam_member" "fc_template_bucket_iam_reader" {
 }
 
 resource "google_storage_bucket" "public_builds_storage_bucket" {
-  count    = var.gcp_project_id == "e2b-prod" ? 1 : 0
+  count    = var.gcp_project_id == "moru-prod" ? 1 : 0
   name     = "${var.gcp_project_id}-public-builds"
   location = var.gcp_region
 
@@ -208,7 +208,7 @@ resource "google_storage_bucket" "public_builds_storage_bucket" {
 }
 
 resource "google_storage_bucket_iam_member" "public_builds_storage_bucket_iam" {
-  count  = var.gcp_project_id == "e2b-prod" ? 1 : 0
+  count  = var.gcp_project_id == "moru-prod" ? 1 : 0
   bucket = google_storage_bucket.public_builds_storage_bucket[0].name
   role   = "roles/storage.objectViewer"
   member = "allUsers"

@@ -11,10 +11,10 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/process/handler"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/process/handler"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 )
 
 func (s *Service) InitializeStartProcess(ctx context.Context, user *user.User, req *rpc.StartRequest) error {

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/constants"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/constants"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
 )
 
 func LimitResources(limits *types.TeamLimits, cpuCount, memoryMB *int32) (int64, int64, *api.APIError) {

@@ -16,8 +16,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	e2bgrpcorchestratorinfo "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	morugrpcorchestratorinfo "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type OrchestratorStatus string
@@ -41,7 +41,7 @@ type OrchestratorInstanceInfo struct {
 
 	Host  string
 	IP    string
-	Roles []e2bgrpcorchestratorinfo.ServiceInfoRole
+	Roles []morugrpcorchestratorinfo.ServiceInfoRole
 }
 
 type OrchestratorInstance struct {
@@ -56,7 +56,7 @@ type OrchestratorInstance struct {
 }
 
 type OrchestratorGRPCClient struct {
-	Info       e2bgrpcorchestratorinfo.InfoServiceClient
+	Info       morugrpcorchestratorinfo.InfoServiceClient
 	Connection *grpc.ClientConn
 }
 
@@ -148,13 +148,13 @@ func (o *OrchestratorInstance) Close() error {
 	return nil
 }
 
-func getMappedStatus(ctx context.Context, s e2bgrpcorchestratorinfo.ServiceInfoStatus) OrchestratorStatus {
+func getMappedStatus(ctx context.Context, s morugrpcorchestratorinfo.ServiceInfoStatus) OrchestratorStatus {
 	switch s {
-	case e2bgrpcorchestratorinfo.ServiceInfoStatus_Healthy:
+	case morugrpcorchestratorinfo.ServiceInfoStatus_Healthy:
 		return OrchestratorStatusHealthy
-	case e2bgrpcorchestratorinfo.ServiceInfoStatus_Draining:
+	case morugrpcorchestratorinfo.ServiceInfoStatus_Draining:
 		return OrchestratorStatusDraining
-	case e2bgrpcorchestratorinfo.ServiceInfoStatus_Unhealthy:
+	case morugrpcorchestratorinfo.ServiceInfoStatus_Unhealthy:
 		return OrchestratorStatusUnhealthy
 	}
 
@@ -178,7 +178,7 @@ func newClient(tracerProvider trace.TracerProvider, meterProvider metric.MeterPr
 	}
 
 	return &OrchestratorGRPCClient{
-		Info:       e2bgrpcorchestratorinfo.NewInfoServiceClient(conn),
+		Info:       morugrpcorchestratorinfo.NewInfoServiceClient(conn),
 		Connection: conn,
 	}, nil
 }

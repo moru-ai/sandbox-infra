@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/service"
-	e2borchestratorinfo "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	e2bHealth "github.com/e2b-dev/infra/packages/shared/pkg/health"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/service"
+	moruorchestratorinfo "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	moruHealth "github.com/moru-ai/sandbox-infra/packages/shared/pkg/health"
 )
 
 type Healthcheck struct {
@@ -35,15 +35,15 @@ func (h *Healthcheck) CreateHandler() http.Handler {
 	return routeMux
 }
 
-func (h *Healthcheck) getStatus() e2bHealth.Status {
+func (h *Healthcheck) getStatus() moruHealth.Status {
 	switch h.info.GetStatus() {
-	case e2borchestratorinfo.ServiceInfoStatus_Healthy:
-		return e2bHealth.Healthy
-	case e2borchestratorinfo.ServiceInfoStatus_Draining:
-		return e2bHealth.Draining
+	case moruorchestratorinfo.ServiceInfoStatus_Healthy:
+		return moruHealth.Healthy
+	case moruorchestratorinfo.ServiceInfoStatus_Draining:
+		return moruHealth.Draining
 	}
 
-	return e2bHealth.Unhealthy
+	return moruHealth.Unhealthy
 }
 
 func (h *Healthcheck) healthHandler(w http.ResponseWriter, _ *http.Request) {
@@ -51,10 +51,10 @@ func (h *Healthcheck) healthHandler(w http.ResponseWriter, _ *http.Request) {
 	defer h.mu.RUnlock()
 
 	status := h.getStatus()
-	response := e2bHealth.Response{Status: status, Version: h.info.SourceCommit}
+	response := moruHealth.Response{Status: status, Version: h.info.SourceCommit}
 
 	w.Header().Set("Content-Type", "application/json")
-	if status == e2bHealth.Unhealthy {
+	if status == moruHealth.Unhealthy {
 		w.WriteHeader(http.StatusServiceUnavailable)
 	} else {
 		w.WriteHeader(http.StatusOK)

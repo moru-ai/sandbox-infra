@@ -1,4 +1,4 @@
-module github.com/e2b-dev/infra/packages/shared
+module github.com/moru-ai/sandbox-infra/packages/shared
 
 go 1.25.4
 
@@ -17,6 +17,9 @@ exclude k8s.io/client-go v8.0.0+incompatible
 // https://github.com/grafana/loki/issues/2826
 replace github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.47.2-0.20231010075449-4b9c19fe5510
 
+// Local workspace packages - used during Docker builds
+replace github.com/moru-ai/sandbox-infra/packages/db => ../db
+
 tool github.com/go-swagger/go-swagger/cmd/swagger
 
 require (
@@ -30,7 +33,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.79.3
 	github.com/bits-and-blooms/bitset v1.22.0
 	github.com/dchest/uniuri v1.2.0
-	github.com/e2b-dev/infra/packages/db v0.0.0-20251013083250-eb6cd250d671
+	github.com/moru-ai/sandbox-infra/packages/db v0.0.0-20251013083250-eb6cd250d671
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-gonic/gin v1.10.1
 	github.com/go-openapi/errors v0.22.0

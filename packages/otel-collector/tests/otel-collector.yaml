@@ -21,7 +21,7 @@ processors:
       include:
         match_type: regexp
         metric_names:
-          - "e2b.*"
+          - "moru.*"
 extensions:
   health_check:
     endpoint: 0.0.0.0:13133

@@ -1,4 +1,4 @@
-module github.com/e2b-dev/infra/packages/proxy
+module github.com/moru-ai/sandbox-infra/packages/proxy
 
 go 1.25.4
 
@@ -20,14 +20,14 @@ exclude k8s.io/client-go v8.0.0+incompatible
 replace github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.47.2-0.20231010075449-4b9c19fe5510
 
 replace (
-	github.com/e2b-dev/infra/packages/clickhouse v0.0.0 => ../clickhouse
-	github.com/e2b-dev/infra/packages/shared v0.0.0 => ../shared
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0 => ../clickhouse
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
 )
 
 require (
 	github.com/caarlos0/env/v11 v11.3.1
-	github.com/e2b-dev/infra/packages/clickhouse v0.0.0
-	github.com/e2b-dev/infra/packages/shared v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/getkin/kin-openapi v0.132.0
 	github.com/gin-contrib/size v1.0.2
 	github.com/gin-contrib/zap v1.1.5

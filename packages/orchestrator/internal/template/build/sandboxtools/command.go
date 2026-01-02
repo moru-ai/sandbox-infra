@@ -14,14 +14,14 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/process"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/process/processconnect"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/process"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/process/processconnect"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const commandHardTimeout = 1 * time.Hour

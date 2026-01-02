@@ -7,10 +7,10 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	sbxtemplate "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/config"
-	"github.com/e2b-dev/infra/packages/shared/pkg/id"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	sbxtemplate "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/config"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
 )
 
 // ResumeSandbox creates sandboxes for resuming existing templates

@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/filesystem"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/process"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
-	"github.com/e2b-dev/infra/tests/integration/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/process"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/utils"
 )
 
 const (

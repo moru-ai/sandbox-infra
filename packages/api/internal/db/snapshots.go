@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 )
 
 var ErrSnapshotNotFound = errors.New("no snapshot found")

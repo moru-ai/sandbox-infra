@@ -8,8 +8,8 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/host"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs/exporter"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs/exporter"
 )
 
 func NewLogger(ctx context.Context, isNotFC bool, mmdsChan <-chan *host.MMDSOpts) *zerolog.Logger {

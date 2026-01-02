@@ -22,8 +22,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
 )
 
 const (

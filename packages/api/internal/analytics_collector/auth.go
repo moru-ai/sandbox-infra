@@ -3,7 +3,7 @@ package analyticscollector
 import (
 	"context"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
 )
 
 type gRPCApiKey struct {

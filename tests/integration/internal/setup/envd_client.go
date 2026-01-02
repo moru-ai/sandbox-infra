@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/filesystem/filesystemconnect"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/process/processconnect"
-	"github.com/e2b-dev/infra/tests/integration/internal/envd/api"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/filesystem/filesystemconnect"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/process/processconnect"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/envd/api"
 )
 
 type EnvdClient struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/tklauser/go-sysconf"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // IOV_MAX is the limit of the vectors that can be passed in a single ioctl call.

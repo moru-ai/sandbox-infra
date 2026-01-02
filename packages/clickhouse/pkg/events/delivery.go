@@ -10,10 +10,10 @@ import (
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/clickhouse/pkg/batcher"
-	"github.com/e2b-dev/infra/packages/shared/pkg/events"
-	flags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg/batcher"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/events"
+	flags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const InsertSandboxEventQuery = `INSERT INTO sandbox_events

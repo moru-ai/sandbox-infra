@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS "public"."addons"
 ALTER TABLE "public"."addons" ENABLE ROW LEVEL SECURITY;
 
 -- Create system user
-INSERT INTO "auth"."users" (id, email) VALUES ('00000000-0000-0000-0000-000000000000', 'system@e2b.dev');
+INSERT INTO "auth"."users" (id, email) VALUES ('00000000-0000-0000-0000-000000000000', 'system@moru.io');
 
 -- Create index on team_id for faster lookups
 CREATE INDEX IF NOT EXISTS "addons_team_id_idx" ON "public"."addons" ("team_id");

@@ -6,7 +6,7 @@ import (
 	"github.com/bsm/redislock"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
 )
 
 const (

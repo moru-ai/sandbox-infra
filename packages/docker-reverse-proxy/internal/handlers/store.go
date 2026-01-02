@@ -9,9 +9,9 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/cache"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/cache"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 type APIStore struct {

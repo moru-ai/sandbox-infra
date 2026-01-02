@@ -7,7 +7,7 @@ import (
 
 	"github.com/caarlos0/env/v11"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/network"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/network"
 )
 
 type BuilderConfig struct {

@@ -1,7 +1,7 @@
 package template_manager
 
 import (
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
 )
 
 type BuildClient struct {

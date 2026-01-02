@@ -9,16 +9,16 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/paths"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/paths"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 const hashingVersion = "v2"
 
 const minimalCachedTemplateVersion = 2
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache")
 
 type Template struct {
 	BuildID string `json:"build_id"`

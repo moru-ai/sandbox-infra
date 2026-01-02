@@ -26,6 +26,6 @@ type SandboxesCatalog interface {
 
 type CatalogProvider string
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog")
 
 var ErrSandboxNotFound = errors.New("sandbox not found")

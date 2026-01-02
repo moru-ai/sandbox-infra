@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	clickhouseUtils "github.com/e2b-dev/infra/packages/clickhouse/pkg/utils"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	clickhouseUtils "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg/utils"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (a *APIStore) V1SandboxMetrics(c *gin.Context, sandboxID string, params api.V1SandboxMetricsParams) {

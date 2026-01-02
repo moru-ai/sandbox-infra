@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 func (sb *StepBuilder) Hash(_ context.Context, sourceLayer phases.LayerResult) (string, error) {

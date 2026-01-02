@@ -16,17 +16,17 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/cors"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/api"
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
-	"github.com/e2b-dev/infra/packages/envd/internal/host"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	publicport "github.com/e2b-dev/infra/packages/envd/internal/port"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/cgroups"
-	filesystemRpc "github.com/e2b-dev/infra/packages/envd/internal/services/filesystem"
-	processRpc "github.com/e2b-dev/infra/packages/envd/internal/services/process"
-	processSpec "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	publicport "github.com/moru-ai/sandbox-infra/packages/envd/internal/port"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/cgroups"
+	filesystemRpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/filesystem"
+	processRpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/process"
+	processSpec "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
 )
 
 const (
@@ -148,8 +148,8 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	if err := os.MkdirAll(host.E2BRunDir, 0o755); err != nil {
-		fmt.Fprintf(os.Stderr, "error creating E2B run directory: %v\n", err)
+	if err := os.MkdirAll(host.MoruRunDir, 0o755); err != nil {
+		fmt.Fprintf(os.Stderr, "error creating Moru run directory: %v\n", err)
 	}
 
 	defaults := &execcontext.Defaults{
@@ -157,8 +157,8 @@ func main() {
 		EnvVars: utils.NewMap[string, string](),
 	}
 	isFCBoolStr := strconv.FormatBool(!isNotFC)
-	defaults.EnvVars.Store("E2B_SANDBOX", isFCBoolStr)
-	if err := os.WriteFile(filepath.Join(host.E2BRunDir, ".E2B_SANDBOX"), []byte(isFCBoolStr), 0o444); err != nil {
+	defaults.EnvVars.Store("MORU_SANDBOX", isFCBoolStr)
+	if err := os.WriteFile(filepath.Join(host.MoruRunDir, ".MORU_SANDBOX"), []byte(isFCBoolStr), 0o444); err != nil {
 		fmt.Fprintf(os.Stderr, "error writing sandbox file: %v\n", err)
 	}
 

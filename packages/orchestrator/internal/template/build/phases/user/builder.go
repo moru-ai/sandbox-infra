@@ -6,17 +6,17 @@ import (
 
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/commands"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/layer"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases/steps"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache"
-	template_manager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/commands"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/layer"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases/steps"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache"
+	template_manager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type UserBuilder struct {

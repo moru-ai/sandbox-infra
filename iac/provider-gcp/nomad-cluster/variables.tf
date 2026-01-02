@@ -15,7 +15,7 @@ variable "cluster_tag_name" {
 
 variable "server_image_family" {
   type    = string
-  default = "e2b-orch"
+  default = "mru-orch"
 }
 
 variable "server_cluster_name" {
@@ -33,7 +33,7 @@ variable "server_machine_type" {
 
 variable "api_image_family" {
   type    = string
-  default = "e2b-orch"
+  default = "mru-orch"
 }
 
 variable "api_cluster_size" {
@@ -54,7 +54,7 @@ variable "loki_machine_type" {
 
 variable "build_image_family" {
   type    = string
-  default = "e2b-orch"
+  default = "mru-orch"
 }
 
 variable "build_cluster_size" {
@@ -110,7 +110,7 @@ variable "docker_reverse_proxy_port" {
 
 variable "client_image_family" {
   type    = string
-  default = "e2b-orch"
+  default = "mru-orch"
 }
 
 variable "client_cluster_name" {
@@ -171,12 +171,12 @@ variable "docker_contexts_bucket_name" {
 
 variable "domain_name" {
   type        = string
-  description = "The domain name where e2b will run"
+  description = "The domain name where moru will run"
 }
 
 variable "additional_domains" {
   type        = list(string)
-  description = "Additional domains which can be used to access the e2b cluster"
+  description = "Additional domains which can be used to access the moru cluster"
 }
 
 variable "cluster_setup_bucket_name" {

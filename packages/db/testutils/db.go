@@ -14,7 +14,7 @@ import (
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	db "github.com/e2b-dev/infra/packages/db/client"
+	db "github.com/moru-ai/sandbox-infra/packages/db/client"
 )
 
 const (

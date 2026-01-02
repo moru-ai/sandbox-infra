@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	txtTemplate "text/template"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 // startScriptArgs represents the arguments for the start script template

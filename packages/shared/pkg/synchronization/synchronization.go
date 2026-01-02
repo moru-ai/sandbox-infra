@@ -9,10 +9,10 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/shared/pkg/synchronization")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/shared/pkg/synchronization")
 
 type Store[SourceItem any, PoolItem any] interface {
 	SourceList(ctx context.Context) ([]SourceItem, error)

@@ -8,12 +8,12 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
-	edgeapi "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logs"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	edgeapi "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logs"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type EdgeProvider struct {
@@ -37,7 +37,7 @@ func (c *EdgeProvider) GetLogs(ctx context.Context, templateID string, buildID s
 			Offset:     &offset,
 			Limit:      &limit,
 			Level:      logToEdgeLevel(level),
-			// TODO: remove this once the API spec is not required to have orchestratorID (https://linear.app/e2b/issue/ENG-3352)
+			// TODO: remove this once the API spec is not required to have orchestratorID
 			OrchestratorID: utils.ToPtr("unused"),
 			Start:          utils.ToPtr(start.UnixMilli()),
 			End:            utils.ToPtr(end.UnixMilli()),

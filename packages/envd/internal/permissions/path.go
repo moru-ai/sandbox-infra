@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
 )
 
 func expand(path, homedir string) (string, error) {

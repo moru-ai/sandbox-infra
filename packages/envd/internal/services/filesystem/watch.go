@@ -9,10 +9,10 @@ import (
 	"connectrpc.com/connect"
 	"github.com/e2b-dev/fsnotify"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
 )
 
 func (s Service) WatchDir(ctx context.Context, req *connect.Request[rpc.WatchDirRequest], stream *connect.ServerStream[rpc.WatchDirResponse]) error {

@@ -14,7 +14,7 @@ init:
 	./scripts/confirm.sh $(TERRAFORM_ENVIRONMENT)
 	$(MAKE) -C iac/provider-gcp init
 
-# Setup production environment variables, this is used only for E2B.dev production
+# Setup production environment variables, this is used only for moru production
 # Uses Infisical CLI to read secrets from Infisical Vault
 # To update them, use the Infisical UI directly
 # On a first use, you need to run `infisical login` and `infisical init`
@@ -94,21 +94,21 @@ copy-public-builds:
 ifeq ($(PROVIDER),aws)
 	mkdir -p ./.kernels
 	mkdir -p ./.firecrackers
-	gsutil -m cp -r gs://e2b-prod-public-builds/kernels/* ./.kernels/
-	gsutil -m cp -r gs://e2b-prod-public-builds/firecrackers/* ./.firecrackers/
+	gsutil -m cp -r gs://moru-479500-public-builds/kernels/* ./.kernels/
+	gsutil -m cp -r gs://moru-479500-public-builds/firecrackers/* ./.firecrackers/
 	aws s3 cp ./.kernels/ s3://${AWS_BUCKET_PREFIX}fc-kernels/ --recursive --profile ${AWS_PROFILE}
 	aws s3 cp ./.firecrackers/ s3://${AWS_BUCKET_PREFIX}fc-versions/ --recursive --profile ${AWS_PROFILE}
 	rm -rf ./.kernels
 	rm -rf ./.firecrackers
 else
-	gsutil cp -r gs://e2b-prod-public-builds/kernels/* gs://$(GCP_PROJECT_ID)-fc-kernels/
-	gsutil cp -r gs://e2b-prod-public-builds/firecrackers/* gs://$(GCP_PROJECT_ID)-fc-versions/
+	gsutil cp -r gs://moru-479500-public-builds/kernels/* gs://$(GCP_PROJECT_ID)-fc-kernels/
+	gsutil cp -r gs://moru-479500-public-builds/firecrackers/* gs://$(GCP_PROJECT_ID)-fc-versions/
 endif
 
 .PHONY: download-public-kernels
 download-public-kernels:
 	mkdir -p ./packages/fc-kernels
-	gsutil cp -r gs://e2b-prod-public-builds/kernels/* ./packages/fc-kernels/
+	gsutil cp -r gs://moru-479500-public-builds/kernels/* ./packages/fc-kernels/
 
 .PHONY: generate
 generate: generate/api generate/orchestrator generate/client-proxy generate/envd generate/db generate/shared generate-tests generate-mocks

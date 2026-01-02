@@ -1,10 +1,10 @@
 openapi: 3.0.0
 info:
   version: 0.1.0
-  title: E2B API
+  title: Moru Sandbox API
 
 servers:
-  - url: https://api.e2b.app
+  - url: https://api.moru.io
 
 components:
   securitySchemes:

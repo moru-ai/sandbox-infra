@@ -7,7 +7,7 @@ FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION}
 RUN apk add --no-cache git curl bash
 
 ENV BUF_VER=1.28.1 \
-    PROTOC_GEN_GO_VER=1.28.1 \
+    PROTOC_GEN_GO_VER=1.36.9 \
     PROTOC_GEN_CONNECT_GO_VER=1.18.1
 
 # Install buf CLI

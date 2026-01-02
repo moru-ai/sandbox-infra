@@ -4,7 +4,7 @@
 // - protoc             v5.29.3
 // source: template-manager.proto
 
-package template_manager
+package orchestrator
 
 import (
 	context "context"

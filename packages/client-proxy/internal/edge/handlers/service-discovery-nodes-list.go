@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
 )
 
 func (a *APIStore) V1ServiceDiscoveryNodes(c *gin.Context) {

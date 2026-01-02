@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	catalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	catalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
 )
 
 func (s *NodePassThroughServer) eventsHandler(ctx context.Context, md metadata.MD) (func(error), error) {

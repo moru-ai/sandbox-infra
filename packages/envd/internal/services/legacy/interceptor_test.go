@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
-	spec "github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem/filesystemconnect"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem/filesystemconnect/mocks"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
+	spec "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem/filesystemconnect"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem/filesystemconnect/mocks"
 )
 
 func TestInterceptor(t *testing.T) {

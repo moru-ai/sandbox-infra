@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/tests"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/tests"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
 )
 
 func GetAPIClient() *api.ClientWithResponses {
@@ -36,7 +36,7 @@ func WithAPIKey(apiKey ...string) func(ctx context.Context, req *http.Request) e
 }
 
 func WithTestsUserAgent() api.RequestEditorFn {
-	return WithUserAgent("e2b-tests/infra")
+	return WithUserAgent("moru-tests/infra")
 }
 
 func WithUserAgent(userAgent string) api.RequestEditorFn {

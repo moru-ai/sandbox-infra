@@ -9,7 +9,7 @@ import (
 	"connectrpc.com/connect"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
 )
 
 // getEntryType determines the type of file entry based on its mode and path.

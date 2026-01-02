@@ -18,16 +18,16 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/filesystem"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci/auth"
-	artifactsregistry "github.com/e2b-dev/infra/packages/shared/pkg/artifacts-registry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/dockerhub"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci/auth"
+	artifactsregistry "github.com/moru-ai/sandbox-infra/packages/shared/pkg/artifacts-registry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/dockerhub"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci")
 
 const (
 	ToMBShift            = 20

@@ -1,8 +1,8 @@
 package metrics_provider
 
 import (
-	clickhouse "github.com/e2b-dev/infra/packages/clickhouse/pkg"
-	"github.com/e2b-dev/infra/packages/proxy/internal/cfg"
+	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/cfg"
 )
 
 func GetSandboxMetricsQueryProvider(config cfg.Config) (clickhouse.SandboxQueriesProvider, error) {

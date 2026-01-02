@@ -5,17 +5,22 @@ FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 RUN apk add --no-cache make
 
-# Cached golang dependencies
+# Copy all go.mod and go.sum files first for dependency caching
+# This ensures replace directives work correctly
+WORKDIR /build
+
+COPY ./shared/go.mod ./shared/go.sum ./shared/
+COPY ./db/go.mod ./db/go.sum ./db/
+COPY ./docker-reverse-proxy/go.mod ./docker-reverse-proxy/go.sum ./docker-reverse-proxy/
+
+# Download dependencies (replace directives now work since all directories exist)
 WORKDIR /build/shared
-COPY ./shared/go.mod ./shared/go.sum ./
 RUN go mod download
 
 WORKDIR /build/db
-COPY ./db/go.mod ./db/go.sum ./
 RUN go mod download
 
 WORKDIR /build/docker-reverse-proxy
-COPY ./docker-reverse-proxy/go.mod ./docker-reverse-proxy/go.sum ./
 RUN go mod download
 
 # Copy source code

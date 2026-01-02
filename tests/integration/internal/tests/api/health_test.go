@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
 func TestHealth(t *testing.T) {

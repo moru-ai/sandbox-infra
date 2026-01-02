@@ -8,11 +8,11 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"go.opentelemetry.io/otel"
 
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager")
 
 func (n *Node) SyncBuilds(builds []*orchestrator.CachedBuildInfo) {
 	for _, build := range builds {

@@ -11,7 +11,7 @@ import (
 	"github.com/launchdarkly/go-server-sdk/v7/testhelpers/ldtestdata"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 // LaunchDarklyOfflineStore is a test fixture that provides dynamically updatable feature flag state

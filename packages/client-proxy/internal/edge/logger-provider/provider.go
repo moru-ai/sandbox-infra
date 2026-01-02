@@ -6,8 +6,8 @@ import (
 
 	"github.com/grafana/loki/pkg/logproto"
 
-	"github.com/e2b-dev/infra/packages/proxy/internal/cfg"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logs"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logs"
 )
 
 type LogsQueryProvider interface {

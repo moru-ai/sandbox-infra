@@ -8,8 +8,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/tracking"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/tracking"
 )
 
 const (

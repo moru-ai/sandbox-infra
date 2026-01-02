@@ -10,8 +10,8 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/ioutils"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/ioutils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 const (
@@ -20,7 +20,7 @@ const (
 	DeprecatedVersion = 1
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata")
 
 type Version struct {
 	Version any `json:"version"`

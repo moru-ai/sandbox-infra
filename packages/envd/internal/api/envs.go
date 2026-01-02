@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
 )
 
 func (a *API) GetEnvs(w http.ResponseWriter, _ *http.Request) {

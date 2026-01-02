@@ -3,7 +3,7 @@ package nodemanager
 import (
 	"sync/atomic"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
 )
 
 type SandboxResources struct {

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/net/publicsuffix"
 
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
 )
 
 func NewRequest(sbx *api.Sandbox, url *url.URL, port int, extraHeaders *http.Header) *http.Request {
@@ -31,7 +31,7 @@ func NewRequest(sbx *api.Sandbox, url *url.URL, port int, extraHeaders *http.Hea
 	}
 
 	if sbx.TrafficAccessToken != nil {
-		header.Set("e2b-traffic-access-token", *sbx.TrafficAccessToken)
+		header.Set("moru-traffic-access-token", *sbx.TrafficAccessToken)
 	}
 
 	if extraHeaders != nil {

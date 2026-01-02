@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/nbd"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/nbd"
 )
 
 func GetNBDDevice(ctx context.Context, backend block.Device) (nbd.DevicePath, *Cleaner, error) {

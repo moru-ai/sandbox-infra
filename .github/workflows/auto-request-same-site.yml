@@ -27,9 +27,9 @@ jobs:
         id: app
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.E2B_GH_APP_AUTO_REQUEST_SAME_SITE_APP_ID }}
-          private-key: ${{ secrets.E2B_GH_APP_AUTO_REQUEST_SAME_SITE_APP_PRIVATE_KEY }}
-          owner: e2b-dev
+          app-id: ${{ secrets.MORU_GH_APP_AUTO_REQUEST_SAME_SITE_APP_ID }}
+          private-key: ${{ secrets.MORU_GH_APP_AUTO_REQUEST_SAME_SITE_APP_PRIVATE_KEY }}
+          owner: moru-ai
 
       - name: Checkout repo (needed because the script lives in the repo)
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
         env:
           APP_TOKEN: ${{ steps.app.outputs.token }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          ORG: e2b-dev
+          ORG: moru-ai
           SF_TEAM_SLUG: eng-sf
           PRG_TEAM_SLUG: eng-prg
           REVIEWERS_TO_REQUEST: "1"

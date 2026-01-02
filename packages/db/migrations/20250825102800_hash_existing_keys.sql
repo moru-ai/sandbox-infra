@@ -20,10 +20,10 @@ $$ LANGUAGE plpgsql;
 -- Update existing API keys with hash and related fields
 UPDATE public.team_api_keys
 SET
-    api_key_hash = hex_to_sha256(api_key, 'e2b_'),
-    api_key_prefix = 'e2b_',
-    api_key_length = length(api_key) - 4,  -- Strip 'e2b_' prefix (4 chars)
-    api_key_mask_prefix = substring(api_key from 5 for 2),  -- Skip 'e2b_' prefix
+    api_key_hash = hex_to_sha256(api_key, 'moru_'),
+    api_key_prefix = 'moru_',
+    api_key_length = length(api_key) - 5,  -- Strip 'moru_' prefix (5 chars)
+    api_key_mask_prefix = substring(api_key from 6 for 2),  -- Skip 'moru_' prefix
     api_key_mask_suffix = substring(api_key from length(api_key) - 3)
 WHERE
     api_key IS NOT NULL
@@ -33,10 +33,10 @@ WHERE
 -- Update existing access tokens with hash and related fields
 UPDATE public.access_tokens
 SET
-    access_token_hash = hex_to_sha256(access_token, 'sk_e2b_'),
-    access_token_prefix = 'sk_e2b_',
-    access_token_length = length(access_token) - 7,  -- Strip 'sk_e2b_' prefix (7 chars)
-    access_token_mask_prefix = substring(access_token from 8 for 2),  -- Skip 'sk_e2b_' prefix
+    access_token_hash = hex_to_sha256(access_token, 'sk_moru_'),
+    access_token_prefix = 'sk_moru_',
+    access_token_length = length(access_token) - 8,  -- Strip 'sk_moru_' prefix (8 chars)
+    access_token_mask_prefix = substring(access_token from 9 for 2),  -- Skip 'sk_moru_' prefix
     access_token_mask_suffix = substring(access_token from length(access_token) - 3)
 WHERE
     access_token IS NOT NULL

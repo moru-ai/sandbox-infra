@@ -5,21 +5,21 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/e2b-dev/infra/packages/proxy/internal/cfg"
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/handlers"
-	e2binfo "github.com/e2b-dev/infra/packages/proxy/internal/edge/info"
-	e2borchestrators "github.com/e2b-dev/infra/packages/proxy/internal/edge/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	catalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/handlers"
+	moruinfo "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/info"
+	moruorchestrators "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	catalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/client-proxy/internal/edge")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/client-proxy/internal/edge")
 
 func NewEdgeAPIStore(
 	ctx context.Context,
 	l logger.Logger,
-	info *e2binfo.ServiceInfo,
-	orchestrators *e2borchestrators.OrchestratorsPool,
+	info *moruinfo.ServiceInfo,
+	orchestrators *moruorchestrators.OrchestratorsPool,
 	catalog catalog.SandboxesCatalog,
 	config cfg.Config,
 ) (*handlers.APIStore, error) {

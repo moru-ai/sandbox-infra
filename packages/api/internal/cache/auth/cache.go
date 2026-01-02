@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/cache"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/cache"
 )
 
 const (

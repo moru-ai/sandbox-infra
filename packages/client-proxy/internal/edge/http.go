@@ -16,12 +16,12 @@ import (
 	"github.com/gin-gonic/gin"
 	middleware "github.com/oapi-codegen/gin-middleware"
 
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/authorization"
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/handlers"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/authorization"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/handlers"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const (

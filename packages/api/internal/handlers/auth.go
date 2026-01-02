@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/auth"
-	dbapi "github.com/e2b-dev/infra/packages/api/internal/db"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/auth"
+	dbapi "github.com/moru-ai/sandbox-infra/packages/api/internal/db"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
 )
 
 func (a *APIStore) GetUserID(c *gin.Context) uuid.UUID {

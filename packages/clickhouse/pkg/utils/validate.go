@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	clickhouse "github.com/e2b-dev/infra/packages/clickhouse/pkg"
+	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
 )
 
 func ValidateRange(start time.Time, end time.Time) (time.Time, time.Time, error) {

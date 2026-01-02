@@ -7,10 +7,10 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/phases"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/cache"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/phases"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/cache"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (bb *BaseBuilder) Hash(ctx context.Context, _ phases.LayerResult) (string, error) {

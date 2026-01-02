@@ -14,9 +14,9 @@ run:
 	clickhouse_database=$(CLICKHOUSE_DATABASE) \
 	envsubst < ./tests/otel-collector.yaml > "./otel-collector.local.yaml"
 
-	docker network create e2b || true
+	docker network create moru || true
 	docker run --rm --name otel-collector \
-		--network e2b \
+		--network moru \
 		-p 4317:4317 \
 		-p 13133:13133 \
 		-v ./otel-collector.local.yaml:/etc/otel-collector-config.yaml \

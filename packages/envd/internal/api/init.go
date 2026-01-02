@@ -15,9 +15,9 @@ import (
 	"github.com/txn2/txeh"
 	"golang.org/x/sys/unix"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/host"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const hostsFilePermissions = 0o644
@@ -138,11 +138,11 @@ func (a *API) SetupHyperloop(address string) {
 	if err := rewriteHostsFile(address, "/etc/hosts"); err != nil {
 		a.logger.Error().Err(err).Msg("failed to modify hosts file")
 	} else {
-		a.defaults.EnvVars.Store("E2B_EVENTS_ADDRESS", fmt.Sprintf("http://%s", address))
+		a.defaults.EnvVars.Store("MORU_EVENTS_ADDRESS", fmt.Sprintf("http://%s", address))
 	}
 }
 
-const eventsHost = "events.e2b.local"
+const eventsHost = "events.moru.local"
 
 func rewriteHostsFile(address, path string) error {
 	data, err := os.ReadFile(path)
@@ -160,8 +160,8 @@ func rewriteHostsFile(address, path string) error {
 		return fmt.Errorf("failed to create hosts: %w", err)
 	}
 
-	// Update /etc/hosts to point events.e2b.local to the hyperloop IP
-	// This will remove any existing entries for events.e2b.local first
+	// Update /etc/hosts to point events.moru.local to the hyperloop IP
+	// This will remove any existing entries for events.moru.local first
 	ipFamily, err := getIPFamily(address)
 	if err != nil {
 		return fmt.Errorf("failed to get ip family: %w", err)

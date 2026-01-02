@@ -20,22 +20,22 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/proxy/internal/cfg"
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge"
-	edgepassthrough "github.com/e2b-dev/infra/packages/proxy/internal/edge-pass-through"
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/authorization"
-	e2binfo "github.com/e2b-dev/infra/packages/proxy/internal/edge/info"
-	e2borchestrators "github.com/e2b-dev/infra/packages/proxy/internal/edge/pool"
-	e2bproxy "github.com/e2b-dev/infra/packages/proxy/internal/proxy"
-	servicediscovery "github.com/e2b-dev/infra/packages/proxy/internal/service-discovery"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	"github.com/e2b-dev/infra/packages/shared/pkg/factories"
-	feature_flags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	e2bcatalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge"
+	edgepassthrough "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge-pass-through"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/authorization"
+	moruinfo "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/info"
+	moruorchestrators "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/pool"
+	moruproxy "github.com/moru-ai/sandbox-infra/packages/proxy/internal/proxy"
+	servicediscovery "github.com/moru-ai/sandbox-infra/packages/proxy/internal/service-discovery"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/factories"
+	feature_flags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	morucatalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type Closeable interface {
@@ -120,7 +120,7 @@ func run() int {
 		return 1
 	}
 
-	var catalog e2bcatalog.SandboxesCatalog
+	var catalog morucatalog.SandboxesCatalog
 
 	redisClient, err := factories.NewRedisClient(ctx, factories.RedisConfig{
 		RedisURL:         config.RedisURL,
@@ -134,7 +134,7 @@ func run() int {
 				l.Error(ctx, "Failed to close redis client", zap.Error(err))
 			}
 		}()
-		catalog = e2bcatalog.NewRedisSandboxesCatalog(redisClient)
+		catalog = morucatalog.NewRedisSandboxesCatalog(redisClient)
 	} else {
 		if !errors.Is(err, factories.ErrRedisDisabled) {
 			l.Error(ctx, "Failed to create redis client", zap.Error(err))
@@ -143,12 +143,12 @@ func run() int {
 		}
 
 		l.Warn(ctx, "Redis environment variable is not set, will fallback to in-memory sandboxes catalog that works only with one instance setup")
-		catalog = e2bcatalog.NewMemorySandboxesCatalog()
+		catalog = morucatalog.NewMemorySandboxesCatalog()
 	}
 
-	orchestrators := e2borchestrators.NewOrchestratorsPool(ctx, l, tel.TracerProvider, tel.MeterProvider, orchestratorsSD)
+	orchestrators := moruorchestrators.NewOrchestratorsPool(ctx, l, tel.TracerProvider, tel.MeterProvider, orchestratorsSD)
 
-	info := &e2binfo.ServiceInfo{
+	info := &moruinfo.ServiceInfo{
 		NodeID:               nodeID,
 		ServiceInstanceID:    uuid.NewString(),
 		ServiceVersion:       version,
@@ -161,7 +161,7 @@ func run() int {
 	info.SetStatus(ctx, api.Unhealthy)
 
 	// Proxy sandbox http traffic to orchestrator nodes
-	trafficProxy, err := e2bproxy.NewClientProxy(
+	trafficProxy, err := moruproxy.NewClientProxy(
 		tel.MeterProvider,
 		serviceName,
 		config.ProxyPort,

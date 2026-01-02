@@ -10,11 +10,11 @@ import (
 
 	"go.uber.org/zap/zapcore"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/sandboxtools"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/metadata"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/sandboxtools"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/metadata"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const configurationTimeout = 5 * time.Minute

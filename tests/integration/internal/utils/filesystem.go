@@ -10,11 +10,11 @@ import (
 
 	"connectrpc.com/connect"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/envd/filesystem"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	envdapi "github.com/e2b-dev/infra/tests/integration/internal/envd/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/envd/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	envdapi "github.com/moru-ai/sandbox-infra/tests/integration/internal/envd/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
 func UploadFile(tb testing.TB, ctx context.Context, sbx *api.Sandbox, envdClient *setup.EnvdClient, path string, content string) {

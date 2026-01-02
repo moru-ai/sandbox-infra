@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/machineinfo"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/machineinfo"
 )
 
 // Tests for isNodeCPUCompatible

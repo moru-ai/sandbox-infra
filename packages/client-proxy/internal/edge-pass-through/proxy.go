@@ -11,19 +11,19 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/e2b-dev/infra/packages/proxy/internal/edge/authorization"
-	e2binfo "github.com/e2b-dev/infra/packages/proxy/internal/edge/info"
-	e2borchestrators "github.com/e2b-dev/infra/packages/proxy/internal/edge/pool"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	catalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/authorization"
+	moruinfo "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/info"
+	moruorchestrators "github.com/moru-ai/sandbox-infra/packages/proxy/internal/edge/pool"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	catalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
 )
 
 type NodePassThroughServer struct {
-	nodes   *e2borchestrators.OrchestratorsPool
+	nodes   *moruorchestrators.OrchestratorsPool
 	catalog catalog.SandboxesCatalog
 
-	info *e2binfo.ServiceInfo
+	info *moruinfo.ServiceInfo
 
 	authorization authorization.AuthorizationService
 }
@@ -36,8 +36,8 @@ const (
 var clientStreamDescForProxying = &grpc.StreamDesc{ServerStreams: true, ClientStreams: true}
 
 func NewNodePassThroughServer(
-	nodes *e2borchestrators.OrchestratorsPool,
-	info *e2binfo.ServiceInfo,
+	nodes *moruorchestrators.OrchestratorsPool,
+	info *moruinfo.ServiceInfo,
 	authorization authorization.AuthorizationService,
 	catalog catalog.SandboxesCatalog,
 ) *grpc.Server {

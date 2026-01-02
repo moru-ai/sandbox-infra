@@ -4,9 +4,9 @@ import (
 	"net"
 	"testing"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
 )
 
 func TestMatchDomain(t *testing.T) {

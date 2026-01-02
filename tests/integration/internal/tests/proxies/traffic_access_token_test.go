@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
-	"github.com/e2b-dev/infra/tests/integration/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/utils"
 )
 
 func TestSandboxWithEnabledTrafficAccessTokenButMissingHeader(t *testing.T) {
@@ -52,7 +52,7 @@ func TestSandboxWithEnabledTrafficAccessTokenButMissingHeader(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&errorResp)
 	require.NoError(t, err)
 	require.NoError(t, resp.Body.Close())
-	assert.Equal(t, "Sandbox is secured with traffic access token. Token header 'e2b-traffic-access-token' is missing", errorResp.Message)
+	assert.Equal(t, "Sandbox is secured with traffic access token. Token header 'moru-traffic-access-token' is missing", errorResp.Message)
 	assert.Equal(t, sbx.SandboxID, errorResp.SandboxID)
 
 	// Pretend to be a browser
@@ -107,7 +107,7 @@ func TestSandboxWithEnabledTrafficAccessTokenButInvalidHeader(t *testing.T) {
 	err = json.NewDecoder(resp.Body).Decode(&errorResp)
 	require.NoError(t, err)
 	require.NoError(t, resp.Body.Close())
-	assert.Equal(t, "Sandbox is secured with traffic access token. Provided token in header 'e2b-traffic-access-token' is invalid", errorResp.Message)
+	assert.Equal(t, "Sandbox is secured with traffic access token. Provided token in header 'moru-traffic-access-token' is invalid", errorResp.Message)
 	assert.Equal(t, sbx.SandboxID, errorResp.SandboxID)
 
 	// Pretend to be a browser

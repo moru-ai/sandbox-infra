@@ -8,7 +8,7 @@ import (
 
 	consulApi "github.com/hashicorp/consul/api"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type StorageKV struct {

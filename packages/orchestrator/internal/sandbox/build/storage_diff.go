@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block"
-	blockmetrics "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block/metrics"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
+	blockmetrics "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 func storagePath(buildId string, diffType DiffType) string {

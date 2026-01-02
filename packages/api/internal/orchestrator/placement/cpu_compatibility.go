@@ -1,8 +1,8 @@
 package placement
 
 import (
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/machineinfo"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/machineinfo"
 )
 
 // isNodeCPUCompatible checks if a single node is compatible with the build CPU requirements.

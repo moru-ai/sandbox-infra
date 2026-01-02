@@ -1,4 +1,4 @@
-import { Sandbox } from "@e2b/code-interpreter";
+import { Sandbox } from "@moru-ai/core";
 import { DEBUG_TIMEOUT_MS, log, runTestWithSandbox } from "./utils.ts";
 
 log("Starting sandbox logs test");
@@ -10,17 +10,17 @@ log("ℹ️ sandbox created", sandbox.sandboxId);
 
 await runTestWithSandbox(sandbox, "internet-works", async () => {
   const out = await sandbox.commands.run(
-    "wget https://www.gstatic.com/generate_204",
+    "curl -s -o /dev/null -w '%{http_code}' https://www.gstatic.com/generate_204",
     {
       requestTimeoutMs: 10000,
     }
   );
-  log("wget output", out.stderr);
+  log("curl output", out.stdout);
 
-  const internetWorking = out.stderr.includes("204 No Content");
+  const internetWorking = out.stdout.trim() === "204";
   // verify internet is working
   if (!internetWorking) {
-    log("Internet is not working");
+    log("Internet is not working, got status:", out.stdout);
     throw new Error("Internet is not working");
   }
 

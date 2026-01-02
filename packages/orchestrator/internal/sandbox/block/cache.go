@@ -19,7 +19,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"golang.org/x/sys/unix"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
 const (
@@ -27,7 +27,7 @@ const (
 	oomMaxJitter  = 100 * time.Millisecond
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block")
 
 type CacheClosedError struct {
 	filePath string

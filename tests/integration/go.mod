@@ -1,12 +1,12 @@
-module github.com/e2b-dev/infra/tests/integration
+module github.com/moru-ai/sandbox-infra/tests/integration
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/shared => ../../packages/shared
+replace github.com/moru-ai/sandbox-infra/packages/shared => ../../packages/shared
 
-replace github.com/e2b-dev/infra/packages/db => ../../packages/db
+replace github.com/moru-ai/sandbox-infra/packages/db => ../../packages/db
 
-replace github.com/e2b-dev/infra/packages/clickhouse => ../../packages/clickhouse
+replace github.com/moru-ai/sandbox-infra/packages/clickhouse => ../../packages/clickhouse
 
 tool (
 	github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
@@ -15,9 +15,9 @@ tool (
 
 require (
 	connectrpc.com/connect v1.18.1
-	github.com/e2b-dev/infra/packages/clickhouse v0.0.0
-	github.com/e2b-dev/infra/packages/db v0.0.0
-	github.com/e2b-dev/infra/packages/shared v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/google/uuid v1.6.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.11.1

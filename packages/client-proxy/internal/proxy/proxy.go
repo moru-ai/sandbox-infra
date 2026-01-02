@@ -11,12 +11,12 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	reverseproxy "github.com/e2b-dev/infra/packages/shared/pkg/proxy"
-	"github.com/e2b-dev/infra/packages/shared/pkg/proxy/pool"
-	catalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	reverseproxy "github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/proxy/pool"
+	catalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const (

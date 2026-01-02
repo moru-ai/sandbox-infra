@@ -9,7 +9,7 @@ import (
 
 	"github.com/bits-and-blooms/bitset"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/uffd/testutils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/uffd/testutils"
 )
 
 type testConfig struct {

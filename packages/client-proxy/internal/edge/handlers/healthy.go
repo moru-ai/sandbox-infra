@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
 )
 
 // HealthCheck is used by load balancer to check if the Edge API and Edge GRPC proxy services are healthy.

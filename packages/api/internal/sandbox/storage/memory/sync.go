@@ -3,7 +3,7 @@ package memory
 import (
 	"time"
 
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
 )
 
 // TODO: this should be removed once we have a better way to handle node sync

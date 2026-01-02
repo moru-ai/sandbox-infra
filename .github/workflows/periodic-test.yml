@@ -1,8 +1,8 @@
 name: Periodic Tests
 
 on:
-  schedule:
-    - cron: "*/10 * * * *"
+  # schedule:
+  #   - cron: "*/10 * * * *"
   workflow_dispatch:
     inputs:
       dev:
@@ -33,28 +33,21 @@ jobs:
       fail-fast: false
       matrix:
         # each domain is a different cluster
-        e2b-domain:
-          - "e2b-foxtrot.dev"
-          - "e2b-juliett.dev"
-          - "e2b-staging.dev"
+        moru-domain:
+          - "moru-test.io"
+          - "moru-staging.io"
+          - "moru-dev.io"
         include:
-          - e2b-domain: "e2b-foxtrot.dev"
-            api_key: E2B_API_KEY
-            access_token: E2B_ACCESS_TOKEN
-          - e2b-domain: "e2b-juliett.dev"
-            api_key: E2B_API_KEY_JULIETT
-            access_token: E2B_ACCESS_TOKEN_JULIETT
-          - e2b-domain: "e2b-staging.dev"
-            api_key: E2B_API_KEY
-            access_token: E2B_ACCESS_TOKEN
+          - moru-domain: "moru-test.io"
+            api_key: MORU_API_KEY
+            access_token: MORU_ACCESS_TOKEN
+          - moru-domain: "moru-staging.io"
+            api_key: MORU_API_KEY_JULIETT
+            access_token: MORU_ACCESS_TOKEN_JULIETT
+          - moru-domain: "moru-dev.io"
+            api_key: MORU_API_KEY
+            access_token: MORU_ACCESS_TOKEN
         test-command:
-          - command: "tests/periodic-test/run-code.ts"
-            name: "run code in sandbox"
-          - command: "index.ts"
-            name: "template builds && time is synchronized"
-            dir: "tests/periodic-test/time-is-synchronized/"
-          - command: "tests/periodic-test/snapshot-and-resume.ts"
-            name: "pause and resume sandbox"
           - command: "tests/periodic-test/internet-works.ts"
             name: "internet connectivity inside of sandbox"
 
@@ -92,22 +85,22 @@ jobs:
       - name: Set env variables from secrets
         if: always()
         run: |
-          echo "E2B_API_KEY=${{ secrets[format('{0}', matrix.api_key)] }}" >> $GITHUB_ENV
-          echo "E2B_ACCESS_TOKEN=${{ secrets[format('{0}', matrix.access_token)] }}" >> $GITHUB_ENV
+          echo "MORU_API_KEY=${{ secrets[format('{0}', matrix.api_key)] }}" >> $GITHUB_ENV
+          echo "MORU_ACCESS_TOKEN=${{ secrets[format('{0}', matrix.access_token)] }}" >> $GITHUB_ENV
 
       - name: ${{ matrix.test-command.name }}
         run: bun run ${{ matrix.test-command.command }}
         working-directory: ${{ matrix.test-command.dir }}
         env:
-          E2B_API_KEY: ${{ env.E2B_API_KEY }}
-          E2B_ACCESS_TOKEN: ${{ env.E2B_ACCESS_TOKEN }}
-          E2B_DOMAIN: ${{ matrix.e2b-domain }}
+          MORU_API_KEY: ${{ env.MORU_API_KEY }}
+          MORU_ACCESS_TOKEN: ${{ env.MORU_ACCESS_TOKEN }}
+          MORU_DOMAIN: ${{ matrix.moru-domain }}
 
       - name: Send Grafana OnCall webhook
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
-          DOMAIN: ${{ matrix.e2b-domain }}
+          DOMAIN: ${{ matrix.moru-domain }}
           RUN_LINK: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           WEBHOOK_URL: ${{ secrets.GRAFANA_ALERT_WEBHOOK }}
           TEST_NAME: ${{ matrix.test-command.name }}

@@ -9,13 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	templatecache "github.com/e2b-dev/infra/packages/api/internal/cache/templates"
-	template_manager "github.com/e2b-dev/infra/packages/api/internal/template-manager"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	sharedUtils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	templatecache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/templates"
+	template_manager "github.com/moru-ai/sandbox-infra/packages/api/internal/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	sharedUtils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 func (a *APIStore) GetTemplatesTemplateIDBuildsBuildIDLogs(c *gin.Context, templateID api.TemplateID, buildID api.BuildID, params api.GetTemplatesTemplateIDBuildsBuildIDLogsParams) {

@@ -8,4 +8,4 @@ managed:
   enabled: true
   optimize_for: SPEED
   go_package_prefix:
-    default: github.com/e2b-dev/infra/packages/envd/internal/services/legacy
+    default: github.com/moru-ai/sandbox-infra/packages/envd/internal/services/legacy

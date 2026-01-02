@@ -44,7 +44,7 @@
       "program": "${workspaceFolder}/packages/orchestrator/cmd/mock-sandbox/mock.go",
       "env": {
         "NODE_ID": "test-client",
-        "TEMPLATE_BUCKET_NAME": "e2b-dev-fc-templates"
+        "TEMPLATE_BUCKET_NAME": "moru-fc-templates"
       },
       "args": [
         "-template",

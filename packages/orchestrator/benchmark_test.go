@@ -19,29 +19,29 @@ import (
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/metric/noop"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/proxy"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	blockmetrics "github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/block/metrics"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/nbd"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/network"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build"
-	buildconfig "github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/config"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/metrics"
-	artifactsregistry "github.com/e2b-dev/infra/packages/shared/pkg/artifacts-registry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/dockerhub"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
-	"github.com/e2b-dev/infra/packages/shared/pkg/limit"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	sbxlogger "github.com/e2b-dev/infra/packages/shared/pkg/logger/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/proxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	blockmetrics "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/nbd"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/network"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build"
+	buildconfig "github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/config"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/metrics"
+	artifactsregistry "github.com/moru-ai/sandbox-infra/packages/shared/pkg/artifacts-registry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/dockerhub"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/limit"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	sbxlogger "github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator")
 
 func BenchmarkBaseImageLaunch(b *testing.B) {
 	if os.Geteuid() != 0 {
@@ -51,7 +51,7 @@ func BenchmarkBaseImageLaunch(b *testing.B) {
 	// test configuration
 	const (
 		testType        = onlyStart
-		baseImage       = "e2bdev/base"
+		baseImage       = "moru/base"
 		kernelVersion   = "vmlinux-6.1.102"
 		fcVersion       = "v1.10.1_1fcdaec08"
 		templateID      = "fcb33d09-3141-42c4-8d3b-c2df411681db"
@@ -63,7 +63,7 @@ func BenchmarkBaseImageLaunch(b *testing.B) {
 	sbxNetwork := &orchestrator.SandboxNetworkConfig{}
 
 	// cache paths, to speed up test runs. these paths aren't wiped between tests
-	persistenceDir := filepath.Join(os.TempDir(), "e2b-orchestrator-benchmark")
+	persistenceDir := filepath.Join(os.TempDir(), "moru-orchestrator-benchmark")
 	kernelsDir := filepath.Join(persistenceDir, "kernels")
 	sandboxDir := filepath.Join(persistenceDir, "sandbox")
 	err := os.MkdirAll(kernelsDir, 0o755)
@@ -92,7 +92,7 @@ func BenchmarkBaseImageLaunch(b *testing.B) {
 		otel.SetTracerProvider(tracerProvider)
 	}
 
-	linuxKernelURL, err := url.JoinPath("https://storage.googleapis.com/e2b-prod-public-builds/kernels/", kernelVersion, "vmlinux.bin")
+	linuxKernelURL, err := url.JoinPath("https://storage.googleapis.com/moru-479500-public-builds/kernels/", kernelVersion, "vmlinux.bin")
 	require.NoError(b, err)
 	linuxKernelFilename := filepath.Join(kernelsDir, kernelVersion, "vmlinux.bin")
 

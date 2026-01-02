@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/storage/paths"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/storage/paths"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
 const signedUrlExpiration = time.Minute * 30

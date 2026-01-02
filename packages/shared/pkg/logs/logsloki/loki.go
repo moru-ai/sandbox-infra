@@ -8,8 +8,8 @@ import (
 	"github.com/grafana/loki/pkg/loghttp"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logs"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logs"
 )
 
 func ResponseMapper(ctx context.Context, res *loghttp.QueryResponse, offset int32, level *logs.LogLevel) ([]logs.LogEntry, error) {

@@ -14,19 +14,19 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/filesystem"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/systeminit"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/constants"
-	artifactsregistry "github.com/e2b-dev/infra/packages/shared/pkg/artifacts-registry"
-	"github.com/e2b-dev/infra/packages/shared/pkg/dockerhub"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/systeminit"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/constants"
+	artifactsregistry "github.com/moru-ai/sandbox-infra/packages/shared/pkg/artifacts-registry"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/dockerhub"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/rootfs")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/rootfs")
 
 //go:embed files
 var files embed.FS
@@ -39,7 +39,7 @@ const (
 	BusyBoxPath     = "usr/bin/busybox"
 	BusyBoxInitPath = "usr/bin/init"
 
-	ProvisioningExitPrefix = "E2B_PROVISIONING_EXIT:"
+	ProvisioningExitPrefix = "MORU_PROVISIONING_EXIT:"
 )
 
 type Rootfs struct {

@@ -11,8 +11,8 @@ import (
 	"github.com/ngrok/firewall_toolkit/pkg/set"
 	"golang.org/x/sys/unix"
 
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (

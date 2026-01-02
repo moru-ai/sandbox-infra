@@ -1,8 +1,8 @@
 package nodemanager
 
 import (
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	"github.com/e2b-dev/infra/packages/shared/pkg/machineinfo"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/machineinfo"
 )
 
 func (n *Node) setMachineInfo(info *infogrpc.MachineInfo) {

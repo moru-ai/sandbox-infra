@@ -16,7 +16,7 @@ type Metrics struct {
 	CPUUsedPercent float32 `json:"cpu_used_pct"` // Percent rounded to 2 decimal places
 
 	// Deprecated
-	// TODO: Remove when they are no longer used in orchestrator (https://linear.app/e2b/issue/E2B-2998/remove-envd-deprecated-metrics-when-not-used)
+	// TODO: Remove when they are no longer used in orchestrator.
 	MemTotalMiB uint64 `json:"mem_total_mib"` // Total virtual memory in MiB
 
 	// Deprecated

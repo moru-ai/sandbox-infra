@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
 )
 
 func TestValidateNetworkConfig(t *testing.T) {

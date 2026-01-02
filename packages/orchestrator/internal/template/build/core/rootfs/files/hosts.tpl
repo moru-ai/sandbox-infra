@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/rootfs.templateModel*/ -}}
+{{- /*gotype:github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/rootfs.templateModel*/ -}}
 {{ .WriteFile "/etc/hosts" 0o644 }}
 
 127.0.0.1	localhost

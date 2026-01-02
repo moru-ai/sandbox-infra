@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	storagemocks "github.com/e2b-dev/infra/packages/shared/pkg/storage/mocks"
+	storagemocks "github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/mocks"
 )
 
 func TestCachedFileObjectProvider_MakeChunkFilename(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
 )
 
 func generateFile(t *template.Template, model *templateModel) ([]byte, error) {
@@ -43,7 +43,7 @@ type templateModel struct {
 func newTemplateModel(buildContext buildcontext.BuildContext, provisionLogPrefix, provisionResultPath string) *templateModel {
 	return &templateModel{
 		Context:             buildContext,
-		Hostname:            "e2b.local",
+		Hostname:            "moru.local",
 		ProvisionLogPrefix:  provisionLogPrefix,
 		ProvisionExitPrefix: ProvisioningExitPrefix,
 		ProvisionResultPath: provisionResultPath,

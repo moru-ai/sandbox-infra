@@ -15,19 +15,19 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/net/idna"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/auth"
-	typesteam "github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/api/internal/middleware/otel/metrics"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	"github.com/e2b-dev/infra/packages/db/types"
-	"github.com/e2b-dev/infra/packages/shared/pkg/id"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	sbxlogger "github.com/e2b-dev/infra/packages/shared/pkg/logger/sandbox"
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
-	sharedUtils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/auth"
+	typesteam "github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/middleware/otel/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	sbxlogger "github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger/sandbox"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
+	sharedUtils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (
@@ -228,7 +228,7 @@ func (a *APIStore) getEnvdAccessToken(envdVersion *string, sandboxID string) (st
 	if envdVersion == nil {
 		return "", &api.APIError{
 			Code:      http.StatusBadRequest,
-			ClientMsg: "You need to re-build template to allow using secured access. Please visit https://e2b.dev/docs/sandbox/secured-access for more information.",
+			ClientMsg: "You need to re-build template to allow using secured access. Please visit https://moru.io/docs/sandbox/secured-access for more information.",
 			Err:       errors.New("envd version is required during envd access token creation"),
 		}
 	}
@@ -245,7 +245,7 @@ func (a *APIStore) getEnvdAccessToken(envdVersion *string, sandboxID string) (st
 	if !ok {
 		return "", &api.APIError{
 			Code:      http.StatusBadRequest,
-			ClientMsg: "Template is not compatible with secured access. Please visit https://e2b.dev/docs/sandbox/secured-access for more information.",
+			ClientMsg: "Template is not compatible with secured access. Please visit https://moru.io/docs/sandbox/secured-access for more information.",
 			Err:       errors.New("envd version is not supported for secure flag"),
 		}
 	}

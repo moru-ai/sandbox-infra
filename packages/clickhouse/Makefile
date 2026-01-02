@@ -6,7 +6,7 @@ CLICKHOUSE_HOST ?= clickhouse
 ifeq ($(PROVIDER),aws)
 	CLICKHOUSE_MIGRATOR_IMAGE ?= $(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com/$(PREFIX)orchestration/clickhouse-migrator
 else
-	CLICKHOUSE_MIGRATOR_IMAGE ?= $(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/e2b-orchestration/clickhouse-migrator
+	CLICKHOUSE_MIGRATOR_IMAGE ?= $(GCP_REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/mru-orchestration/clickhouse-migrator
 endif
 
 .PHONY: migrate
@@ -15,9 +15,9 @@ migrate: build migrate-without-build
 .PHONY: migrate-without-build
 migrate-without-build:
 	@echo "Applying Clickhouse migrations *$(notdir $@)*"
-	@docker network create e2b || true
+	@docker network create moru || true
 	@docker run --rm \
-		--network e2b \
+		--network moru \
 		--name clickhouse-migrator \
 		-e GOOSE_DBSTRING="clickhouse://${CLICKHOUSE_USERNAME}:${CLICKHOUSE_PASSWORD}@${CLICKHOUSE_HOST}:${CLICKHOUSE_PORT}/${CLICKHOUSE_DATABASE}" \
 		-v "$(shell pwd)/migrations:/app/migrations" \
@@ -59,9 +59,9 @@ run:
 	chmod 644 ./local/config.xml
 	chmod 644 ./local/users.xml
 
-	docker network create e2b || true
+	docker network create moru || true
 	docker run --rm --name clickhouse \
-				--network e2b \
+				--network moru \
 				-p 9000:9000 \
 				--health-cmd="clickhouse-client --query 'SELECT 1'" \
 				--health-interval=5s \

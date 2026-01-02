@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/build"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/template"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage"
-	"github.com/e2b-dev/infra/packages/shared/pkg/storage/header"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/build"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/template"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage/header"
 )
 
 type Snapshot struct {

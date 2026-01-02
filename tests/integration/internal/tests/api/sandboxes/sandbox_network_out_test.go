@@ -9,11 +9,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sandbox_network "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-network"
-	sharedutils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
-	"github.com/e2b-dev/infra/tests/integration/internal/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
-	"github.com/e2b-dev/infra/tests/integration/internal/utils"
+	sandbox_network "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-network"
+	sharedutils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/utils"
 )
 
 var (

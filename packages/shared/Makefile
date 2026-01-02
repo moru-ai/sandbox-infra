@@ -13,11 +13,11 @@ build-base-template:
 	@echo "Building base template..."
 	@cd scripts; \
     	npm install --silent; \
-        E2B_API_KEY=$(E2B_API_KEY); \
-        if [ -z "$$E2B_API_KEY" ]; then \
-			read -p "Enter E2B_API_KEY for the base template team: " E2B_API_KEY; \
+        MORU_API_KEY=$(MORU_API_KEY); \
+        if [ -z "$$MORU_API_KEY" ]; then \
+			read -p "Enter MORU_API_KEY for the base template team: " MORU_API_KEY; \
 		fi; \
-		E2B_API_KEY=$$E2B_API_KEY E2B_DOMAIN=$(DOMAIN_NAME) \
+		MORU_API_KEY=$$MORU_API_KEY MORU_DOMAIN=$(DOMAIN_NAME) \
     	npx tsx build.prod.ts
 	@echo "Done"
 

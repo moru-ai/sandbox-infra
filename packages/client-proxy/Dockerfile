@@ -5,17 +5,26 @@ FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
 RUN apk add --no-cache make
 
-# Cached golang dependencies
+# Copy all go.mod and go.sum files first for dependency caching
+# This ensures replace directives work correctly
+WORKDIR /build
+
+COPY ./shared/go.mod ./shared/go.sum ./shared/
+COPY ./clickhouse/go.mod ./clickhouse/go.sum ./clickhouse/
+COPY ./db/go.mod ./db/go.sum ./db/
+COPY ./client-proxy/go.mod ./client-proxy/go.sum ./client-proxy/
+
+# Download dependencies (replace directives now work since all directories exist)
+WORKDIR /build/db
+RUN go mod download
+
 WORKDIR /build/shared
-COPY ./shared/go.mod ./shared/go.sum ./
 RUN go mod download
 
 WORKDIR /build/clickhouse
-COPY ./clickhouse/go.mod ./clickhouse/go.sum ./
 RUN go mod download
 
 WORKDIR /build/client-proxy
-COPY ./client-proxy/go.mod ./client-proxy/go.sum ./
 RUN go mod download
 
 # Copy source code

@@ -1,10 +1,10 @@
-module github.com/e2b-dev/infra/packages/orchestrator
+module github.com/moru-ai/sandbox-infra/packages/orchestrator
 
 go 1.25.4
 
 replace (
-	github.com/e2b-dev/infra/packages/clickhouse v0.0.0 => ../clickhouse
-	github.com/e2b-dev/infra/packages/shared v0.0.0 => ../shared
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0 => ../clickhouse
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
 )
 
 // Fix non existent garyburd/redigo from Microsoft/hcsshim/test v0.0.0
@@ -24,8 +24,8 @@ require (
 	github.com/containers/storage v1.58.0
 	github.com/coreos/go-iptables v0.8.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/e2b-dev/infra/packages/clickhouse v0.0.0
-	github.com/e2b-dev/infra/packages/shared v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/edsrzf/mmap-go v1.2.0
 	github.com/firecracker-microvm/firecracker-go-sdk v1.0.0
 	github.com/gin-contrib/size v1.0.2

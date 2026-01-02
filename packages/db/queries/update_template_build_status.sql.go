@@ -9,7 +9,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/db/types"
 	"github.com/google/uuid"
 )
 

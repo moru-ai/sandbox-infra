@@ -5,9 +5,9 @@ import (
 
 	"google.golang.org/grpc/metadata"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	"github.com/e2b-dev/infra/packages/shared/pkg/edge"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/edge"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
 )
 
 type NodeMetadata struct {

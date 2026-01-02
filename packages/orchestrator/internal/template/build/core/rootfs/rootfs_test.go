@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/buildcontext"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/config"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/buildcontext"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/config"
 )
 
 func TestAdditionalOCILayers(t *testing.T) {
@@ -76,7 +76,7 @@ func TestAdditionalOCILayers(t *testing.T) {
 		keysIter := maps.Keys(actualFiles)
 		keys := slices.Collect(keysIter)
 		assert.Len(t, keys, 13)
-		assert.Equal(t, "e2b.local", actualFiles["etc/hostname"])
+		assert.Equal(t, "moru.local", actualFiles["etc/hostname"])
 		assert.Equal(t, "nameserver 8.8.8.8", actualFiles["etc/resolv.conf"])
 
 		// verify that memory function works

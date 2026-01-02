@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 )
 
 func GetTeamByIDAndUserIDAuth(ctx context.Context, db *sqlcdb.Client, teamID string, userID uuid.UUID) (*types.Team, error) {

@@ -10,9 +10,9 @@ import (
 	"go.uber.org/zap"
 	"inet.af/tcpproxy"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/network"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/network"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type Proxy struct {

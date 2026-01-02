@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
 )
 
 func convertEntryInfo(info *filesystem.EntryInfo) *EntryInfo {

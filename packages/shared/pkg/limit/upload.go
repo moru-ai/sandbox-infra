@@ -6,8 +6,8 @@ import (
 
 	"go.uber.org/zap"
 
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 func (l *Limiter) UpdateUploadLimitSemaphore(ctx context.Context) {

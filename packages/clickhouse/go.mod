@@ -1,12 +1,12 @@
-module github.com/e2b-dev/infra/packages/clickhouse
+module github.com/moru-ai/sandbox-infra/packages/clickhouse
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/shared => ../shared
+replace github.com/moru-ai/sandbox-infra/packages/shared => ../shared
 
 require (
 	github.com/ClickHouse/clickhouse-go/v2 v2.37.2
-	github.com/e2b-dev/infra/packages/shared v0.0.0-20250811171846-d1cdc9527dec
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0-20250811171846-d1cdc9527dec
 	github.com/google/uuid v1.6.0
 	go.uber.org/zap v1.27.0
 )

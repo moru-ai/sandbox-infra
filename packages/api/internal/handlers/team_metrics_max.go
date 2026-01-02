@@ -7,15 +7,15 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/auth"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/api/internal/metrics"
-	clickhouse "github.com/e2b-dev/infra/packages/clickhouse/pkg"
-	clickhouseUtils "github.com/e2b-dev/infra/packages/clickhouse/pkg/utils"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/auth"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/metrics"
+	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
+	clickhouseUtils "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg/utils"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 func (a *APIStore) GetTeamsTeamIDMetricsMax(c *gin.Context, teamID string, params api.GetTeamsTeamIDMetricsMaxParams) {

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/hyperloop"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/hyperloop"
 )
 
 func (h *APIStore) Me(c *gin.Context) {

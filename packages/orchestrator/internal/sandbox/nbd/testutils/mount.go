@@ -8,7 +8,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/nbd"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/nbd"
 )
 
 func MountNBDDevice(device nbd.DevicePath, mountPath string) (*Cleaner, error) {

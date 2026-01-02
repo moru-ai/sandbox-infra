@@ -6,7 +6,7 @@ import (
 
 	"github.com/ngrok/firewall_toolkit/pkg/set"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 const (

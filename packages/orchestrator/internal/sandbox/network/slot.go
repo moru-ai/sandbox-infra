@@ -15,11 +15,11 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	netutils "k8s.io/utils/net"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	"github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator"
 )
 
-var tracer = otel.Tracer("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/network")
+var tracer = otel.Tracer("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/network")
 
 const (
 	defaultHostNetworkCIDR = "10.11.0.0/16"

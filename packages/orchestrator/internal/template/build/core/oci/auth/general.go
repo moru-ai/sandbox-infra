@@ -6,7 +6,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
 
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
 )
 
 // GeneralAuthProvider implements authentication for registries with username/password

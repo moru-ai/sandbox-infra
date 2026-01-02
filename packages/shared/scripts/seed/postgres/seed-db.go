@@ -10,9 +10,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
 )
 
 func main() {
@@ -69,7 +69,7 @@ func main() {
 	}
 	defer db.Close()
 
-	// Open .e2b/config.json
+	// Open .moru/config.json
 	// Delete existing user and recreate (simpler for seeding)
 	err = db.TestsRawSQL(ctx, `
 DELETE FROM auth.users WHERE email = $1
@@ -100,7 +100,7 @@ DELETE FROM teams WHERE email = $1
 	err = db.TestsRawSQL(ctx, `
 INSERT INTO teams (id, email, name, tier, is_blocked)
 VALUES ($1, $2, $3, $4, $5)
-`, teamUUID, email, "E2B", "base_v1", false)
+`, teamUUID, email, "Moru", "base_v1", false)
 	if err != nil {
 		panic(err)
 	}

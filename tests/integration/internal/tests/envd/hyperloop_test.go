@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	sharedUtils "github.com/e2b-dev/infra/packages/shared/pkg/utils"
-	envdapi "github.com/e2b-dev/infra/tests/integration/internal/envd/api"
-	"github.com/e2b-dev/infra/tests/integration/internal/setup"
-	"github.com/e2b-dev/infra/tests/integration/internal/utils"
+	sharedUtils "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
+	envdapi "github.com/moru-ai/sandbox-infra/tests/integration/internal/envd/api"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
+	"github.com/moru-ai/sandbox-infra/tests/integration/internal/utils"
 )
 
 func TestAccessingHyperloopServerViaIP(t *testing.T) {
@@ -48,7 +48,7 @@ func TestAccessingHyperloopServerViaDomain(t *testing.T) {
 
 	envdClient := setup.GetEnvdClient(t, ctx)
 
-	err := utils.ExecCommand(t, ctx, sbx, envdClient, "/bin/bash", "-c", "curl -o output.txt http://events.e2b.local/me")
+	err := utils.ExecCommand(t, ctx, sbx, envdClient, "/bin/bash", "-c", "curl -o output.txt http://events.moru.local/me")
 	require.NoError(t, err, "Should be able to contact hyperloop server")
 
 	readPath := "output.txt"

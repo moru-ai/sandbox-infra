@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	db "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/db/testutils"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
+	db "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/db/testutils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
 )
 
 func TestValidate(t *testing.T) {
@@ -110,13 +110,13 @@ func setupValidateTest(tb testing.TB, db *db.Client, userID, teamID uuid.UUID, a
 	// Create team
 	err := db.TestsRawSQL(tb.Context(), `
 		INSERT INTO "auth"."users" (id, email)
-		VALUES ($1, 'test@e2b.dev')
+		VALUES ($1, 'test@moru.io')
 	`, userID)
 	require.NoError(tb, err)
 
 	err = db.TestsRawSQL(tb.Context(), `
 		INSERT INTO teams (id, name, email, tier)
-		VALUES ($1, 'test-team', 'test@e2b.dev', 'base_v1')
+		VALUES ($1, 'test-team', 'test@moru.io', 'base_v1')
 	`, teamID)
 	require.NoError(tb, err)
 

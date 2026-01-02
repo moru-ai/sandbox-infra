@@ -42,7 +42,7 @@ func TestSimpleCases(t *testing.T) {
 			assert.Equal(t, `# comment
 127.0.0.1        one.host
 127.0.0.2        two.host
-127.0.0.3        events.e2b.local`, strings.TrimSpace(string(data)))
+127.0.0.3        events.moru.local`, strings.TrimSpace(string(data)))
 		})
 	}
 }

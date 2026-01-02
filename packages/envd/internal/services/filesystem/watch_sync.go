@@ -11,11 +11,11 @@ import (
 	"github.com/e2b-dev/fsnotify"
 	"github.com/rs/zerolog"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/filesystem"
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
-	"github.com/e2b-dev/infra/packages/shared/pkg/id"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/filesystem"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
 )
 
 type FileWatcher struct {

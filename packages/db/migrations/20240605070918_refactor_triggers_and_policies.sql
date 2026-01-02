@@ -22,7 +22,7 @@ CREATE OR REPLACE FUNCTION public.generate_team_api_key()
     LANGUAGE plpgsql
 AS $generate_team_api_key$
 DECLARE
-    team_api_key_prefix TEXT := 'e2b_';
+    team_api_key_prefix TEXT := 'moru_';
     generated_key TEXT;
 BEGIN
     -- Generate a random 20 byte string and encode it as hex, so it's 40 characters
@@ -38,7 +38,7 @@ CREATE OR REPLACE FUNCTION public.generate_access_token()
     LANGUAGE plpgsql
 AS $extra_for_post_user_signup$
 DECLARE
-    access_token_prefix TEXT := 'sk_e2b_';
+    access_token_prefix TEXT := 'sk_moru_';
     generated_token TEXT;
 BEGIN
     -- Generate a random 20 byte string and encode it as hex, so it's 40 characters

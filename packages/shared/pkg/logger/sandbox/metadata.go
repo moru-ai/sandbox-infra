@@ -3,7 +3,7 @@ package sbxlogger
 import (
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 type SandboxMetadata struct {

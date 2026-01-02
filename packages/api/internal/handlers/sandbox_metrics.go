@@ -10,15 +10,15 @@ import (
 	"github.com/launchdarkly/go-sdk-common/v3/ldcontext"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/api"
-	"github.com/e2b-dev/infra/packages/api/internal/auth"
-	"github.com/e2b-dev/infra/packages/api/internal/db/types"
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	clickhouse "github.com/e2b-dev/infra/packages/clickhouse/pkg"
-	clickhouseUtils "github.com/e2b-dev/infra/packages/clickhouse/pkg/utils"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/auth"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
+	clickhouseUtils "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg/utils"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 func (a *APIStore) GetSandboxesSandboxIDMetrics(c *gin.Context, sandboxID string, params api.GetSandboxesSandboxIDMetricsParams) {

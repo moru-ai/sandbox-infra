@@ -10,10 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 
-	orchestratorinfo "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/edge"
-	l "github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	orchestratorinfo "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
+	l "github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 var ApiNodeToOrchestratorStateMapper = map[api.ClusterNodeStatus]orchestratorinfo.ServiceInfoStatus{

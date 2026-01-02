@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/constants"
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/handlers"
-	"github.com/e2b-dev/infra/packages/docker-reverse-proxy/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/constants"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/handlers"
+	"github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy/internal/utils"
 )
 
 var commitSHA string

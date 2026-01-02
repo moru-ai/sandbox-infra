@@ -9,11 +9,11 @@ import (
 	nomadapi "github.com/hashicorp/nomad/api"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
-	grpclient "github.com/e2b-dev/infra/packages/api/internal/grpc"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	grpclient "github.com/moru-ai/sandbox-infra/packages/api/internal/grpc"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const nodeHealthCheckTimeout = time.Second * 2

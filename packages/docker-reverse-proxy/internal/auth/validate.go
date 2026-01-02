@@ -7,9 +7,9 @@ import (
 	"log"
 	"strings"
 
-	"github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/db/queries"
-	"github.com/e2b-dev/infra/packages/shared/pkg/keys"
+	"github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
 )
 
 func Validate(ctx context.Context, sqlcDB *client.Client, token, envID string) (bool, error) {
@@ -59,7 +59,7 @@ func ExtractAccessToken(authHeader, authType string) (string, error) {
 	}
 
 	username := loginInfoParts[0]
-	if username != "_e2b_access_token" {
+	if username != "_moru_access_token" {
 		return "", fmt.Errorf("invalid username %s", username)
 	}
 

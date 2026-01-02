@@ -8,7 +8,7 @@ import (
 	"github.com/pressly/goose/v3"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const trackingTable = "_migrations"

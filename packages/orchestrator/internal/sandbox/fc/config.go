@@ -3,7 +3,7 @@ package fc
 import (
 	"path/filepath"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
 )
 
 const (

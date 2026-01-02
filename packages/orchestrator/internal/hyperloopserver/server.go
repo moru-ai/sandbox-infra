@@ -10,11 +10,11 @@ import (
 	"github.com/gin-gonic/gin"
 	middleware "github.com/oapi-codegen/gin-middleware"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/hyperloopserver/handlers"
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	api "github.com/e2b-dev/infra/packages/shared/pkg/http/hyperloop"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/hyperloopserver/handlers"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/hyperloop"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 const maxUploadLimit = 1 << 28 // 256 MiB

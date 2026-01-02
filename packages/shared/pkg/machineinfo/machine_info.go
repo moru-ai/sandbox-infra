@@ -1,9 +1,9 @@
 package machineinfo
 
 import (
-	"github.com/e2b-dev/infra/packages/db/queries"
-	infogrpc "github.com/e2b-dev/infra/packages/shared/pkg/grpc/orchestrator-info"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+	infogrpc "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/orchestrator-info"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 type MachineInfo struct {

@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
 )
 
 // applyFilter checks if a sandbox matches the filter criteria

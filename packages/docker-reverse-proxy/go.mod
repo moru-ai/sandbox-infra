@@ -1,14 +1,14 @@
-module github.com/e2b-dev/infra/packages/docker-reverse-proxy
+module github.com/moru-ai/sandbox-infra/packages/docker-reverse-proxy
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/db v0.0.0 => ../db
+replace github.com/moru-ai/sandbox-infra/packages/db v0.0.0 => ../db
 
-replace github.com/e2b-dev/infra/packages/shared v0.0.0 => ../shared
+replace github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
 
 require (
-	github.com/e2b-dev/infra/packages/db v0.0.0
-	github.com/e2b-dev/infra/packages/shared v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/db v0.0.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/google/uuid v1.6.0
 	github.com/jellydator/ttlcache/v3 v3.4.0
 	github.com/stretchr/testify v1.11.1

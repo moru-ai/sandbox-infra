@@ -12,25 +12,25 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	analyticscollector "github.com/e2b-dev/infra/packages/api/internal/analytics_collector"
-	"github.com/e2b-dev/infra/packages/api/internal/cfg"
-	"github.com/e2b-dev/infra/packages/api/internal/edge"
-	"github.com/e2b-dev/infra/packages/api/internal/metrics"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/evictor"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/nodemanager"
-	"github.com/e2b-dev/infra/packages/api/internal/orchestrator/placement"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox/reservations"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox/storage/memory"
-	"github.com/e2b-dev/infra/packages/api/internal/sandbox/storage/populate_redis"
-	redisbackend "github.com/e2b-dev/infra/packages/api/internal/sandbox/storage/redis"
-	sqlcdb "github.com/e2b-dev/infra/packages/db/client"
-	"github.com/e2b-dev/infra/packages/shared/pkg/env"
-	featureflags "github.com/e2b-dev/infra/packages/shared/pkg/feature-flags"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	e2bcatalog "github.com/e2b-dev/infra/packages/shared/pkg/sandbox-catalog"
-	"github.com/e2b-dev/infra/packages/shared/pkg/smap"
-	"github.com/e2b-dev/infra/packages/shared/pkg/telemetry"
+	analyticscollector "github.com/moru-ai/sandbox-infra/packages/api/internal/analytics_collector"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/metrics"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/evictor"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/nodemanager"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator/placement"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox/reservations"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox/storage/memory"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox/storage/populate_redis"
+	redisbackend "github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox/storage/redis"
+	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/env"
+	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	morucatalog "github.com/moru-ai/sandbox-infra/packages/shared/pkg/sandbox-catalog"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/smap"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
 const statusLogInterval = time.Second * 20
@@ -46,7 +46,7 @@ type Orchestrator struct {
 	featureFlagsClient      *featureflags.Client
 	analytics               *analyticscollector.Analytics
 	posthogClient           *analyticscollector.PosthogClient
-	routingCatalog          e2bcatalog.SandboxesCatalog
+	routingCatalog          morucatalog.SandboxesCatalog
 	sqlcDB                  *sqlcdb.Client
 	tel                     *telemetry.Client
 	clusters                *edge.Pool
@@ -81,11 +81,11 @@ func New(
 		return nil, err
 	}
 
-	var routingCatalog e2bcatalog.SandboxesCatalog
+	var routingCatalog morucatalog.SandboxesCatalog
 	if redisClient != nil {
-		routingCatalog = e2bcatalog.NewRedisSandboxesCatalog(redisClient)
+		routingCatalog = morucatalog.NewRedisSandboxesCatalog(redisClient)
 	} else {
-		routingCatalog = e2bcatalog.NewMemorySandboxesCatalog()
+		routingCatalog = morucatalog.NewMemorySandboxesCatalog()
 	}
 
 	// We will need to either use Redis or Consul's KV for storing active sandboxes to keep everything in sync,

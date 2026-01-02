@@ -21,10 +21,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/e2b-dev/infra/packages/orchestrator/internal/template/build/core/oci/auth"
-	"github.com/e2b-dev/infra/packages/shared/pkg/dockerhub"
-	templatemanager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/template/build/core/oci/auth"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/dockerhub"
+	templatemanager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 func createFileTar(t *testing.T, fileName string) *bytes.Buffer {

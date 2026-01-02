@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 	"google.golang.org/grpc/metadata"
 
-	"github.com/e2b-dev/infra/packages/api/internal/utils"
-	template_manager "github.com/e2b-dev/infra/packages/shared/pkg/grpc/template-manager"
-	ut "github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
+	template_manager "github.com/moru-ai/sandbox-infra/packages/shared/pkg/grpc/template-manager"
+	ut "github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 func (tm *TemplateManager) InitLayerFileUpload(ctx context.Context, clusterID uuid.UUID, nodeID string, teamID uuid.UUID, templateID string, hash string) (*template_manager.InitLayerFileUploadResponse, error) {

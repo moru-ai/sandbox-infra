@@ -359,7 +359,7 @@ variable "otel_tracing_print" {
 
 variable "domain_name" {
   type        = string
-  description = "The domain name where e2b will run"
+  description = "The domain name where moru will run"
 }
 
 variable "additional_api_services_json" {
@@ -371,7 +371,7 @@ Example:
 [
   {
     "paths": ["/api/v1"],
-    "service_id": "projects/e2b/global/backendServices/example",
+    "service_id": "projects/moru/global/backendServices/example",
     "api_node_group_port_name": "example-port",
     "api_node_group_port": 8080
   }
@@ -383,14 +383,14 @@ EOT
 variable "prefix" {
   type        = string
   description = "The prefix to use for all resources in this module"
-  default     = "e2b-"
+  default     = "moru-"
 }
 
 variable "labels" {
   description = "The labels to attach to resources created by this module"
   type        = map(string)
   default = {
-    "app"       = "e2b"
+    "app"       = "mru"
     "terraform" = "true"
   }
 }

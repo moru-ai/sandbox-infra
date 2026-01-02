@@ -9,7 +9,7 @@ SELECT
     MetricName AS metric_name,
     Value AS value
 FROM metrics_gauge
-WHERE MetricName LIKE 'e2b.sandbox.%';
+WHERE MetricName LIKE 'moru.sandbox.%';
 
 
 -- +goose Down

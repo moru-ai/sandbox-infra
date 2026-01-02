@@ -1,6 +1,6 @@
 package keys
 
 const (
-	ApiKeyPrefix      = "e2b_"
-	AccessTokenPrefix = "sk_e2b_"
+	ApiKeyPrefix      = "moru_"
+	AccessTokenPrefix = "sk_moru_"
 )

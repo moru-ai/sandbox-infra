@@ -16,8 +16,8 @@ import (
 	"go.opentelemetry.io/otel/metric"
 	"go.uber.org/zap"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/logger"
-	"github.com/e2b-dev/infra/packages/shared/pkg/utils"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/utils"
 )
 
 // maxSlotsReady is the number of slots that are ready to be used.
@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	meter       = otel.Meter("github.com/e2b-dev/infra/packages/orchestrator/internal/sandbox/nbd")
+	meter       = otel.Meter("github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/nbd")
 	slotCounter = utils.Must(meter.Int64UpDownCounter("orchestrator.nbd.slots_pool.ready",
 		metric.WithDescription("Number of nbd slots ready to be used."),
 		metric.WithUnit("{slot}"),

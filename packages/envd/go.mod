@@ -1,8 +1,8 @@
-module github.com/e2b-dev/infra/packages/envd
+module github.com/moru-ai/sandbox-infra/packages/envd
 
 go 1.25.4
 
-replace github.com/e2b-dev/infra/packages/shared v0.0.0 => ../shared
+replace github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
 
 tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
 
@@ -12,9 +12,9 @@ require (
 	connectrpc.com/cors v0.1.0
 	github.com/creack/pty v1.1.23
 	github.com/e2b-dev/fsnotify v0.0.1
-	github.com/e2b-dev/infra/packages/shared v0.0.0
 	github.com/go-chi/chi/v5 v5.2.2
 	github.com/google/uuid v1.6.0
+	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.34.0

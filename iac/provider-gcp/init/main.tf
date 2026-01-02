@@ -231,7 +231,7 @@ resource "google_secret_manager_secret_version" "routing_domains" {
 
 resource "google_artifact_registry_repository" "orchestration_repository" {
   format        = "DOCKER"
-  repository_id = "e2b-orchestration"
+  repository_id = "mru-orchestration"
   labels        = var.labels
 
   depends_on = [time_sleep.artifact_registry_api_wait_90_seconds]

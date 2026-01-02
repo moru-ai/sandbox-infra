@@ -8,9 +8,9 @@ import (
 	"os/user"
 	"time"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/permissions"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/permissions"
 )
 
 func (a *API) GetFiles(w http.ResponseWriter, r *http.Request, params GetFilesParams) {

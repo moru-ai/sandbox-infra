@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/e2b-dev/infra/packages/shared/pkg/consts"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/consts"
 )
 
 // SetDockerUnauthorizedHeaders https://distribution.github.io/distribution/spec/api/#api-version-check

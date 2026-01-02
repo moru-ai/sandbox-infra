@@ -7,13 +7,13 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/execcontext"
-	"github.com/e2b-dev/infra/packages/envd/internal/logs"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/cgroups"
-	"github.com/e2b-dev/infra/packages/envd/internal/services/process/handler"
-	rpc "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
-	spec "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process/processconnect"
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/execcontext"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/logs"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/cgroups"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/services/process/handler"
+	rpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
+	spec "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process/processconnect"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
 )
 
 type Service struct {

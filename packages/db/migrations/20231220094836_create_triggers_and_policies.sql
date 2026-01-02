@@ -44,7 +44,7 @@ CREATE OR REPLACE FUNCTION public.generate_teams_api_keys_trigger() RETURNS TRIG
     LANGUAGE plpgsql
 AS $generate_teams_api_keys$
 DECLARE
-    key_prefix TEXT := 'e2b_';
+    key_prefix TEXT := 'moru_';
     generated_key TEXT;
 BEGIN
     -- Generate a random 20 byte string and encode it as hex, so it's 40 characters
@@ -67,7 +67,7 @@ CREATE OR REPLACE FUNCTION public.generate_access_token_trigger() RETURNS TRIGGE
     LANGUAGE plpgsql
     AS $generate_access_token$
 DECLARE
-    key_prefix TEXT := 'sk_e2b_';
+    key_prefix TEXT := 'sk_moru_';
     generated_key TEXT;
 BEGIN
     -- Generate a random 20 byte string and encode it as hex, so it's 40 characters

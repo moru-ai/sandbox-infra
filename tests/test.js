@@ -1,4 +1,4 @@
-import { Sandbox } from 'e2b'
+import { Sandbox } from '@moru-ai/core'
 import 'dotenv/config'
 
 async function main(){

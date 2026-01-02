@@ -23,7 +23,7 @@ TO team_metrics_gauge AS SELECT
     MetricName AS metric_name,
     Value AS value
 FROM metrics_gauge
-WHERE MetricName LIKE 'e2b.team.%';
+WHERE MetricName LIKE 'moru.team.%';
 
 
 -- +goose Down

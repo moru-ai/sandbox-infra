@@ -3,7 +3,7 @@ package execcontext
 import (
 	"errors"
 
-	"github.com/e2b-dev/infra/packages/envd/internal/utils"
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
 )
 
 type Defaults struct {

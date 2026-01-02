@@ -8,7 +8,7 @@ import (
 	connect "connectrpc.com/connect"
 	context "context"
 	errors "errors"
-	process "github.com/e2b-dev/infra/packages/envd/internal/services/spec/process"
+	process "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 	http "net/http"
 	strings "strings"
 )
