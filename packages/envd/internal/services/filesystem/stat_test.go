@@ -2,9 +2,11 @@ package filesystem
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/user"
 	"path/filepath"
+	"syscall"
 	"testing"
 
 	"connectrpc.com/authn"
@@ -27,9 +29,6 @@ func TestStat(t *testing.T) {
 	u, err := user.Current()
 	require.NoError(t, err)
 
-	group, err := user.LookupGroupId(u.Gid)
-	require.NoError(t, err)
-
 	// Setup directory structure
 	testFolder := filepath.Join(root, "test")
 	err = os.MkdirAll(testFolder, 0o755)
@@ -37,6 +36,13 @@ func TestStat(t *testing.T) {
 
 	testFile := filepath.Join(testFolder, "file.txt")
 	err = os.WriteFile(testFile, []byte("Hello, World!"), 0o644)
+	require.NoError(t, err)
+
+	// Get the file's actual group (may differ from user's primary group on macOS)
+	fileInfo, err := os.Stat(testFile)
+	require.NoError(t, err)
+	sys := fileInfo.Sys().(*syscall.Stat_t)
+	group, err := user.LookupGroupId(fmt.Sprintf("%d", sys.Gid))
 	require.NoError(t, err)
 
 	linkedFile := filepath.Join(testFolder, "linked-file.txt")
