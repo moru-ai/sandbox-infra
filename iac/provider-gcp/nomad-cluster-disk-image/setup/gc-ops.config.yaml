@@ -1,6 +1,8 @@
 logging:
   service:
-    pipelines: {}
+    pipelines:
+      default_pipeline:
+        receivers: []
 
 metrics:
   receivers:
