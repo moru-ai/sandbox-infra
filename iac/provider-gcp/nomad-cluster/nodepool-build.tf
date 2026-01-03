@@ -25,7 +25,6 @@ locals {
     BASE_HUGEPAGES_PERCENTAGE    = var.build_base_hugepages_percentage
     CACHE_DISK_COUNT             = var.build_cluster_cache_disk_count
     LOCAL_SSD                    = local.build_has_local_ssd ? "true" : "false"
-    ENABLE_OPS_AGENT             = var.enable_ops_agent
   })
 }
 
@@ -99,7 +98,7 @@ resource "google_compute_instance_template" "build" {
 
   labels = merge(
     var.labels,
-    (var.enable_ops_agent && var.environment != "dev" ? {
+    (var.environment != "dev" ? {
       goog-ops-agent-policy = "v2-x86-template-1-2-0-${var.gcp_zone}"
     } : {})
   )

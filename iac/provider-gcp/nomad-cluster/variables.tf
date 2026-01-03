@@ -401,9 +401,3 @@ variable "loki_boot_disk_type" {
   description = "The GCE boot disk type for the Loki machines."
   type        = string
 }
-
-variable "enable_ops_agent" {
-  description = "Whether to enable the Google Cloud Ops Agent for monitoring and logging. When disabled, saves Cloud Monitoring costs but disables memory-based autoscaling."
-  type        = bool
-  default     = false
-}

@@ -15,13 +15,6 @@ set -x
 # Inspired by https://alestic.com/2010/12/ec2-user-data-output/
 exec > >(tee /var/log/user-data.log | logger -t user-data -s 2>/dev/console) 2>&1
 
-%{ if ENABLE_OPS_AGENT == false }
-# Disable Google Cloud Ops Agent to reduce Cloud Monitoring costs
-echo "Disabling Google Cloud Ops Agent..."
-sudo systemctl stop google-cloud-ops-agent || true
-sudo systemctl disable google-cloud-ops-agent || true
-%{ endif }
-
 %{ if LOCAL_SSD == "true" }
   # Add cache disk for orchestrator and swapfile
   for i in {0..${ CACHE_DISK_COUNT - 1 }}; do

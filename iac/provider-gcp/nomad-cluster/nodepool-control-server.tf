@@ -9,7 +9,6 @@ locals {
     RUN_CONSUL_FILE_HASH         = local.file_hash["scripts/run-consul.sh"]
     RUN_NOMAD_FILE_HASH          = local.file_hash["scripts/run-nomad.sh"]
     CONSUL_GOSSIP_ENCRYPTION_KEY = google_secret_manager_secret_version.consul_gossip_encryption_key.secret_data
-    ENABLE_OPS_AGENT             = var.enable_ops_agent
   })
 }
 
@@ -92,7 +91,7 @@ resource "google_compute_instance_template" "server" {
 
   labels = merge(
     var.labels,
-    (var.enable_ops_agent && var.environment != "dev" ? {
+    (var.environment != "dev" ? {
       goog-ops-agent-policy = "v2-x86-template-1-2-0-${var.gcp_zone}"
     } : {})
   )
