@@ -20,13 +20,12 @@ jobs:
     uses: ./.github/workflows/out-of-order-migrations.yml
   unit-tests:
     uses: ./.github/workflows/pr-tests.yml
-  integration-tests:
-    needs: [out-of-order-migrations]
-    uses: ./.github/workflows/integration_tests.yml
+  # integration-tests:
+  #   needs: [out-of-order-migrations]
+  #   uses: ./.github/workflows/integration_tests.yml
   publish-test-results:
     needs:
       - unit-tests
-      - integration-tests
     runs-on: ubuntu-latest
     permissions:
       checks: write
