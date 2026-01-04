@@ -620,11 +620,11 @@ func (siw *ServerInterfaceWrapper) GetSandboxesSandboxIDLogs(c *gin.Context) {
 		return
 	}
 
-	// ------------- Optional query parameter "level" -------------
+	// ------------- Optional query parameter "eventType" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "level", c.Request.URL.Query(), &params.Level)
+	err = runtime.BindQueryParameter("form", true, false, "eventType", c.Request.URL.Query(), &params.EventType)
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter level: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter eventType: %w", err), http.StatusBadRequest)
 		return
 	}
 

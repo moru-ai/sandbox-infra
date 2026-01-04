@@ -255,7 +255,7 @@ components:
     SandboxLogEntry:
       required:
         - timestamp
-        - level
+        - eventType
         - message
         - fields
       properties:
@@ -266,8 +266,8 @@ components:
         message:
           type: string
           description: Log message content
-        level:
-          $ref: "#/components/schemas/LogLevel"
+        eventType:
+          $ref: "#/components/schemas/SandboxLogEventType"
         fields:
           type: object
           additionalProperties:
@@ -1013,12 +1013,19 @@ components:
 
     LogLevel:
       type: string
-      description: State of the sandbox
+      description: Log level for build logs
       enum:
         - debug
         - info
         - warn
         - error
+
+    SandboxLogEventType:
+      type: string
+      description: Type of sandbox log event (stdout or stderr)
+      enum:
+        - stdout
+        - stderr
 
     BuildLogEntry:
       required:
@@ -1797,9 +1804,10 @@ paths:
           schema:
             $ref: "#/components/schemas/LogsDirection"
         - in: query
-          name: level
+          name: eventType
+          description: Filter by event type (stdout or stderr). If not specified, returns all logs.
           schema:
-            $ref: "#/components/schemas/LogLevel"
+            $ref: "#/components/schemas/SandboxLogEventType"
       responses:
         "200":
           description: Successfully returned the sandbox logs

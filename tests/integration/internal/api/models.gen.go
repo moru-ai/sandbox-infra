@@ -63,6 +63,12 @@ const (
 	NodeStatusUnhealthy  NodeStatus = "unhealthy"
 )
 
+// Defines values for SandboxLogEventType.
+const (
+	Stderr SandboxLogEventType = "stderr"
+	Stdout SandboxLogEventType = "stdout"
+)
+
 // Defines values for SandboxState.
 const (
 	Paused  SandboxState = "paused"
@@ -112,7 +118,7 @@ type AdminSandboxKillResult struct {
 
 // BuildLogEntry defines model for BuildLogEntry.
 type BuildLogEntry struct {
-	// Level State of the sandbox
+	// Level Log level for build logs
 	Level LogLevel `json:"level"`
 
 	// Message Log message content
@@ -303,7 +309,7 @@ type ListedSandbox struct {
 	TemplateID string `json:"templateID"`
 }
 
-// LogLevel State of the sandbox
+// LogLevel Log level for build logs
 type LogLevel string
 
 // LogsDirection Direction of the logs that should be returned
@@ -593,10 +599,9 @@ type SandboxLog struct {
 
 // SandboxLogEntry defines model for SandboxLogEntry.
 type SandboxLogEntry struct {
-	Fields map[string]string `json:"fields"`
-
-	// Level State of the sandbox
-	Level LogLevel `json:"level"`
+	// EventType Type of sandbox log event (stdout or stderr)
+	EventType SandboxLogEventType `json:"eventType"`
+	Fields    map[string]string   `json:"fields"`
 
 	// Message Log message content
 	Message string `json:"message"`
@@ -604,6 +609,9 @@ type SandboxLogEntry struct {
 	// Timestamp Timestamp of the log entry
 	Timestamp time.Time `json:"timestamp"`
 }
+
+// SandboxLogEventType Type of sandbox log event (stdout or stderr)
+type SandboxLogEventType string
 
 // SandboxLogs defines model for SandboxLogs.
 type SandboxLogs struct {
@@ -1097,7 +1105,9 @@ type GetSandboxesSandboxIDLogsParams struct {
 	// Limit Maximum number of logs that should be returned
 	Limit     *int32         `form:"limit,omitempty" json:"limit,omitempty"`
 	Direction *LogsDirection `form:"direction,omitempty" json:"direction,omitempty"`
-	Level     *LogLevel      `form:"level,omitempty" json:"level,omitempty"`
+
+	// EventType Filter by event type (stdout or stderr). If not specified, returns all logs.
+	EventType *SandboxLogEventType `form:"eventType,omitempty" json:"eventType,omitempty"`
 }
 
 // GetSandboxesSandboxIDMetricsParams defines parameters for GetSandboxesSandboxIDMetrics.

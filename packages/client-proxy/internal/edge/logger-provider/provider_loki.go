@@ -58,12 +58,23 @@ func (l *LokiQueryProvider) QueryBuildLogs(ctx context.Context, templateID strin
 	return lm, nil
 }
 
-func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string, sandboxID string, start time.Time, end time.Time, limit int, level *logs.LogLevel, direction logproto.Direction) ([]logs.LogEntry, error) {
+func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string, sandboxID string, start time.Time, end time.Time, limit int, eventType string, direction logproto.Direction, includeSystemLogs bool) ([]logs.LogEntry, error) {
 	// https://grafana.com/blog/2021/01/05/how-to-escape-special-characters-with-lokis-logql/
 	sandboxIdSanitized := strings.ReplaceAll(sandboxID, "`", "")
 	teamIdSanitized := strings.ReplaceAll(teamID, "`", "")
 
-	query := fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"}", teamIdSanitized, sandboxIdSanitized)
+	var query string
+	if includeSystemLogs {
+		// Admin view: include all logs (stdout, stderr, process_start, process_end, etc.)
+		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"}", teamIdSanitized, sandboxIdSanitized)
+	} else if eventType == "stdout" || eventType == "stderr" {
+		// User view with specific event type filter
+		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"} | json | event_type=\"%s\"", teamIdSanitized, sandboxIdSanitized, eventType)
+	} else {
+		// User view: filter to only stdout/stderr logs (user program output)
+		// This excludes system logs like process_start, process_end
+		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"} | json | event_type=~\"stdout|stderr\"", teamIdSanitized, sandboxIdSanitized)
+	}
 
 	res, err := l.client.QueryRange(query, limit, start, end, direction, time.Duration(0), time.Duration(0), true)
 	if err != nil {
@@ -73,7 +84,7 @@ func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string,
 		return make([]logs.LogEntry, 0), nil
 	}
 
-	lm, err := logsloki.ResponseMapper(ctx, res, 0, level)
+	lm, err := logsloki.ResponseMapper(ctx, res, 0, nil)
 	if err != nil {
 		telemetry.ReportError(ctx, "error when mapping sandbox logs", err)
 		logger.L().Error(ctx, "error when mapping logs for sandbox", zap.Error(err), logger.WithSandboxID(sandboxID))

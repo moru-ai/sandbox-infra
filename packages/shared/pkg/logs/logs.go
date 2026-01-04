@@ -11,6 +11,7 @@ type LogEntry struct {
 	Message   string
 	Raw       string
 	Level     LogLevel
+	EventType string // For sandbox logs: "stdout" or "stderr"
 	Fields    map[string]string
 }
 

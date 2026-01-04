@@ -32,7 +32,14 @@ func ResponseMapper(ctx context.Context, res *loghttp.QueryResponse, offset int3
 				levelName = ll
 			}
 
+			eventType := ""
+			if et, ok := fields["event_type"]; ok {
+				eventType = et
+			}
+
 			// Skip logs that are below the specified level
+			// Note: For sandbox logs, level filtering is done via Loki query (event_type filter)
+			// This level filter is primarily used for build logs which have proper log levels
 			if level != nil && logs.CompareLevels(levelName, logs.LevelToString(*level)) < 0 {
 				continue
 			}
@@ -44,7 +51,14 @@ func ResponseMapper(ctx context.Context, res *loghttp.QueryResponse, offset int3
 			}
 
 			message := ""
-			if msg, ok := fields["message"]; ok {
+			// For stdout/stderr logs, use the "data" field as the message
+			// since the "message" field is a generic "Streaming process event"
+			if eventType == "stdout" || eventType == "stderr" {
+				if data, ok := fields["data"]; ok {
+					message = data
+					delete(fields, "data")
+				}
+			} else if msg, ok := fields["message"]; ok {
 				message = msg
 			}
 
@@ -56,9 +70,10 @@ func ResponseMapper(ctx context.Context, res *loghttp.QueryResponse, offset int3
 				Timestamp: entry.Timestamp,
 				Raw:       entry.Line,
 
-				Level:   logs.StringToLevel(levelName),
-				Message: message,
-				Fields:  fields,
+				Level:     logs.StringToLevel(levelName),
+				EventType: eventType,
+				Message:   message,
+				Fields:    fields,
 			})
 		}
 	}

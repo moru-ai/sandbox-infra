@@ -8,7 +8,6 @@ import (
 	"github.com/grafana/loki/pkg/logproto"
 
 	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
-	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logs"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/telemetry"
 )
 
@@ -44,7 +43,15 @@ func (a *APIStore) V1SandboxLogs(c *gin.Context, sandboxID string, params api.V1
 		limit = int(*params.Limit)
 	}
 
-	logsRaw, err := a.queryLogsProvider.QuerySandboxLogs(ctx, params.TeamID, sandboxID, start, end, limit, apiLevelToLogLevel(params.Level), direction)
+	// Convert API event type to string for query
+	eventType := ""
+	if params.EventType != nil {
+		eventType = string(*params.EventType)
+	}
+
+	// includeSystemLogs=false: show only stdout/stderr (user program output)
+	// Admins can query Loki directly via Grafana to see all logs
+	logsRaw, err := a.queryLogsProvider.QuerySandboxLogs(ctx, params.TeamID, sandboxID, start, end, limit, eventType, direction, false)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Error when fetching sandbox logs")
 		telemetry.ReportCriticalError(ctx, "error when fetching sandbox logs", err)
@@ -61,7 +68,7 @@ func (a *APIStore) V1SandboxLogs(c *gin.Context, sandboxID string, params api.V1
 			le, api.SandboxLogEntry{
 				Timestamp: log.Timestamp,
 				Message:   log.Message,
-				Level:     api.LogLevel(logs.LevelToString(log.Level)),
+				EventType: api.SandboxLogEventType(log.EventType),
 				Fields:    log.Fields,
 			},
 		)

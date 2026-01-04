@@ -552,9 +552,9 @@ func NewV1SandboxLogsRequest(server string, sandboxID string, params *V1SandboxL
 
 		}
 
-		if params.Level != nil {
+		if params.EventType != nil {
 
-			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "level", runtime.ParamLocationQuery, *params.Level); err != nil {
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "eventType", runtime.ParamLocationQuery, *params.EventType); err != nil {
 				return nil, err
 			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
 				return nil, err

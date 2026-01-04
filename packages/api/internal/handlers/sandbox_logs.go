@@ -59,9 +59,9 @@ func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, 
 		direction := apiedge.LogsDirection(*params.Direction)
 		edgeParams.Direction = &direction
 	}
-	if params.Level != nil {
-		level := apiedge.LogLevel(*params.Level)
-		edgeParams.Level = &level
+	if params.EventType != nil {
+		eventType := apiedge.SandboxLogEventType(*params.EventType)
+		edgeParams.EventType = &eventType
 	}
 
 	res, err := cluster.GetHttpClient().V1SandboxLogsWithResponse(
@@ -95,7 +95,7 @@ func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, 
 		le = append(
 			le, api.SandboxLogEntry{
 				Timestamp: row.Timestamp,
-				Level:     api.LogLevel(row.Level),
+				EventType: api.SandboxLogEventType(row.EventType),
 				Message:   row.Message,
 				Fields:    row.Fields,
 			},
