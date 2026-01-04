@@ -161,9 +161,6 @@ limits_config:
   max_global_streams_per_user: 0
   unordered_writes: true
   reject_old_samples_max_age: 168h
-  # Query limits to prevent 429 errors
-  max_query_parallelism: 32
-  max_outstanding_per_tenant: 256
 EOF
 
         destination = "local/loki-config.yml"
