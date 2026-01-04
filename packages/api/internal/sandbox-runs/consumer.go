@@ -3,6 +3,7 @@ package sandboxruns
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"os"
 	"time"
 
@@ -48,6 +49,7 @@ func (c *Consumer) Run(ctx context.Context) {
 	err := c.redis.XGroupCreateMkStream(ctx, events.SandboxEventsStreamName, groupName, "0").Err()
 	if err != nil && err.Error() != "BUSYGROUP Consumer Group name already exists" {
 		logger.L().Error(ctx, "Failed to create consumer group", zap.Error(err))
+
 		return
 	}
 
@@ -55,6 +57,7 @@ func (c *Consumer) Run(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			logger.L().Info(ctx, "Sandbox runs consumer stopping")
+
 			return
 		default:
 			c.processBatch(ctx)
@@ -72,9 +75,10 @@ func (c *Consumer) processBatch(ctx context.Context) {
 		Block:    blockTime,
 	}).Result()
 	if err != nil {
-		if err != redis.Nil {
+		if !errors.Is(err, redis.Nil) {
 			logger.L().Error(ctx, "Failed to read from stream", zap.Error(err))
 		}
+
 		return
 	}
 
@@ -84,6 +88,7 @@ func (c *Consumer) processBatch(ctx context.Context) {
 				logger.L().Error(ctx, "Failed to process message",
 					zap.String("messageID", msg.ID),
 					zap.Error(err))
+
 				continue // Don't ACK, will be redelivered
 			}
 
@@ -104,7 +109,7 @@ func (c *Consumer) processMessage(ctx context.Context, msg redis.XMessage) error
 
 	var event events.SandboxEvent
 	if err := json.Unmarshal([]byte(payload), &event); err != nil {
-		return nil // Skip unparseable messages
+		return nil //nolint:nilerr // Skip unparseable messages intentionally
 	}
 
 	return c.handleEvent(ctx, event)
@@ -121,6 +126,7 @@ func (c *Consumer) handleEvent(ctx context.Context, event events.SandboxEvent) e
 	case events.SandboxResumedEvent:
 		return c.handleResumed(ctx, event)
 	}
+
 	return nil
 }
 
@@ -148,8 +154,10 @@ func (c *Consumer) handleCreated(ctx context.Context, event events.SandboxEvent)
 		if isDuplicateKeyError(err) {
 			logger.L().Debug(ctx, "Sandbox run already exists, skipping",
 				logger.WithSandboxID(event.SandboxID))
+
 			return nil
 		}
+
 		return err
 	}
 
@@ -212,6 +220,7 @@ func (c *Consumer) handleResumed(ctx context.Context, event events.SandboxEvent)
 				SandboxID: event.SandboxID,
 			})
 		}
+
 		return err
 	}
 
@@ -254,5 +263,6 @@ func containsAt(s, substr string, start int) bool {
 			return true
 		}
 	}
+
 	return false
 }

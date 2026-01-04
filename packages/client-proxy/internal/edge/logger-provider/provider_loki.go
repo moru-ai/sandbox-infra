@@ -64,13 +64,14 @@ func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string,
 	teamIdSanitized := strings.ReplaceAll(teamID, "`", "")
 
 	var query string
-	if includeSystemLogs {
+	switch {
+	case includeSystemLogs:
 		// Admin view: include all logs (stdout, stderr, process_start, process_end, etc.)
 		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"}", teamIdSanitized, sandboxIdSanitized)
-	} else if eventType == "stdout" || eventType == "stderr" {
+	case eventType == "stdout" || eventType == "stderr":
 		// User view with specific event type filter - use label matching (fast)
 		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\", event_type=\"%s\"}", teamIdSanitized, sandboxIdSanitized, eventType)
-	} else {
+	default:
 		// User view: filter to only stdout/stderr logs (user program output)
 		// This excludes system logs like process_start, process_end
 		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\", event_type=~\"stdout|stderr\"}", teamIdSanitized, sandboxIdSanitized)

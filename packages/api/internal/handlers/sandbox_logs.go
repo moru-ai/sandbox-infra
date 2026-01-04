@@ -102,5 +102,18 @@ func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, 
 		)
 	}
 
+	// Filter out system logs from template build (timestamps before sandbox creation).
+	// This is safe for pause/resume: created_at is immutable and only set once when sandbox is first created.
+	sandboxRun, err := a.sqlcDB.GetSandboxRun(ctx, sandboxID)
+	if err == nil {
+		filtered := make([]api.SandboxLogEntry, 0, len(le))
+		for _, log := range le {
+			if !log.Timestamp.Before(sandboxRun.CreatedAt) {
+				filtered = append(filtered, log)
+			}
+		}
+		le = filtered
+	}
+
 	return &api.SandboxLogs{Logs: l, LogEntries: le}, nil
 }

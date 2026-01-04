@@ -74,12 +74,13 @@ Currently, sandbox logs have issues:
 
 ## Testing
 
-- [ ] Run sandbox, echo to stdout and stderr
-- [ ] Verify only stdout/stderr shown (no process_start/end)
-- [ ] Verify actual output shown (not "Streaming process event")
-- [ ] Verify stdout filter works
-- [ ] Verify stderr filter works
-- [ ] Verify build logs still work with level filter
+- [x] Run sandbox, echo to stdout and stderr
+- [x] Verify only stdout/stderr shown (no process_start/end)
+- [x] Verify actual output shown (not "Streaming process event")
+- [x] Verify stdout filter works
+- [x] Verify stderr filter works
+- [x] Verify build logs still work with level filter
+- [x] Verify system logs filtered by sandbox created_at timestamp
 
 ## Deployment
 
