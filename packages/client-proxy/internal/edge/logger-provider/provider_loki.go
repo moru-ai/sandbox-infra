@@ -68,12 +68,12 @@ func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string,
 		// Admin view: include all logs (stdout, stderr, process_start, process_end, etc.)
 		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"}", teamIdSanitized, sandboxIdSanitized)
 	} else if eventType == "stdout" || eventType == "stderr" {
-		// User view with specific event type filter
-		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"} | json | event_type=\"%s\"", teamIdSanitized, sandboxIdSanitized, eventType)
+		// User view with specific event type filter - use label matching (fast)
+		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\", event_type=\"%s\"}", teamIdSanitized, sandboxIdSanitized, eventType)
 	} else {
 		// User view: filter to only stdout/stderr logs (user program output)
 		// This excludes system logs like process_start, process_end
-		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\"} | json | event_type=~\"stdout|stderr\"", teamIdSanitized, sandboxIdSanitized)
+		query = fmt.Sprintf("{teamID=`%s`, sandboxID=`%s`, category!=\"metrics\", event_type=~\"stdout|stderr\"}", teamIdSanitized, sandboxIdSanitized)
 	}
 
 	res, err := l.client.QueryRange(query, limit, start, end, direction, time.Duration(0), time.Duration(0), true)

@@ -146,6 +146,9 @@ if !exists(.buildID) {
 if !exists(.service) {
   .service = "envd"
 }
+if !exists(.event_type) {
+  .event_type = "unknown"
+}
 """
 
 [transforms.internal_routing]
@@ -186,6 +189,7 @@ envID = "{{ envID }}"
 buildID = "{{ buildID }}"
 sandboxID = "{{ sandboxID }}"
 category = "{{ category }}"
+event_type = "{{ event_type }}"
 
 %{ if grafana_logs_endpoint != " " }
 [sinks.grafana]
