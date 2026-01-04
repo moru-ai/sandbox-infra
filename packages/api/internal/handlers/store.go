@@ -25,6 +25,7 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
+	sandboxruns "github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox-runs"
 	template_manager "github.com/moru-ai/sandbox-infra/packages/api/internal/template-manager"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
 	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
@@ -142,6 +143,12 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 
 	// Start the periodic sync of template builds statuses
 	go templateManager.BuildsStatusPeriodicalSync(ctx)
+
+	// Start sandbox runs consumer (writes sandbox events to PostgreSQL)
+	if redisClient != nil {
+		sandboxRunsConsumer := sandboxruns.NewConsumer(redisClient, sqlcDB)
+		go sandboxRunsConsumer.Run(ctx)
+	}
 
 	a := &APIStore{
 		config:               config,

@@ -102,11 +102,14 @@ func (o *Orchestrator) removeSandboxFromNode(ctx context.Context, sbx sandbox.Sa
 
 			return fmt.Errorf("failed to auto pause sandbox '%s': %w", sbx.SandboxID, err)
 		}
-	case sandbox.StateActionKill:
-		var err error
-		req := &orchestrator.SandboxDeleteRequest{SandboxId: sbx.SandboxID}
+	case sandbox.StateActionKill, sandbox.StateActionTimeout:
+		endReason := "killed"
+		if stateAction == sandbox.StateActionTimeout {
+			endReason = "timeout"
+		}
+		req := &orchestrator.SandboxDeleteRequest{SandboxId: sbx.SandboxID, EndReason: &endReason}
 		client, ctx := node.GetClient(ctx)
-		_, err = client.Sandbox.Delete(node.GetSandboxDeleteCtx(ctx, sbx.SandboxID, sbx.ExecutionID), req)
+		_, err := client.Sandbox.Delete(node.GetSandboxDeleteCtx(ctx, sbx.SandboxID, sbx.ExecutionID), req)
 		if err != nil {
 			return fmt.Errorf("failed to delete sandbox '%s': %w", sbx.SandboxID, err)
 		}

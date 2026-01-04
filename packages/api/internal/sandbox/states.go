@@ -12,8 +12,9 @@ var AllowedTransitions = map[State]map[State]bool{
 }
 
 const (
-	StateActionPause StateAction = "pause"
-	StateActionKill  StateAction = "kill"
+	StateActionPause   StateAction = "pause"
+	StateActionKill    StateAction = "kill"
+	StateActionTimeout StateAction = "timeout"
 )
 
 const (

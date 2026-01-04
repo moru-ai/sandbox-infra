@@ -348,6 +348,11 @@ func (s *Server) Delete(ctxConn context.Context, in *orchestrator.SandboxDeleteR
 
 	teamID, buildId, eventData := s.prepareSandboxEventData(ctx, sbx)
 
+	// Include end_reason in event if provided (e.g., "timeout", "killed")
+	if endReason := in.GetEndReason(); endReason != "" {
+		eventData["end_reason"] = endReason
+	}
+
 	eventType := events.SandboxKilledEventPair
 	go s.sbxEventsService.Publish(
 		context.WithoutCancel(ctx),

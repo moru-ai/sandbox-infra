@@ -84,6 +84,9 @@ message SandboxUpdateRequest {
 
 message SandboxDeleteRequest {
   string sandbox_id = 1;
+  // Reason for killing the sandbox. Optional for backwards compatibility.
+  // Values: "killed" (user-initiated), "timeout" (expired), "error", "shutdown"
+  optional string end_reason = 2;
 }
 
 message SandboxPauseRequest {
