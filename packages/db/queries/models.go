@@ -102,6 +102,21 @@ type EnvBuild struct {
 	CpuFlags           []string
 }
 
+type SandboxRun struct {
+	ID         uuid.UUID
+	SandboxID  string
+	TeamID     uuid.UUID
+	TemplateID string
+	BuildID    *string
+	Status     string
+	EndReason  *string
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
+	EndedAt    *time.Time
+	TimeoutAt  *time.Time
+	Metadata   types.JSONBStringMap
+}
+
 type Snapshot struct {
 	CreatedAt           pgtype.Timestamptz
 	EnvID               string
