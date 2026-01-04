@@ -33,7 +33,13 @@ func (a *APIStore) V1SandboxLogs(c *gin.Context, sandboxID string, params api.V1
 	var start time.Time
 
 	if params.Cursor != nil {
-		start = time.UnixMilli(*params.Cursor)
+		cursorTime := time.UnixMilli(*params.Cursor)
+		if direction == logproto.BACKWARD {
+			end = cursorTime
+			start = end.Add(-sandboxLogsOldestLimit)
+		} else {
+			start = cursorTime
+		}
 	} else {
 		start = end.Add(-sandboxLogsOldestLimit)
 	}

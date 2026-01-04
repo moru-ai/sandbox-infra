@@ -44,7 +44,7 @@ func (l *LokiQueryProvider) QueryBuildLogs(ctx context.Context, templateID strin
 		telemetry.ReportError(ctx, "error when returning logs for template build", err)
 		logger.L().Error(ctx, "error when returning logs for template build", zap.Error(err), logger.WithBuildID(buildID))
 
-		return make([]logs.LogEntry, 0), nil
+		return nil, fmt.Errorf("failed to query build logs: %w", err)
 	}
 
 	lm, err := logsloki.ResponseMapper(ctx, res, offset, level)
@@ -52,7 +52,7 @@ func (l *LokiQueryProvider) QueryBuildLogs(ctx context.Context, templateID strin
 		telemetry.ReportError(ctx, "error when mapping build logs", err)
 		logger.L().Error(ctx, "error when mapping logs for template build", zap.Error(err), logger.WithBuildID(buildID))
 
-		return make([]logs.LogEntry, 0), nil
+		return nil, fmt.Errorf("failed to map build logs: %w", err)
 	}
 
 	return lm, nil
@@ -81,7 +81,7 @@ func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string,
 		telemetry.ReportError(ctx, "error when returning logs for sandbox", err)
 		logger.L().Error(ctx, "error when returning logs for sandbox", zap.Error(err), logger.WithSandboxID(sandboxID))
 
-		return make([]logs.LogEntry, 0), nil
+		return nil, fmt.Errorf("failed to query sandbox logs: %w", err)
 	}
 
 	lm, err := logsloki.ResponseMapper(ctx, res, 0, nil)
@@ -89,7 +89,7 @@ func (l *LokiQueryProvider) QuerySandboxLogs(ctx context.Context, teamID string,
 		telemetry.ReportError(ctx, "error when mapping sandbox logs", err)
 		logger.L().Error(ctx, "error when mapping logs for sandbox", zap.Error(err), logger.WithSandboxID(sandboxID))
 
-		return make([]logs.LogEntry, 0), nil
+		return nil, fmt.Errorf("failed to map sandbox logs: %w", err)
 	}
 
 	return lm, nil

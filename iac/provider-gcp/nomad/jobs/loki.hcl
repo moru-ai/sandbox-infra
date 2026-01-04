@@ -139,6 +139,16 @@ compactor:
   retention_delete_worker_count: 150
   shared_store: gcs
 
+# Query frontend settings to prevent 429 errors
+frontend:
+  max_outstanding_per_tenant: 256
+  compress_responses: true
+  log_queries_longer_than: 10s
+
+# Querier settings
+querier:
+  max_concurrent: 16
+
 # The bucket lifecycle policy should be set to delete objects after MORE than the specified retention period
 limits_config:
   retention_period: 168h
@@ -151,6 +161,9 @@ limits_config:
   max_global_streams_per_user: 0
   unordered_writes: true
   reject_old_samples_max_age: 168h
+  # Query limits to prevent 429 errors
+  max_query_parallelism: 32
+  max_outstanding_per_tenant: 256
 EOF
 
         destination = "local/loki-config.yml"
