@@ -71,7 +71,6 @@ func (c *Consumer) processBatch(ctx context.Context) {
 		Count:    batchSize,
 		Block:    blockTime,
 	}).Result()
-
 	if err != nil {
 		if err != redis.Nil {
 			logger.L().Error(ctx, "Failed to read from stream", zap.Error(err))
@@ -143,7 +142,6 @@ func (c *Consumer) handleCreated(ctx context.Context, event events.SandboxEvent)
 		TimeoutAt:  nil, // We don't have timeout info in the created event
 		Metadata:   nil,
 	})
-
 	if err != nil {
 		// Check for unique constraint violation (duplicate sandbox_id)
 		// This can happen on redelivery - treat as success
@@ -206,7 +204,6 @@ func (c *Consumer) handleResumed(ctx context.Context, event events.SandboxEvent)
 		TimeoutAt:  nil,
 		Metadata:   nil,
 	})
-
 	if err != nil {
 		if isDuplicateKeyError(err) {
 			// If sandbox already exists, just update status to running
