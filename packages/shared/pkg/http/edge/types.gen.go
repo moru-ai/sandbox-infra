@@ -37,6 +37,12 @@ const (
 	LogLevelWarn  LogLevel = "warn"
 )
 
+// Defines values for LogsDirection.
+const (
+	LogsDirectionBackward LogsDirection = "backward"
+	LogsDirectionForward  LogsDirection = "forward"
+)
+
 // Defines values for V1TemplateBuildLogsParamsDirection.
 const (
 	Backward V1TemplateBuildLogsParamsDirection = "backward"
@@ -151,6 +157,9 @@ type Error struct {
 // LogLevel State of the sandbox
 type LogLevel string
 
+// LogsDirection Direction of the logs that should be returned
+type LogsDirection string
+
 // SandboxLog Log entry with timestamp and line
 type SandboxLog struct {
 	// Line Log line content
@@ -256,11 +265,13 @@ type V1SandboxesMetricsParams struct {
 type V1SandboxLogsParams struct {
 	TeamID string `form:"teamID" json:"teamID"`
 
-	// Start Starting timestamp of the logs that should be returned in milliseconds
-	Start *int64 `form:"start,omitempty" json:"start,omitempty"`
+	// Cursor Starting timestamp of the logs that should be returned in milliseconds
+	Cursor *int64 `form:"cursor,omitempty" json:"cursor,omitempty"`
 
 	// Limit Maximum number of logs that should be returned
-	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit     *int32         `form:"limit,omitempty" json:"limit,omitempty"`
+	Direction *LogsDirection `form:"direction,omitempty" json:"direction,omitempty"`
+	Level     *LogLevel      `form:"level,omitempty" json:"level,omitempty"`
 }
 
 // V1SandboxMetricsParams defines parameters for V1SandboxMetrics.

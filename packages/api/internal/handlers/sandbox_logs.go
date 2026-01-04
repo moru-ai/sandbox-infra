@@ -29,7 +29,7 @@ func (a *APIStore) GetSandboxesSandboxIDLogs(c *gin.Context, sandboxID string, p
 	)
 
 	// Sandboxes living in a cluster
-	sbxLogs, err := a.getClusterSandboxLogs(ctx, sandboxID, team.ID.String(), utils.WithClusterFallback(team.ClusterID), params.Limit, params.Start)
+	sbxLogs, err := a.getClusterSandboxLogs(ctx, sandboxID, team.ID.String(), utils.WithClusterFallback(team.ClusterID), params)
 	if err != nil {
 		a.sendAPIStoreError(c, int(err.Code), err.Message)
 
@@ -39,7 +39,7 @@ func (a *APIStore) GetSandboxesSandboxIDLogs(c *gin.Context, sandboxID string, p
 	c.JSON(http.StatusOK, sbxLogs)
 }
 
-func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, teamID string, clusterID uuid.UUID, qLimit *int32, qStart *int64) (*api.SandboxLogs, *api.Error) {
+func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, teamID string, clusterID uuid.UUID, params api.GetSandboxesSandboxIDLogsParams) (*api.SandboxLogs, *api.Error) {
 	cluster, ok := a.clustersPool.GetClusterById(clusterID)
 	if !ok {
 		telemetry.ReportCriticalError(ctx, "error getting cluster by ID", fmt.Errorf("cluster with ID '%s' not found", clusterID))
@@ -50,12 +50,22 @@ func (a *APIStore) getClusterSandboxLogs(ctx context.Context, sandboxID string, 
 		}
 	}
 
+	edgeParams := &apiedge.V1SandboxLogsParams{
+		TeamID: teamID,
+		Cursor: params.Cursor,
+		Limit:  params.Limit,
+	}
+	if params.Direction != nil {
+		direction := apiedge.LogsDirection(*params.Direction)
+		edgeParams.Direction = &direction
+	}
+	if params.Level != nil {
+		level := apiedge.LogLevel(*params.Level)
+		edgeParams.Level = &level
+	}
+
 	res, err := cluster.GetHttpClient().V1SandboxLogsWithResponse(
-		ctx, sandboxID, &apiedge.V1SandboxLogsParams{
-			TeamID: teamID,
-			Start:  qStart,
-			Limit:  qLimit,
-		},
+		ctx, sandboxID, edgeParams,
 	)
 	if err != nil {
 		telemetry.ReportCriticalError(ctx, "error when returning logs for sandbox", err)

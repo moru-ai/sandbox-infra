@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/grafana/loki/pkg/logproto"
 
 	api "github.com/moru-ai/sandbox-infra/packages/shared/pkg/http/edge"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logs"
@@ -13,7 +14,9 @@ import (
 
 const (
 	sandboxLogsOldestLimit = 168 * time.Hour // 7 days
-	defaultLogsLimit       = 1000
+	sandboxLogsLimit       = 100
+
+	sandboxDefaultDirection = logproto.FORWARD
 )
 
 func (a *APIStore) V1SandboxLogs(c *gin.Context, sandboxID string, params api.V1SandboxLogsParams) {
@@ -22,20 +25,26 @@ func (a *APIStore) V1SandboxLogs(c *gin.Context, sandboxID string, params api.V1
 	_, templateSpan := tracer.Start(c, "sandbox-logs-handler")
 	defer templateSpan.End()
 
+	direction := sandboxDefaultDirection
+	if params.Direction != nil && *params.Direction == api.LogsDirectionBackward {
+		direction = logproto.BACKWARD
+	}
+
 	end := time.Now()
 	var start time.Time
 
-	if params.Start != nil {
-		start = time.UnixMilli(*params.Start)
+	if params.Cursor != nil {
+		start = time.UnixMilli(*params.Cursor)
 	} else {
 		start = end.Add(-sandboxLogsOldestLimit)
 	}
 
-	limit := defaultLogsLimit
-	if params.Limit != nil {
+	limit := sandboxLogsLimit
+	if params.Limit != nil && *params.Limit <= sandboxLogsLimit {
 		limit = int(*params.Limit)
 	}
-	logsRaw, err := a.queryLogsProvider.QuerySandboxLogs(ctx, params.TeamID, sandboxID, start, end, limit)
+
+	logsRaw, err := a.queryLogsProvider.QuerySandboxLogs(ctx, params.TeamID, sandboxID, start, end, limit, apiLevelToLogLevel(params.Level), direction)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Error when fetching sandbox logs")
 		telemetry.ReportCriticalError(ctx, "error when fetching sandbox logs", err)

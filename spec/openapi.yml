@@ -1777,7 +1777,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/sandboxID"
         - in: query
-          name: start
+          name: cursor
           schema:
             type: integer
             format: int64
@@ -1786,11 +1786,20 @@ paths:
         - in: query
           name: limit
           schema:
-            default: 1000
+            default: 100
+            type: integer
             format: int32
             minimum: 0
-            type: integer
+            maximum: 100
           description: Maximum number of logs that should be returned
+        - in: query
+          name: direction
+          schema:
+            $ref: "#/components/schemas/LogsDirection"
+        - in: query
+          name: level
+          schema:
+            $ref: "#/components/schemas/LogLevel"
       responses:
         "200":
           description: Successfully returned the sandbox logs
