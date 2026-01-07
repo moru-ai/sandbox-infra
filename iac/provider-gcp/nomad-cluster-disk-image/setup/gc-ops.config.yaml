@@ -1,3 +1,6 @@
+# Minimal config - only memory for autoscaling
+# All other metrics go to Grafana via otel-collector
+
 logging:
   service:
     pipelines:
@@ -8,12 +11,21 @@ metrics:
   receivers:
     hostmetrics:
       type: hostmetrics
-      collection_interval: 60s  # lower if we need more frequent checking
+      collection_interval: 180s  # 3 min (autoscaler cooldown is 4 min)
   processors:
     metrics_filter:
       type: exclude_metrics
       metrics_pattern:
+        # Exclude everything except memory/percent_used
+        - agent.googleapis.com/cpu/*
+        - agent.googleapis.com/disk/*
+        - agent.googleapis.com/interface/*
+        - agent.googleapis.com/network/*
+        - agent.googleapis.com/pagefile/*
         - agent.googleapis.com/processes/*
+        - agent.googleapis.com/swap/*
+        - agent.googleapis.com/agent/*
+        - agent.googleapis.com/iis/*
   service:
     pipelines:
       default_pipeline:
