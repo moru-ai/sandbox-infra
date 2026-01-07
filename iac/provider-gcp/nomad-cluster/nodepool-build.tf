@@ -112,7 +112,7 @@ resource "google_compute_instance_template" "build" {
   )
 
   scheduling {
-    on_host_maintenance = local.build_has_local_ssd ? "TERMINATE" : "MIGRATE"
+    on_host_maintenance = "MIGRATE"
   }
 
   disk {
