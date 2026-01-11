@@ -65,8 +65,10 @@ const (
 
 // Defines values for SandboxLogEventType.
 const (
-	Stderr SandboxLogEventType = "stderr"
-	Stdout SandboxLogEventType = "stdout"
+	ProcessEnd   SandboxLogEventType = "process_end"
+	ProcessStart SandboxLogEventType = "process_start"
+	Stderr       SandboxLogEventType = "stderr"
+	Stdout       SandboxLogEventType = "stdout"
 )
 
 // Defines values for SandboxState.
@@ -599,7 +601,7 @@ type SandboxLog struct {
 
 // SandboxLogEntry defines model for SandboxLogEntry.
 type SandboxLogEntry struct {
-	// EventType Type of sandbox log event (stdout or stderr)
+	// EventType Type of sandbox log event
 	EventType SandboxLogEventType `json:"eventType"`
 	Fields    map[string]string   `json:"fields"`
 
@@ -610,7 +612,7 @@ type SandboxLogEntry struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
-// SandboxLogEventType Type of sandbox log event (stdout or stderr)
+// SandboxLogEventType Type of sandbox log event
 type SandboxLogEventType string
 
 // SandboxLogs defines model for SandboxLogs.

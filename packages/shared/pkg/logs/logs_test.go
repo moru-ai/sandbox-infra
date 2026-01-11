@@ -65,20 +65,22 @@ func TestFlatJsonLogLineParser(t *testing.T) {
 			hasError: false,
 		},
 		{
-			name:  "array values ignored",
+			name:  "array values serialized",
 			input: `{"message": "test", "tags": ["tag1", "tag2"], "level": "info"}`,
 			expected: map[string]string{
 				"message": "test",
 				"level":   "info",
+				"tags":    `["tag1","tag2"]`,
 			},
 			hasError: false,
 		},
 		{
-			name:  "nested object ignored",
+			name:  "nested object serialized",
 			input: `{"message": "test", "metadata": {"key": "value"}, "level": "info"}`,
 			expected: map[string]string{
-				"message": "test",
-				"level":   "info",
+				"message":  "test",
+				"level":    "info",
+				"metadata": `{"key":"value"}`,
 			},
 			hasError: false,
 		},
