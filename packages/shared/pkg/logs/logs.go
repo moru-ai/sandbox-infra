@@ -84,8 +84,13 @@ func FlatJsonLogLineParser(input string) (map[string]string, error) {
 			result[key] = strconv.FormatFloat(t, 'G', -1, 64)
 		case bool:
 			result[key] = strconv.FormatBool(t)
+		case nil:
+			// Skip null values
 		default:
-			// Reject arrays, objects, nulls, etc.
+			// Convert arrays and objects to JSON strings
+			if jsonBytes, err := json.Marshal(t); err == nil {
+				result[key] = string(jsonBytes)
+			}
 		}
 	}
 
