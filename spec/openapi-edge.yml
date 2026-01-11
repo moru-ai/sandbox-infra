@@ -189,10 +189,12 @@ components:
 
     SandboxLogEventType:
       type: string
-      description: Type of sandbox log event (stdout or stderr)
+      description: Type of sandbox log event
       enum:
         - stdout
         - stderr
+        - process_start
+        - process_end
 
     LogsDirection:
       type: string
