@@ -109,7 +109,9 @@ func (p *PosthogClient) GetPackageToPosthogProperties(header *http.Header) posth
 		Set("publisher", header.Get("publisher")).
 		Set("release", header.Get("release")).
 		Set("sdk_runtime", header.Get("sdk_runtime")).
-		Set("system", header.Get("system"))
+		Set("system", header.Get("system")).
+		Set("client_type", header.Get("x-moru-client")).
+		Set("cli_version", header.Get("x-moru-cli-version"))
 
 	return properties
 }

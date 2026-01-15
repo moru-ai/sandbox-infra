@@ -100,7 +100,11 @@ func (a *APIStore) startSandbox(
 		props = props.Set("mcp_servers", slices.Collect(maps.Keys(mcp)))
 	}
 
-	a.posthog.CreateAnalyticsTeamEvent(ctx, team.ID.String(), "created_instance", props)
+	// Track sandbox creation (non-blocking)
+	teamID := team.ID.String()
+	go func() {
+		a.posthog.CreateAnalyticsTeamEvent(ctx, teamID, "created_instance", props)
+	}()
 	analyticsSpan.End()
 
 	telemetry.ReportEvent(ctx, "Created analytics event")

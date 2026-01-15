@@ -171,6 +171,16 @@ func (a *APIStore) PostApiKeys(c *gin.Context) {
 		return
 	}
 
+	// Track API key creation (non-blocking)
+	teamInfo := a.GetTeamInfo(c)
+	properties := a.posthog.GetPackageToPosthogProperties(&c.Request.Header)
+	keyName := body.Name
+	go func() {
+		a.posthog.IdentifyAnalyticsTeam(ctx, teamID.String(), teamInfo.Team.Name)
+		a.posthog.CreateAnalyticsUserEvent(ctx, userID.String(), teamID.String(), "api_key_created", properties.
+			Set("key_name", keyName))
+	}()
+
 	c.JSON(http.StatusCreated, api.CreatedTeamAPIKey{
 		Id:   apiKey.ID,
 		Name: apiKey.Name,
