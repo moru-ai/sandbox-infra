@@ -123,6 +123,9 @@ type ServerInterface interface {
 	// (GET /templates/{templateID}/files/{hash})
 	GetTemplatesTemplateIDFilesHash(c *gin.Context, templateID TemplateID, hash string)
 
+	// (GET /v2/sandbox-runs)
+	GetV2SandboxRuns(c *gin.Context, params GetV2SandboxRunsParams)
+
 	// (GET /v2/sandboxes)
 	GetV2Sandboxes(c *gin.Context, params GetV2SandboxesParams)
 
@@ -1347,6 +1350,54 @@ func (siw *ServerInterfaceWrapper) GetTemplatesTemplateIDFilesHash(c *gin.Contex
 	siw.Handler.GetTemplatesTemplateIDFilesHash(c, templateID, hash)
 }
 
+// GetV2SandboxRuns operation middleware
+func (siw *ServerInterfaceWrapper) GetV2SandboxRuns(c *gin.Context) {
+
+	var err error
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetV2SandboxRunsParams
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameter("form", false, false, "status", c.Request.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter status: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "nextToken" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "nextToken", c.Request.URL.Query(), &params.NextToken)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter nextToken: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", c.Request.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetV2SandboxRuns(c, params)
+}
+
 // GetV2Sandboxes operation middleware
 func (siw *ServerInterfaceWrapper) GetV2Sandboxes(c *gin.Context) {
 
@@ -1537,6 +1588,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.GET(options.BaseURL+"/templates/:templateID/builds/:buildID/logs", wrapper.GetTemplatesTemplateIDBuildsBuildIDLogs)
 	router.GET(options.BaseURL+"/templates/:templateID/builds/:buildID/status", wrapper.GetTemplatesTemplateIDBuildsBuildIDStatus)
 	router.GET(options.BaseURL+"/templates/:templateID/files/:hash", wrapper.GetTemplatesTemplateIDFilesHash)
+	router.GET(options.BaseURL+"/v2/sandbox-runs", wrapper.GetV2SandboxRuns)
 	router.GET(options.BaseURL+"/v2/sandboxes", wrapper.GetV2Sandboxes)
 	router.POST(options.BaseURL+"/v2/templates", wrapper.PostV2Templates)
 	router.POST(options.BaseURL+"/v2/templates/:templateID/builds/:buildID", wrapper.PostV2TemplatesTemplateIDBuildsBuildID)

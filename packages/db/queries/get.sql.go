@@ -7,6 +7,9 @@ package queries
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 const getSandboxRun = `-- name: GetSandboxRun :one
@@ -32,4 +35,72 @@ func (q *Queries) GetSandboxRun(ctx context.Context, sandboxID string) (SandboxR
 		&i.Metadata,
 	)
 	return i, err
+}
+
+const listSandboxRuns = `-- name: ListSandboxRuns :many
+SELECT
+    sr.sandbox_id,
+    sr.template_id,
+    ea.alias,
+    sr.status,
+    sr.end_reason,
+    sr.created_at,
+    sr.ended_at
+FROM "public"."sandbox_runs" sr
+LEFT JOIN "public"."env_aliases" ea ON sr.template_id = ea.env_id
+WHERE sr.team_id = $1
+  AND ($2::text[] IS NULL OR sr.status = ANY($2::text[]))
+  AND sr.created_at < $3
+ORDER BY sr.created_at DESC
+LIMIT $4
+`
+
+type ListSandboxRunsParams struct {
+	TeamID     uuid.UUID
+	Status     []string
+	CursorTime time.Time
+	QueryLimit int32
+}
+
+type ListSandboxRunsRow struct {
+	SandboxID  string
+	TemplateID string
+	Alias      *string
+	Status     string
+	EndReason  *string
+	CreatedAt  time.Time
+	EndedAt    *time.Time
+}
+
+func (q *Queries) ListSandboxRuns(ctx context.Context, arg ListSandboxRunsParams) ([]ListSandboxRunsRow, error) {
+	rows, err := q.db.Query(ctx, listSandboxRuns,
+		arg.TeamID,
+		arg.Status,
+		arg.CursorTime,
+		arg.QueryLimit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []ListSandboxRunsRow
+	for rows.Next() {
+		var i ListSandboxRunsRow
+		if err := rows.Scan(
+			&i.SandboxID,
+			&i.TemplateID,
+			&i.Alias,
+			&i.Status,
+			&i.EndReason,
+			&i.CreatedAt,
+			&i.EndedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

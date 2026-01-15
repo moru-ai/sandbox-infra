@@ -108,7 +108,7 @@ func (a *APIStore) GetV2Sandboxes(c *gin.Context, params api.GetV2SandboxesParam
 	// If no state is provided we want to return both running and paused sandboxes
 	states := make([]api.SandboxState, 0)
 	if params.State == nil {
-		states = append(states, api.Running, api.Paused)
+		states = append(states, api.SandboxStateRunning, api.SandboxStatePaused)
 	} else {
 		states = append(states, *params.State...)
 	}
@@ -151,7 +151,7 @@ func (a *APIStore) GetV2Sandboxes(c *gin.Context, params api.GetV2SandboxesParam
 		return sbx.State == sandbox.StatePausing
 	})
 
-	if slices.Contains(states, api.Running) {
+	if slices.Contains(states, api.SandboxStateRunning) {
 		runningSandboxList := instanceInfoToPaginatedSandboxes(runningSandboxes)
 
 		// Filter based on metadata
@@ -166,7 +166,7 @@ func (a *APIStore) GetV2Sandboxes(c *gin.Context, params api.GetV2SandboxesParam
 		sandboxes = append(sandboxes, runningSandboxList...)
 	}
 
-	if slices.Contains(states, api.Paused) {
+	if slices.Contains(states, api.SandboxStatePaused) {
 		// Running Sandbox IDs
 		runningSandboxesIDs := make([]string, 0)
 		for _, info := range runningSandboxes {
@@ -240,7 +240,7 @@ func snapshotsToPaginatedSandboxes(ctx context.Context, snapshots []queries.GetS
 				MemoryMB:    int32(build.RamMb),
 				DiskSizeMB:  diskSize,
 				EndAt:       snapshot.CreatedAt.Time,
-				State:       api.Paused,
+				State:       api.SandboxStatePaused,
 				EnvdVersion: envdVersion,
 			},
 			PaginationTimestamp: snapshot.SandboxStartedAt.Time,
@@ -262,10 +262,10 @@ func instanceInfoToPaginatedSandboxes(runningSandboxes []sandbox.Sandbox) []util
 
 	// Add running sandboxes to results
 	for _, info := range runningSandboxes {
-		state := api.Running
+		state := api.SandboxStateRunning
 		// If the sandbox is pausing, for the user it behaves the like a paused sandbox - it can be resumed, etc.
 		if info.State == sandbox.StatePausing {
-			state = api.Paused
+			state = api.SandboxStatePaused
 		}
 
 		sandbox := utils.PaginatedSandbox{

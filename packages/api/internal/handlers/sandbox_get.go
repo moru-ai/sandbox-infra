@@ -51,11 +51,11 @@ func (a *APIStore) GetSandboxesSandboxID(c *gin.Context, id string) {
 			return
 		}
 
-		state := api.Running
+		state := api.SandboxStateRunning
 		switch sbx.State {
 		// Sandbox is being paused or already is paused, user can work with that as if it's paused
 		case sandbox.StatePausing:
-			state = api.Paused
+			state = api.SandboxStatePaused
 		// Sandbox is being stopped or already is stopped, user can't work with it anymore
 		case sandbox.StateKilling:
 			a.sendAPIStoreError(c, http.StatusNotFound, fmt.Sprintf("sandbox \"%s\" doesn't exist or you don't have access to it", id))
@@ -140,7 +140,7 @@ func (a *APIStore) GetSandboxesSandboxID(c *gin.Context, id string) {
 		MemoryMB:        memoryMB,
 		DiskSizeMB:      diskSize,
 		EndAt:           lastSnapshot.Snapshot.CreatedAt.Time, // Snapshot is created when sandbox is paused
-		State:           api.Paused,
+		State:           api.SandboxStatePaused,
 		EnvdVersion:     envdVersion,
 		EnvdAccessToken: sbxAccessToken,
 		Domain:          nil,
