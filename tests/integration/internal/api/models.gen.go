@@ -71,10 +71,25 @@ const (
 	Stdout       SandboxLogEventType = "stdout"
 )
 
+// Defines values for SandboxRunEndReason.
+const (
+	SandboxRunEndReasonError    SandboxRunEndReason = "error"
+	SandboxRunEndReasonKilled   SandboxRunEndReason = "killed"
+	SandboxRunEndReasonShutdown SandboxRunEndReason = "shutdown"
+	SandboxRunEndReasonTimeout  SandboxRunEndReason = "timeout"
+)
+
+// Defines values for SandboxRunStatus.
+const (
+	SandboxRunStatusPaused  SandboxRunStatus = "paused"
+	SandboxRunStatusRunning SandboxRunStatus = "running"
+	SandboxRunStatusStopped SandboxRunStatus = "stopped"
+)
+
 // Defines values for SandboxState.
 const (
-	Paused  SandboxState = "paused"
-	Running SandboxState = "running"
+	SandboxStatePaused  SandboxState = "paused"
+	SandboxStateRunning SandboxState = "running"
 )
 
 // Defines values for TemplateBuildStatus.
@@ -670,6 +685,36 @@ type SandboxNetworkConfig struct {
 	MaskRequestHost *string `json:"maskRequestHost,omitempty"`
 }
 
+// SandboxRun defines model for SandboxRun.
+type SandboxRun struct {
+	// Alias Template alias
+	Alias *string `json:"alias,omitempty"`
+
+	// CreatedAt When the sandbox was created
+	CreatedAt time.Time `json:"createdAt"`
+
+	// EndReason Reason the sandbox stopped
+	EndReason *SandboxRunEndReason `json:"endReason,omitempty"`
+
+	// EndedAt When the sandbox stopped
+	EndedAt *time.Time `json:"endedAt,omitempty"`
+
+	// SandboxID Unique sandbox identifier
+	SandboxID string `json:"sandboxID"`
+
+	// Status Status of a sandbox run
+	Status SandboxRunStatus `json:"status"`
+
+	// TemplateID Template used to create the sandbox
+	TemplateID string `json:"templateID"`
+}
+
+// SandboxRunEndReason Reason the sandbox stopped
+type SandboxRunEndReason string
+
+// SandboxRunStatus Status of a sandbox run
+type SandboxRunStatus string
+
 // SandboxState State of the sandbox
 type SandboxState string
 
@@ -1187,6 +1232,18 @@ type GetTemplatesTemplateIDBuildsBuildIDStatusParams struct {
 	// Limit Maximum number of logs that should be returned
 	Limit *int32    `form:"limit,omitempty" json:"limit,omitempty"`
 	Level *LogLevel `form:"level,omitempty" json:"level,omitempty"`
+}
+
+// GetV2SandboxRunsParams defines parameters for GetV2SandboxRuns.
+type GetV2SandboxRunsParams struct {
+	// Status Filter runs by one or more statuses
+	Status *[]SandboxRunStatus `form:"status,omitempty" json:"status,omitempty"`
+
+	// NextToken Cursor to start the list from
+	NextToken *PaginationNextToken `form:"nextToken,omitempty" json:"nextToken,omitempty"`
+
+	// Limit Maximum number of items to return per page
+	Limit *PaginationLimit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
 // GetV2SandboxesParams defines parameters for GetV2Sandboxes.
