@@ -215,6 +215,7 @@ processors:
         match_type: regexp
         metric_names:
           - "orchestrator.*"
+          - "orchestration-api.*"
           - "template.*"
           - "api.*"
           - "db.sql.connection.*"
