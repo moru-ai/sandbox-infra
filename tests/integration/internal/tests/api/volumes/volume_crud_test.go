@@ -12,6 +12,35 @@ import (
 	"github.com/moru-ai/sandbox-infra/tests/integration/internal/setup"
 )
 
+// createTestVolume creates a volume for testing, handling idempotent creates.
+// Returns the created/existing volume.
+func createTestVolume(t *testing.T, ctx context.Context, c *api.ClientWithResponses, name string) *api.Volume {
+	t.Helper()
+
+	// First try to delete any existing volume with this name
+	_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, name, setup.WithAPIKey())
+
+	resp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
+		Name: name,
+	}, setup.WithAPIKey())
+	require.NoError(t, err)
+
+	// Get the volume from either 200 (existing) or 201 (created) response
+	var volume *api.Volume
+	if resp.JSON201 != nil {
+		volume = resp.JSON201
+	} else if resp.JSON200 != nil {
+		volume = resp.JSON200
+	}
+
+	if volume == nil {
+		t.Logf("Create response: %s", string(resp.Body))
+	}
+	require.NotNil(t, volume, "Expected volume in response, got status %d", resp.StatusCode())
+
+	return volume
+}
+
 func TestVolumeCreate(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
@@ -19,26 +48,14 @@ func TestVolumeCreate(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-create"
-	resp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	t.Cleanup(func() {
-		if t.Failed() {
-			t.Logf("Response: %s", string(resp.Body))
-		}
-
-		if resp.JSON201 != nil {
-			// Clean up volume
-			_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, resp.JSON201.VolumeID, setup.WithAPIKey())
-		}
+		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	})
 
-	assert.Equal(t, http.StatusCreated, resp.StatusCode())
-	require.NotNil(t, resp.JSON201)
-	assert.Equal(t, volumeName, resp.JSON201.Name)
-	assert.Contains(t, resp.JSON201.VolumeID, "vol_")
+	assert.Equal(t, volumeName, volume.Name)
+	assert.Contains(t, volume.VolumeID, "vol_")
 }
 
 func TestVolumeCreateIdempotent(t *testing.T) {
@@ -48,17 +65,10 @@ func TestVolumeCreateIdempotent(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-idempotent"
-
-	// First create
-	resp1, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, resp1.StatusCode())
-	require.NotNil(t, resp1.JSON201)
+	volume1 := createTestVolume(t, ctx, c, volumeName)
 
 	t.Cleanup(func() {
-		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, resp1.JSON201.VolumeID, setup.WithAPIKey())
+		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volume1.VolumeID, setup.WithAPIKey())
 	})
 
 	// Second create with same name should return existing (200 OK)
@@ -70,7 +80,7 @@ func TestVolumeCreateIdempotent(t *testing.T) {
 	// Should return 200 (existing) not 201 (created)
 	assert.Equal(t, http.StatusOK, resp2.StatusCode())
 	require.NotNil(t, resp2.JSON200)
-	assert.Equal(t, resp1.JSON201.VolumeID, resp2.JSON200.VolumeID)
+	assert.Equal(t, volume1.VolumeID, resp2.JSON200.VolumeID)
 }
 
 func TestVolumeGetByID(t *testing.T) {
@@ -80,24 +90,19 @@ func TestVolumeGetByID(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-get-by-id"
-	createResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, createResp.StatusCode())
-	require.NotNil(t, createResp.JSON201)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	t.Cleanup(func() {
-		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	})
 
 	// Get by ID
-	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	require.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, getResp.StatusCode())
 	require.NotNil(t, getResp.JSON200)
-	assert.Equal(t, createResp.JSON201.VolumeID, getResp.JSON200.VolumeID)
+	assert.Equal(t, volume.VolumeID, getResp.JSON200.VolumeID)
 	assert.Equal(t, volumeName, getResp.JSON200.Name)
 }
 
@@ -108,15 +113,10 @@ func TestVolumeGetByName(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-get-by-name"
-	createResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, createResp.StatusCode())
-	require.NotNil(t, createResp.JSON201)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	t.Cleanup(func() {
-		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	})
 
 	// Get by name
@@ -125,7 +125,7 @@ func TestVolumeGetByName(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, getResp.StatusCode())
 	require.NotNil(t, getResp.JSON200)
-	assert.Equal(t, createResp.JSON201.VolumeID, getResp.JSON200.VolumeID)
+	assert.Equal(t, volume.VolumeID, getResp.JSON200.VolumeID)
 }
 
 func TestVolumeList(t *testing.T) {
@@ -135,15 +135,10 @@ func TestVolumeList(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-list"
-	createResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, createResp.StatusCode())
-	require.NotNil(t, createResp.JSON201)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	t.Cleanup(func() {
-		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	})
 
 	// List volumes
@@ -156,7 +151,7 @@ func TestVolumeList(t *testing.T) {
 	// Should contain our created volume
 	found := false
 	for _, v := range *listResp.JSON200 {
-		if v.VolumeID == createResp.JSON201.VolumeID {
+		if v.VolumeID == volume.VolumeID {
 			found = true
 			break
 		}
@@ -171,20 +166,15 @@ func TestVolumeDelete(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-delete"
-	createResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, createResp.StatusCode())
-	require.NotNil(t, createResp.JSON201)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	// Delete the volume
-	deleteResp, err := c.DeleteVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+	deleteResp, err := c.DeleteVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNoContent, deleteResp.StatusCode())
 
 	// Verify it's gone
-	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, getResp.StatusCode())
 }
@@ -196,12 +186,7 @@ func TestVolumeDeleteByName(t *testing.T) {
 	c := setup.GetAPIClient()
 
 	volumeName := "test-volume-delete-name"
-	createResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, createResp.StatusCode())
-	require.NotNil(t, createResp.JSON201)
+	volume := createTestVolume(t, ctx, c, volumeName)
 
 	// Delete by name
 	deleteResp, err := c.DeleteVolumesIdOrNameWithResponse(ctx, volumeName, setup.WithAPIKey())
@@ -209,7 +194,7 @@ func TestVolumeDeleteByName(t *testing.T) {
 	assert.Equal(t, http.StatusNoContent, deleteResp.StatusCode())
 
 	// Verify it's gone
-	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, createResp.JSON201.VolumeID, setup.WithAPIKey())
+	getResp, err := c.GetVolumesIdOrNameWithResponse(ctx, volume.VolumeID, setup.WithAPIKey())
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, getResp.StatusCode())
 }

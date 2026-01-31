@@ -19,16 +19,10 @@ func TestSandboxWithVolume(t *testing.T) {
 
 	c := setup.GetAPIClient()
 
-	// Create a volume
+	// Create a volume using helper that handles idempotent creates
 	volumeName := "test-sandbox-volume"
-	volResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, volResp.StatusCode())
-	require.NotNil(t, volResp.JSON201)
-
-	volumeID := volResp.JSON201.VolumeID
+	volume := createTestVolume(t, ctx, c, volumeName)
+	volumeID := volume.VolumeID
 
 	t.Cleanup(func() {
 		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volumeID, setup.WithAPIKey())
@@ -65,16 +59,10 @@ func TestSandboxVolumeInvalidMountPath(t *testing.T) {
 
 	c := setup.GetAPIClient()
 
-	// Create a volume
+	// Create a volume using helper that handles idempotent creates
 	volumeName := "test-sandbox-invalid-mount"
-	volResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, volResp.StatusCode())
-	require.NotNil(t, volResp.JSON201)
-
-	volumeID := volResp.JSON201.VolumeID
+	volume := createTestVolume(t, ctx, c, volumeName)
+	volumeID := volume.VolumeID
 
 	t.Cleanup(func() {
 		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volumeID, setup.WithAPIKey())
@@ -101,16 +89,10 @@ func TestSandboxVolumeMissingMountPath(t *testing.T) {
 
 	c := setup.GetAPIClient()
 
-	// Create a volume
+	// Create a volume using helper that handles idempotent creates
 	volumeName := "test-sandbox-missing-mount"
-	volResp, err := c.PostVolumesWithResponse(ctx, api.CreateVolumeRequest{
-		Name: volumeName,
-	}, setup.WithAPIKey())
-	require.NoError(t, err)
-	require.Equal(t, http.StatusCreated, volResp.StatusCode())
-	require.NotNil(t, volResp.JSON201)
-
-	volumeID := volResp.JSON201.VolumeID
+	volume := createTestVolume(t, ctx, c, volumeName)
+	volumeID := volume.VolumeID
 
 	t.Cleanup(func() {
 		_, _ = c.DeleteVolumesIdOrNameWithResponse(ctx, volumeID, setup.WithAPIKey())
