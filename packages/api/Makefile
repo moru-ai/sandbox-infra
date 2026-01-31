@@ -22,7 +22,8 @@ build:
 	# Allow for passing commit sha directly for docker builds
 	$(eval COMMIT_SHA ?= $(shell git rev-parse --short HEAD))
 	$(eval EXPECTED_MIGRATION_TIMESTAMP ?= $(expectedMigration))
-	CGO_ENABLED=0 go build -o bin/api -ldflags "-X=main.commitSHA=$(COMMIT_SHA) -X=main.expectedMigrationTimestamp=$(EXPECTED_MIGRATION_TIMESTAMP)" .
+	# Build with nonfs noobs tags to exclude NFS and OBS backends from JuiceFS (fixes build errors)
+	CGO_ENABLED=0 go build -tags 'nonfs noobs' -o bin/api -ldflags "-X=main.commitSHA=$(COMMIT_SHA) -X=main.expectedMigrationTimestamp=$(EXPECTED_MIGRATION_TIMESTAMP)" .
 
 .PHONY: build-debug
 build-debug:
