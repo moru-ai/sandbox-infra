@@ -46,6 +46,24 @@ message SandboxConfig {
   optional bool allow_internet_access = 21;
 
   optional SandboxNetworkConfig network = 22;
+
+  // Volume configuration for persistent storage.
+  optional VolumeConfig volume = 23;
+}
+
+// VolumeConfig contains configuration for attaching a volume to a sandbox.
+message VolumeConfig {
+  // The volume ID (e.g., "vol_abc123").
+  string volume_id = 1;
+
+  // The mount path inside the sandbox (e.g., "/workspace").
+  string mount_path = 2;
+
+  // Redis database number for JuiceFS metadata key prefix.
+  int32 redis_db = 3;
+
+  // GCS bucket name for volume data storage.
+  string gcs_bucket = 4;
 }
 
 message SandboxNetworkConfig {
