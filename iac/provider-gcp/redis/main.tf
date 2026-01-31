@@ -127,3 +127,85 @@ resource "google_secret_manager_secret_version" "redis_tls_ca_base64" {
   secret      = var.redis_tls_ca_base64_secret_version.secret
   secret_data = base64encode(join("\n", google_memorystore_instance.valkey_cluster.managed_server_ca[0].ca_certs[0].certificates))
 }
+
+# ============================================================================
+# Volume Metadata Redis Cluster
+# Dedicated cluster for JuiceFS volume metadata - failure isolated from app cache
+# ============================================================================
+
+resource "google_memorystore_instance" "volumes" {
+  count = var.volumes_enabled ? 1 : 0
+
+  project     = var.gcp_project_id
+  location    = var.gcp_region
+  instance_id = "${var.prefix}volume-meta"
+
+  engine_version = "VALKEY_8_0"
+  mode           = "CLUSTER"
+
+  desired_auto_created_endpoints {
+    network    = "projects/${var.gcp_project_id}/global/networks/${var.network_name}"
+    project_id = var.gcp_project_id
+  }
+
+  # Start small - 1 shard, 1 replica for HA
+  shard_count             = 1
+  replica_count           = 1
+  node_type               = "SHARED_CORE_NANO" # ~$27/mo per shard+replica
+  transit_encryption_mode = "SERVER_AUTHENTICATION"
+  authorization_mode      = "AUTH_DISABLED"
+
+  zone_distribution_config {
+    mode = "MULTI_ZONE" # Required when replica_count > 0
+  }
+
+  deletion_protection_enabled = true
+
+  maintenance_policy {
+    weekly_maintenance_window {
+      day = "SUNDAY"
+      start_time {
+        hours = 3
+      }
+    }
+  }
+
+  # AOF persistence - critical for metadata durability
+  # AOF with EVERY_SEC: lose at most ~1 second of data on crash
+  persistence_config {
+    mode = "AOF"
+    aof_config {
+      append_fsync = "EVERY_SEC"
+    }
+  }
+
+  depends_on = [
+    google_network_connectivity_service_connection_policy.valkey,
+    google_service_networking_connection.private_service_connection,
+    google_project_service.memory_store,
+    time_sleep.memory_store_api_wait_60_seconds
+  ]
+
+  labels = {
+    purpose = "volume-metadata"
+    managed = "terraform"
+  }
+}
+
+locals {
+  volumes_redis_connection = var.volumes_enabled ? google_memorystore_instance.volumes[0].endpoints[0].connections[0].psc_auto_connection[0] : null
+}
+
+resource "google_secret_manager_secret_version" "volumes_redis_url" {
+  count = var.volumes_enabled ? 1 : 0
+
+  secret      = var.volumes_redis_url_secret_version.secret
+  secret_data = "${local.volumes_redis_connection.ip_address}:${local.volumes_redis_connection.port}"
+}
+
+resource "google_secret_manager_secret_version" "volumes_redis_tls_ca_base64" {
+  count = var.volumes_enabled ? 1 : 0
+
+  secret      = var.volumes_redis_tls_ca_base64_secret_version.secret
+  secret_data = base64encode(join("\n", google_memorystore_instance.volumes[0].managed_server_ca[0].ca_certs[0].certificates))
+}

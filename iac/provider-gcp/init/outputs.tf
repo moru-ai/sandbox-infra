@@ -86,3 +86,20 @@ output "fc_build_cache_bucket_name" {
 output "clickhouse_backups_bucket_name" {
   value = google_storage_bucket.clickhouse_backups_bucket.name
 }
+
+# Volume Primitive outputs
+output "volumes_bucket_name" {
+  value = google_storage_bucket.volumes.name
+}
+
+output "juicefs_versions_bucket_name" {
+  value = google_storage_bucket.juicefs_versions.name
+}
+
+output "volumes_redis_url_secret_version" {
+  value = google_secret_manager_secret_version.volumes_redis_url
+}
+
+output "volumes_redis_tls_ca_base64_secret_version" {
+  value = google_secret_manager_secret_version.volumes_redis_tls_ca_base64
+}

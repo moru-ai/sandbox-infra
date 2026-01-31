@@ -39,3 +39,20 @@ variable "redis_cluster_url_secret_version" {
 variable "redis_tls_ca_base64_secret_version" {
   type = any
 }
+
+# Volume Redis (optional)
+variable "volumes_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable dedicated Redis cluster for volume metadata"
+}
+
+variable "volumes_redis_url_secret_version" {
+  type    = any
+  default = null
+}
+
+variable "volumes_redis_tls_ca_base64_secret_version" {
+  type    = any
+  default = null
+}

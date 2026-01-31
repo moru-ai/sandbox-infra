@@ -213,3 +213,61 @@ resource "google_storage_bucket_iam_member" "public_builds_storage_bucket_iam" {
   role   = "roles/storage.objectViewer"
   member = "allUsers"
 }
+
+# ============================================================================
+# Volume Primitive - JuiceFS Storage
+# ============================================================================
+
+# GCS bucket for JuiceFS volume data (chunks)
+resource "google_storage_bucket" "volumes" {
+  name          = "${var.gcp_project_id}-volumes"
+  location      = var.gcp_region
+  storage_class = "STANDARD"
+
+  uniform_bucket_level_access = true
+  public_access_prevention    = "enforced"
+
+  versioning {
+    enabled = false # JuiceFS manages its own data
+  }
+
+  lifecycle_rule {
+    condition {
+      age = 7 # days
+    }
+    action {
+      type = "AbortIncompleteMultipartUpload"
+    }
+  }
+
+  soft_delete_policy {
+    retention_duration_seconds = 0
+  }
+
+  labels = var.labels
+}
+
+# Grant infra instances service account access (used by API and orchestrator)
+resource "google_storage_bucket_iam_member" "volumes_infra" {
+  bucket = google_storage_bucket.volumes.name
+  role   = "roles/storage.objectAdmin"
+  member = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+}
+
+# GCS bucket for JuiceFS binary versions
+resource "google_storage_bucket" "juicefs_versions" {
+  location = var.gcp_region
+  name     = "${var.gcp_project_id}-juicefs-versions"
+
+  public_access_prevention    = "enforced"
+  storage_class               = "STANDARD"
+  uniform_bucket_level_access = true
+
+  labels = var.labels
+}
+
+resource "google_storage_bucket_iam_member" "juicefs_versions_bucket_iam" {
+  bucket = google_storage_bucket.juicefs_versions.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+}

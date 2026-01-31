@@ -286,3 +286,45 @@ resource "google_secret_manager_secret_version" "redis_tls_ca_base64" {
     ignore_changes = [secret_data]
   }
 }
+
+# ============================================================================
+# Volume Redis Secrets
+# ============================================================================
+
+resource "google_secret_manager_secret" "volumes_redis_url" {
+  secret_id = "${var.prefix}volumes-redis-url"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [time_sleep.secrets_api_wait_60_seconds]
+}
+
+resource "google_secret_manager_secret_version" "volumes_redis_url" {
+  secret      = google_secret_manager_secret.volumes_redis_url.name
+  secret_data = " "
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
+}
+
+resource "google_secret_manager_secret" "volumes_redis_tls_ca_base64" {
+  secret_id = "${var.prefix}volumes-redis-tls-ca-base64"
+
+  replication {
+    auto {}
+  }
+
+  depends_on = [time_sleep.secrets_api_wait_60_seconds]
+}
+
+resource "google_secret_manager_secret_version" "volumes_redis_tls_ca_base64" {
+  secret      = google_secret_manager_secret.volumes_redis_tls_ca_base64.name
+  secret_data = " "
+
+  lifecycle {
+    ignore_changes = [secret_data]
+  }
+}

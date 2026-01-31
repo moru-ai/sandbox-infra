@@ -271,6 +271,11 @@ module "redis" {
   redis_cluster_url_secret_version   = google_secret_manager_secret_version.redis_cluster_url
   redis_tls_ca_base64_secret_version = module.init.redis_tls_ca_base64_secret_version
 
+  # Volume Redis (only created when volumes_enabled AND redis_managed)
+  volumes_enabled                            = var.volumes_enabled
+  volumes_redis_url_secret_version           = module.init.volumes_redis_url_secret_version
+  volumes_redis_tls_ca_base64_secret_version = module.init.volumes_redis_tls_ca_base64_secret_version
+
   prefix = var.prefix
 }
 

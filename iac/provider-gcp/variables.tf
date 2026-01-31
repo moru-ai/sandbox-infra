@@ -554,3 +554,10 @@ variable "loki_boot_disk_type" {
   type        = string
   default     = "pd-ssd"
 }
+
+# Volume Primitive
+variable "volumes_enabled" {
+  type        = bool
+  description = "Enable volume primitive (JuiceFS-backed persistent storage). Creates dedicated Redis cluster and GCS bucket."
+  default     = false
+}
