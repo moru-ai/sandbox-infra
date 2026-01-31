@@ -160,7 +160,7 @@ func (a *APIStore) GetVolumes(c *gin.Context, params api.GetVolumesParams) {
 }
 
 // GetVolumesIdOrName gets a volume by ID or name.
-func (a *APIStore) GetVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOrName) {
+func (a *APIStore) GetVolumesIdOrName(c *gin.Context, volumeID api.VolumeIdOrName) {
 	ctx := c.Request.Context()
 
 	team, apiErr := a.GetTeam(ctx, c, nil)
@@ -169,7 +169,7 @@ func (a *APIStore) GetVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOrNam
 		return
 	}
 
-	volume, err := a.resolveVolume(ctx, team.ID, idOrName)
+	volume, err := a.resolveVolume(ctx, team.ID, volumeID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			a.sendAPIStoreError(c, http.StatusNotFound, "Volume not found")
@@ -183,7 +183,7 @@ func (a *APIStore) GetVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOrNam
 }
 
 // DeleteVolumesIdOrName deletes a volume by ID or name.
-func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOrName) {
+func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, volumeID api.VolumeIdOrName) {
 	ctx := c.Request.Context()
 
 	team, apiErr := a.GetTeam(ctx, c, nil)
@@ -192,7 +192,7 @@ func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOr
 		return
 	}
 
-	volume, err := a.resolveVolume(ctx, team.ID, idOrName)
+	volume, err := a.resolveVolume(ctx, team.ID, volumeID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			a.sendAPIStoreError(c, http.StatusNotFound, "Volume not found")

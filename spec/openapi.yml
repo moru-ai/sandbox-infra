@@ -94,7 +94,7 @@ components:
       schema:
         type: string
     volumeIdOrName:
-      name: idOrName
+      name: volumeID
       in: path
       required: true
       description: Volume ID (vol_xxx) or name
@@ -2936,7 +2936,7 @@ paths:
         "500":
           $ref: "#/components/responses/500"
 
-  /volumes/{idOrName}:
+  /volumes/{volumeID}:
     get:
       summary: Get volume
       description: Get volume details by ID (vol_xxx) or name.

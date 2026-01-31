@@ -144,11 +144,11 @@ type ServerInterface interface {
 	// (POST /volumes)
 	PostVolumes(c *gin.Context)
 	// Delete volume
-	// (DELETE /volumes/{idOrName})
-	DeleteVolumesIdOrName(c *gin.Context, idOrName VolumeIdOrName)
+	// (DELETE /volumes/{volumeID})
+	DeleteVolumesIdOrName(c *gin.Context, volumeID VolumeIdOrName)
 	// Get volume
-	// (GET /volumes/{idOrName})
-	GetVolumesIdOrName(c *gin.Context, idOrName VolumeIdOrName)
+	// (GET /volumes/{volumeID})
+	GetVolumesIdOrName(c *gin.Context, volumeID VolumeIdOrName)
 	// Delete file or directory
 	// (DELETE /volumes/{volumeID}/files)
 	DeleteVolumesVolumeIDFiles(c *gin.Context, volumeID string, params DeleteVolumesVolumeIDFilesParams)
@@ -1613,12 +1613,12 @@ func (siw *ServerInterfaceWrapper) DeleteVolumesIdOrName(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "idOrName" -------------
-	var idOrName VolumeIdOrName
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID VolumeIdOrName
 
-	err = runtime.BindStyledParameterWithOptions("simple", "idOrName", c.Param("idOrName"), &idOrName, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter idOrName: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1635,7 +1635,7 @@ func (siw *ServerInterfaceWrapper) DeleteVolumesIdOrName(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.DeleteVolumesIdOrName(c, idOrName)
+	siw.Handler.DeleteVolumesIdOrName(c, volumeID)
 }
 
 // GetVolumesIdOrName operation middleware
@@ -1643,12 +1643,12 @@ func (siw *ServerInterfaceWrapper) GetVolumesIdOrName(c *gin.Context) {
 
 	var err error
 
-	// ------------- Path parameter "idOrName" -------------
-	var idOrName VolumeIdOrName
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID VolumeIdOrName
 
-	err = runtime.BindStyledParameterWithOptions("simple", "idOrName", c.Param("idOrName"), &idOrName, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
 	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter idOrName: %w", err), http.StatusBadRequest)
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
 		return
 	}
 
@@ -1665,7 +1665,7 @@ func (siw *ServerInterfaceWrapper) GetVolumesIdOrName(c *gin.Context) {
 		}
 	}
 
-	siw.Handler.GetVolumesIdOrName(c, idOrName)
+	siw.Handler.GetVolumesIdOrName(c, volumeID)
 }
 
 // DeleteVolumesVolumeIDFiles operation middleware
@@ -1947,8 +1947,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/v3/templates", wrapper.PostV3Templates)
 	router.GET(options.BaseURL+"/volumes", wrapper.GetVolumes)
 	router.POST(options.BaseURL+"/volumes", wrapper.PostVolumes)
-	router.DELETE(options.BaseURL+"/volumes/:idOrName", wrapper.DeleteVolumesIdOrName)
-	router.GET(options.BaseURL+"/volumes/:idOrName", wrapper.GetVolumesIdOrName)
+	router.DELETE(options.BaseURL+"/volumes/:volumeID", wrapper.DeleteVolumesIdOrName)
+	router.GET(options.BaseURL+"/volumes/:volumeID", wrapper.GetVolumesIdOrName)
 	router.DELETE(options.BaseURL+"/volumes/:volumeID/files", wrapper.DeleteVolumesVolumeIDFiles)
 	router.GET(options.BaseURL+"/volumes/:volumeID/files", wrapper.GetVolumesVolumeIDFiles)
 	router.GET(options.BaseURL+"/volumes/:volumeID/files/download", wrapper.GetVolumesVolumeIDFilesDownload)
