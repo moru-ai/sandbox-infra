@@ -279,6 +279,20 @@ module "redis" {
   prefix = var.prefix
 }
 
+# Volumes Redis - separate from main Redis to allow independent enabling
+module "volumes_redis" {
+  source = "./volumes-redis"
+  count  = var.volumes_enabled && !var.redis_managed ? 1 : 0
+
+  gcp_project_id = var.gcp_project_id
+  gcp_region     = var.gcp_region
+  gcp_zone       = var.gcp_zone
+  prefix         = var.prefix
+
+  volumes_redis_url_secret_version           = module.init.volumes_redis_url_secret_version
+  volumes_redis_tls_ca_base64_secret_version = module.init.volumes_redis_tls_ca_base64_secret_version
+}
+
 module "remote_repository" {
   source = "./remote-repository"
 
