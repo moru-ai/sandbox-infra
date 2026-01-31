@@ -14,16 +14,29 @@ jobs:
         include:
           - package: packages/api
             test_path: ./...
+            # JuiceFS requires CGO and build tags to exclude unused backends
+            build_tags: "nonfs noobs nosqlite nomysql nopg nobadger notikv noetcd"
+            cgo_enabled: "1"
           - package: packages/client-proxy
             test_path: ./...
+            build_tags: ""
+            cgo_enabled: "0"
           - package: packages/docker-reverse-proxy
             test_path: ./...
+            build_tags: ""
+            cgo_enabled: "0"
           - package: packages/envd
             test_path: ./...
+            build_tags: ""
+            cgo_enabled: "0"
           - package: packages/orchestrator
             test_path: ./...
+            build_tags: ""
+            cgo_enabled: "0"
           - package: packages/shared
             test_path: ./pkg/...
+            build_tags: ""
+            cgo_enabled: "0"
       fail-fast: false
     steps:
       - name: Checkout repository
@@ -56,9 +69,20 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger
 
+      - name: Install CGO dependencies
+        if: matrix.cgo_enabled == '1'
+        run: sudo apt-get update && sudo apt-get install -y gcc
+
       - name: Run tests
         working-directory: ${{ matrix.package }}
-        run: sudo -E go test -v ${{ matrix.test_path }}
+        env:
+          CGO_ENABLED: ${{ matrix.cgo_enabled }}
+        run: |
+          if [ -n "${{ matrix.build_tags }}" ]; then
+            sudo -E go test -tags '${{ matrix.build_tags }}' -v ${{ matrix.test_path }}
+          else
+            sudo -E go test -v ${{ matrix.test_path }}
+          fi
 
   validate-iac:
     name: Validate terraform
