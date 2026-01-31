@@ -56,6 +56,7 @@ type Orchestrator struct {
 	accessTokenGenerator    *sandbox.AccessTokenGenerator
 	sandboxCounter          metric.Int64UpDownCounter
 	createdCounter          metric.Int64Counter
+	volumesBucket           string // GCS bucket for volume data storage
 }
 
 func New(
@@ -127,6 +128,7 @@ func New(
 
 		sandboxCounter: sandboxCounter,
 		createdCounter: createdCounter,
+		volumesBucket:  config.VolumesBucket,
 	}
 
 	var sandboxStorage sandbox.Storage

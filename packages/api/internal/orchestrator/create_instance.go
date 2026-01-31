@@ -100,6 +100,7 @@ func (o *Orchestrator) CreateSandbox(
 	envdAuthToken *string,
 	allowInternetAccess *bool,
 	network *types.SandboxNetworkConfig,
+	volumeConfig *types.VolumeConfig,
 ) (sbx sandbox.Sandbox, apiErr *api.APIError) {
 	ctx, childSpan := tracer.Start(ctx, "create-sandbox")
 	defer childSpan.End()
@@ -211,6 +212,18 @@ func (o *Orchestrator) CreateSandbox(
 	}
 
 	sbxNetwork := buildNetworkConfig(network, allowInternetAccess, trafficAccessToken)
+
+	// Build volume config for proto if provided
+	var sbxVolume *orchestrator.VolumeConfig
+	if volumeConfig != nil {
+		sbxVolume = &orchestrator.VolumeConfig{
+			VolumeId:  volumeConfig.VolumeID,
+			MountPath: volumeConfig.MountPath,
+			RedisDb:   int32(volumeConfig.RedisDB),
+			GcsBucket: o.volumesBucket, // Set from orchestrator config
+		}
+	}
+
 	sbxRequest := &orchestrator.SandboxCreateRequest{
 		Sandbox: &orchestrator.SandboxConfig{
 			BaseTemplateId:      baseTemplateID,
@@ -235,6 +248,7 @@ func (o *Orchestrator) CreateSandbox(
 			AllowInternetAccess: allowInternetAccess,
 			Network:             sbxNetwork,
 			TotalDiskSizeMb:     ut.FromPtr(build.TotalDiskSizeMb),
+			Volume:              sbxVolume,
 		},
 		StartTime: timestamppb.New(startTime),
 		EndTime:   timestamppb.New(endTime),

@@ -34,6 +34,18 @@ type PausedSandboxConfig struct {
 	Network *SandboxNetworkConfig `json:"network,omitempty"`
 }
 
+// VolumeConfig contains configuration for attaching a volume to a sandbox.
+type VolumeConfig struct {
+	// VolumeID is the volume identifier (e.g., "vol_abc123").
+	VolumeID string `json:"volumeId"`
+
+	// MountPath is the path where the volume should be mounted (e.g., "/workspace").
+	MountPath string `json:"mountPath"`
+
+	// RedisDB is the database number for JuiceFS metadata key prefix.
+	RedisDB int `json:"redisDb"`
+}
+
 // Status defines the type for the "status" enum field.
 type BuildStatus string
 

@@ -162,6 +162,7 @@ func (a *APIStore) PostSandboxesSandboxIDConnect(c *gin.Context, sandboxID api.S
 		snap.AllowInternetAccess,
 		network,
 		nil, // mcp
+		nil, // volumeConfig - not supported for connect
 	)
 	if createErr != nil {
 		logger.L().Error(ctx, "Failed to resume sandbox", zap.Error(createErr.Err))

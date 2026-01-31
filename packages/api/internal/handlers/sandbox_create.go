@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"net"
@@ -195,6 +196,51 @@ func (a *APIStore) PostSandboxes(c *gin.Context) {
 		}
 	}
 
+	// Validate and lookup volume if provided
+	var volumeConfig *types.VolumeConfig
+	if body.VolumeId != nil {
+		// volumeMountPath is required if volumeId is provided
+		if body.VolumeMountPath == nil || *body.VolumeMountPath == "" {
+			a.sendAPIStoreError(c, http.StatusBadRequest, "volumeMountPath is required when volumeId is provided")
+			return
+		}
+
+		// Validate mount path
+		if errMsg := ValidateMountPath(*body.VolumeMountPath); errMsg != "" {
+			a.sendAPIStoreError(c, http.StatusBadRequest, errMsg)
+			return
+		}
+
+		// Lookup volume and verify ownership
+		volume, err := a.sqlcDB.GetVolume(ctx, *body.VolumeId)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				a.sendAPIStoreError(c, http.StatusNotFound, "Volume not found")
+				return
+			}
+			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to get volume")
+			return
+		}
+
+		// Verify team ownership
+		if volume.TeamID != teamInfo.Team.ID {
+			a.sendAPIStoreError(c, http.StatusNotFound, "Volume not found")
+			return
+		}
+
+		// Check volume status
+		if volume.Status != "available" {
+			a.sendAPIStoreError(c, http.StatusConflict, fmt.Sprintf("Volume is %s, must be available", volume.Status))
+			return
+		}
+
+		volumeConfig = &types.VolumeConfig{
+			VolumeID:  volume.ID,
+			MountPath: *body.VolumeMountPath,
+			RedisDB:   int(volume.RedisDb),
+		}
+	}
+
 	sbx, createErr := a.startSandbox(
 		ctx,
 		sandboxID,
@@ -213,6 +259,7 @@ func (a *APIStore) PostSandboxes(c *gin.Context) {
 		allowInternetAccess,
 		network,
 		mcp,
+		volumeConfig,
 	)
 	if createErr != nil {
 		logger.L().Error(ctx, "Failed to create sandbox", zap.Error(createErr.Err))

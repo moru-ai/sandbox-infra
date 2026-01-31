@@ -36,6 +36,9 @@ type Config struct {
 	SupabaseJWTSecrets []string `env:"SUPABASE_JWT_SECRETS"`
 
 	DefaultKernelVersion string `env:"DEFAULT_KERNEL_VERSION"`
+
+	// VolumesBucket is the GCS bucket for volume data storage.
+	VolumesBucket string `env:"VOLUMES_BUCKET"`
 }
 
 func Parse() (Config, error) {
