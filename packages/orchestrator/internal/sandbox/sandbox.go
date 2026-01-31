@@ -70,6 +70,9 @@ type Config struct {
 	Network *orchestrator.SandboxNetworkConfig
 
 	Envd EnvdMetadata
+
+	// Volume is the configuration for persistent volume attachment.
+	Volume *orchestrator.VolumeConfig
 }
 
 type EnvdMetadata struct {
@@ -505,6 +508,18 @@ func (f *Factory) ResumeSandbox(
 
 	telemetry.ReportEvent(ctx, "got snapfile")
 
+	// Convert volume config to MMDS format if present
+	var volumeConfig *fc.MmdsVolumeConfig
+	if config.Volume != nil {
+		volumeConfig = &fc.MmdsVolumeConfig{
+			VolumeID:  config.Volume.GetVolumeId(),
+			MountPath: config.Volume.GetMountPath(),
+			RedisDB:   int(config.Volume.GetRedisDb()),
+			GCSBucket: config.Volume.GetGcsBucket(),
+			ProxyHost: ips.slot.VpeerIP().String(),
+		}
+	}
+
 	fcStartErr := fcHandle.Resume(
 		uffdStartCtx,
 		sbxlogger.SandboxMetadata{
@@ -516,6 +531,7 @@ func (f *Factory) ResumeSandbox(
 		snapfile,
 		fcUffd.Ready(),
 		ips.slot,
+		volumeConfig,
 	)
 	if fcStartErr != nil {
 		return nil, fmt.Errorf("failed to start FC: %w", fcStartErr)

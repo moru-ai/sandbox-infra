@@ -129,6 +129,17 @@ func getMMDSOpts(ctx context.Context, client *http.Client, token string) (*MMDSO
 	return &opts, nil
 }
 
+// VolumeMounter is the interface for mounting JuiceFS volumes.
+type VolumeMounter interface {
+	Mount(ctx context.Context) error
+}
+
+// VolumeMounterFactory creates a volume mounter from config.
+type VolumeMounterFactory func(config *VolumeConfig) VolumeMounter
+
+// DefaultVolumeMounterFactory is set by the volume package during init.
+var DefaultVolumeMounterFactory VolumeMounterFactory
+
 func PollForMMDSOpts(ctx context.Context, mmdsChan chan<- *MMDSOpts, envVars *utils.Map[string, string]) {
 	httpClient := &http.Client{}
 	defer httpClient.CloseIdleConnections()
@@ -165,6 +176,20 @@ func PollForMMDSOpts(ctx context.Context, mmdsChan chan<- *MMDSOpts, envVars *ut
 			}
 			if err := os.WriteFile(filepath.Join(MoruRunDir, ".MORU_TEMPLATE_ID"), []byte(mmdsOpts.TemplateID), 0o666); err != nil {
 				fmt.Fprintf(os.Stderr, "error writing template ID file: %v\n", err)
+			}
+
+			// Mount volume if configured
+			if mmdsOpts.Volume != nil && DefaultVolumeMounterFactory != nil {
+				mounter := DefaultVolumeMounterFactory(mmdsOpts.Volume)
+				if err := mounter.Mount(ctx); err != nil {
+					fmt.Fprintf(os.Stderr, "error mounting volume %s at %s: %v\n",
+						mmdsOpts.Volume.VolumeID, mmdsOpts.Volume.MountPath, err)
+				} else {
+					fmt.Fprintf(os.Stderr, "mounted volume %s at %s\n",
+						mmdsOpts.Volume.VolumeID, mmdsOpts.Volume.MountPath)
+					envVars.Store("MORU_VOLUME_ID", mmdsOpts.Volume.VolumeID)
+					envVars.Store("MORU_VOLUME_MOUNT_PATH", mmdsOpts.Volume.MountPath)
+				}
 			}
 
 			if mmdsOpts.LogsCollectorAddress != "" {

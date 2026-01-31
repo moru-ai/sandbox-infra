@@ -12,6 +12,13 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
 )
 
+func init() {
+	// Register the volume mounter factory with the host package
+	host.DefaultVolumeMounterFactory = func(config *host.VolumeConfig) host.VolumeMounter {
+		return NewMounter(config)
+	}
+}
+
 const (
 	// JuiceFSBinary is the path to the JuiceFS binary.
 	JuiceFSBinary = "/usr/local/bin/juicefs"

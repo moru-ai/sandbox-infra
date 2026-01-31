@@ -347,6 +347,7 @@ func (p *Process) Resume(
 	snapfile template.File,
 	uffdReady chan struct{},
 	slot *network.Slot,
+	volumeConfig *MmdsVolumeConfig,
 ) error {
 	ctx, span := tracer.Start(ctx, "resume-fc")
 	defer span.End()
@@ -393,6 +394,7 @@ func (p *Process) Resume(
 		SandboxID:            sbxMetadata.SandboxID,
 		TemplateID:           sbxMetadata.TemplateID,
 		LogsCollectorAddress: fmt.Sprintf("http://%s/logs", slot.HyperloopIPString()),
+		Volume:               volumeConfig,
 	}
 
 	err = p.client.setMmds(ctx, meta)

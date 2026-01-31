@@ -27,6 +27,9 @@ import (
 	processRpc "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/process"
 	processSpec "github.com/moru-ai/sandbox-infra/packages/envd/internal/services/spec/process"
 	"github.com/moru-ai/sandbox-infra/packages/envd/internal/utils"
+
+	// Import volume package to register the volume mounter factory
+	_ "github.com/moru-ai/sandbox-infra/packages/envd/internal/volume"
 )
 
 const (
