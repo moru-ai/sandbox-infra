@@ -44,12 +44,16 @@ func FormatVolume(ctx context.Context, cfg FormatConfig) error {
 	}
 
 	// Create new format configuration
+	// Bucket format for GCS: gs://bucket-name/ (no path, prefix is added via WithPrefix wrapper)
+	bucketURL := fmt.Sprintf("gs://%s/", cfg.PoolConfig.GCSBucket)
+	volumePrefix := cfg.VolumeID + "/"
+
 	format := &meta.Format{
 		Name:             cfg.VolumeID,
 		UUID:             uuid.New().String(),
 		Storage:          "gs",
-		Bucket:           fmt.Sprintf("https://storage.googleapis.com/%s/%s/", cfg.PoolConfig.GCSBucket, cfg.VolumeID),
-		BlockSize:        4096, // 4 MiB blocks (in KiB units)
+		Bucket:           bucketURL + volumePrefix, // Store full path in format for reference
+		BlockSize:        4096,                     // 4 MiB blocks (in KiB units)
 		Compression:      "lz4",
 		TrashDays:        0,  // Disable trash for API volumes
 		DirStats:         true,
@@ -58,12 +62,14 @@ func FormatVolume(ctx context.Context, cfg FormatConfig) error {
 	}
 
 	// Test storage connectivity
-	blob, err := object.CreateStorage("gs", format.Bucket, "", "", "")
+	// Create base storage with just bucket, then add prefix wrapper
+	baseBlob, err := object.CreateStorage("gs", bucketURL, "", "", "")
 	if err != nil {
 		return fmt.Errorf("create storage client: %w", err)
 	}
+	blob := object.WithPrefix(baseBlob, volumePrefix)
 
-	// Write UUID marker to GCS
+	// Write UUID marker to GCS (will be written as {volumeID}/juicefs_uuid)
 	if err = blob.Put(ctx, "juicefs_uuid", strings.NewReader(format.UUID)); err != nil {
 		return fmt.Errorf("write uuid marker: %w", err)
 	}
@@ -99,13 +105,30 @@ func DestroyVolume(ctx context.Context, cfg FormatConfig, deleteData bool) error
 	}
 
 	if deleteData {
-		// Create storage client and delete data
-		blob, err := object.CreateStorage("gs", format.Bucket, "", "", "")
+		// Parse the bucket URL to extract bucket and prefix
+		// Format is gs://bucket-name/prefix/
+		bucketURL := format.Bucket
+		if !strings.HasPrefix(bucketURL, "gs://") {
+			return fmt.Errorf("invalid bucket URL format: %s", bucketURL)
+		}
+
+		// Extract bucket name and prefix from gs://bucket-name/prefix/
+		trimmed := strings.TrimPrefix(bucketURL, "gs://")
+		parts := strings.SplitN(trimmed, "/", 2)
+		baseBucketURL := fmt.Sprintf("gs://%s/", parts[0])
+		var volumePrefix string
+		if len(parts) > 1 {
+			volumePrefix = parts[1]
+		}
+
+		// Create storage client with prefix wrapper
+		baseBlob, err := object.CreateStorage("gs", baseBucketURL, "", "", "")
 		if err != nil {
 			return fmt.Errorf("create storage client: %w", err)
 		}
+		blob := object.WithPrefix(baseBlob, volumePrefix)
 
-		// List and delete all objects
+		// List and delete all objects under the volume prefix
 		objs, err := object.ListAll(ctx, blob, "", "", true, false)
 		if err != nil {
 			return fmt.Errorf("list objects: %w", err)

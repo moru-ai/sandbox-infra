@@ -91,12 +91,14 @@ func NewClient(volumeID string, redisDB int32, config Config) (*Client, error) {
 	}
 
 	// Create GCS object storage
-	// Use GCS JSON API endpoint
-	bucketEndpoint := fmt.Sprintf("https://storage.googleapis.com/%s/%s/", config.GCSBucket, volumeID)
-	c.blob, err = object.CreateStorage("gs", bucketEndpoint, "", "", "")
+	// Use gs:// scheme with bucket name, then add volume prefix wrapper
+	baseBucketURL := fmt.Sprintf("gs://%s/", config.GCSBucket)
+	volumePrefix := volumeID + "/"
+	baseBlob, err := object.CreateStorage("gs", baseBucketURL, "", "", "")
 	if err != nil {
 		return nil, fmt.Errorf("create GCS storage: %w", err)
 	}
+	c.blob = object.WithPrefix(baseBlob, volumePrefix)
 
 	// Create chunk configuration with sensible defaults for API server usage
 	chunkConf := &chunk.Config{
