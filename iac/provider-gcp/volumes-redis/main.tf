@@ -100,10 +100,12 @@ locals {
   redis_connection = google_memorystore_instance.volumes.endpoints[0].connections[0].psc_auto_connection[0]
 }
 
-# Store Redis URL in Secret Manager
+# Store Redis URL in Secret Manager (rediss:// scheme for TLS)
+# Note: insecure-skip-verify=true because Memorystore uses Google-managed CA
+# which JuiceFS doesn't have in its trust store. The connection is still TLS-encrypted.
 resource "google_secret_manager_secret_version" "volumes_redis_url" {
   secret      = var.volumes_redis_url_secret_version.secret
-  secret_data = "${local.redis_connection.ip_address}:${local.redis_connection.port}"
+  secret_data = "rediss://${local.redis_connection.ip_address}:${local.redis_connection.port}?insecure-skip-verify=true"
 }
 
 # Store TLS CA in Secret Manager
