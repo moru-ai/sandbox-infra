@@ -25,6 +25,12 @@ const (
 	Aws AWSRegistryType = "aws"
 )
 
+// Defines values for FileInfoType.
+const (
+	Directory FileInfoType = "directory"
+	File      FileInfoType = "file"
+)
+
 // Defines values for GCPRegistryType.
 const (
 	Gcp GCPRegistryType = "gcp"
@@ -247,6 +253,35 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// FileInfo defines model for FileInfo.
+type FileInfo struct {
+	// ModifiedAt Last modification time
+	ModifiedAt *time.Time `json:"modifiedAt,omitempty"`
+
+	// Name File or directory name
+	Name string `json:"name"`
+
+	// Path Full path within volume
+	Path string `json:"path"`
+
+	// Size File size in bytes (only for files)
+	Size *int64 `json:"size,omitempty"`
+
+	// Type Entry type
+	Type FileInfoType `json:"type"`
+}
+
+// FileInfoType Entry type
+type FileInfoType string
+
+// FileListResponse defines model for FileListResponse.
+type FileListResponse struct {
+	Files []FileInfo `json:"files"`
+
+	// NextToken Pagination token for next page
+	NextToken *string `json:"nextToken,omitempty"`
+}
+
 // FromImageRegistry defines model for FromImageRegistry.
 type FromImageRegistry struct {
 	union json.RawMessage
@@ -403,6 +438,12 @@ type NewSandbox struct {
 
 	// Timeout Time to live for the sandbox in seconds.
 	Timeout *int32 `json:"timeout,omitempty"`
+
+	// VolumeId Volume ID to attach (e.g., vol_abc123). Requires volumeMountPath.
+	VolumeId *string `json:"volumeId,omitempty"`
+
+	// VolumeMountPath Mount path inside sandbox (e.g., /workspace/data). Required if volumeId is provided. Must start with /workspace/, /data/, /mnt/, or /volumes/.
+	VolumeMountPath *string `json:"volumeMountPath,omitempty"`
 }
 
 // NewTeamAPIKey defines model for NewTeamAPIKey.
@@ -1087,6 +1128,15 @@ type UpdateTeamAPIKey struct {
 	Name string `json:"name"`
 }
 
+// UploadResponse defines model for UploadResponse.
+type UploadResponse struct {
+	// Path Path of uploaded file
+	Path string `json:"path"`
+
+	// Size Size of uploaded file in bytes
+	Size int64 `json:"size"`
+}
+
 // Volume defines model for Volume.
 type Volume struct {
 	// CreatedAt When the volume was created
@@ -1298,6 +1348,39 @@ type GetVolumesParams struct {
 
 	// NextToken Cursor to start the list from
 	NextToken *PaginationNextToken `form:"nextToken,omitempty" json:"nextToken,omitempty"`
+}
+
+// DeleteVolumesVolumeIDFilesParams defines parameters for DeleteVolumesVolumeIDFiles.
+type DeleteVolumesVolumeIDFilesParams struct {
+	// Path Path to delete
+	Path string `form:"path" json:"path"`
+
+	// Recursive Delete directory recursively
+	Recursive *bool `form:"recursive,omitempty" json:"recursive,omitempty"`
+}
+
+// GetVolumesVolumeIDFilesParams defines parameters for GetVolumesVolumeIDFiles.
+type GetVolumesVolumeIDFilesParams struct {
+	// Path Directory path to list
+	Path *string `form:"path,omitempty" json:"path,omitempty"`
+
+	// Limit Maximum number of items to return per page
+	Limit *PaginationLimit `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// NextToken Cursor to start the list from
+	NextToken *PaginationNextToken `form:"nextToken,omitempty" json:"nextToken,omitempty"`
+}
+
+// GetVolumesVolumeIDFilesDownloadParams defines parameters for GetVolumesVolumeIDFilesDownload.
+type GetVolumesVolumeIDFilesDownloadParams struct {
+	// Path File path in volume
+	Path string `form:"path" json:"path"`
+}
+
+// PutVolumesVolumeIDFilesUploadParams defines parameters for PutVolumesVolumeIDFilesUpload.
+type PutVolumesVolumeIDFilesUploadParams struct {
+	// Path Destination path in volume
+	Path string `form:"path" json:"path"`
 }
 
 // PostAccessTokensJSONRequestBody defines body for PostAccessTokens for application/json ContentType.

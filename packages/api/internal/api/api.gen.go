@@ -149,6 +149,18 @@ type ServerInterface interface {
 	// Get volume
 	// (GET /volumes/{idOrName})
 	GetVolumesIdOrName(c *gin.Context, idOrName VolumeIdOrName)
+	// Delete file or directory
+	// (DELETE /volumes/{volumeID}/files)
+	DeleteVolumesVolumeIDFiles(c *gin.Context, volumeID string, params DeleteVolumesVolumeIDFilesParams)
+	// List files in volume
+	// (GET /volumes/{volumeID}/files)
+	GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, params GetVolumesVolumeIDFilesParams)
+	// Download file content
+	// (GET /volumes/{volumeID}/files/download)
+	GetVolumesVolumeIDFilesDownload(c *gin.Context, volumeID string, params GetVolumesVolumeIDFilesDownloadParams)
+	// Upload file content
+	// (PUT /volumes/{volumeID}/files/upload)
+	PutVolumesVolumeIDFilesUpload(c *gin.Context, volumeID string, params PutVolumesVolumeIDFilesUploadParams)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1656,6 +1668,215 @@ func (siw *ServerInterfaceWrapper) GetVolumesIdOrName(c *gin.Context) {
 	siw.Handler.GetVolumesIdOrName(c, idOrName)
 }
 
+// DeleteVolumesVolumeIDFiles operation middleware
+func (siw *ServerInterfaceWrapper) DeleteVolumesVolumeIDFiles(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteVolumesVolumeIDFilesParams
+
+	// ------------- Required query parameter "path" -------------
+
+	if paramValue := c.Query("path"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument path is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "path", c.Request.URL.Query(), &params.Path)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter path: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "recursive" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "recursive", c.Request.URL.Query(), &params.Recursive)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter recursive: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteVolumesVolumeIDFiles(c, volumeID, params)
+}
+
+// GetVolumesVolumeIDFiles operation middleware
+func (siw *ServerInterfaceWrapper) GetVolumesVolumeIDFiles(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVolumesVolumeIDFilesParams
+
+	// ------------- Optional query parameter "path" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "path", c.Request.URL.Query(), &params.Path)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter path: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", c.Request.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "nextToken" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "nextToken", c.Request.URL.Query(), &params.NextToken)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter nextToken: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetVolumesVolumeIDFiles(c, volumeID, params)
+}
+
+// GetVolumesVolumeIDFilesDownload operation middleware
+func (siw *ServerInterfaceWrapper) GetVolumesVolumeIDFilesDownload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVolumesVolumeIDFilesDownloadParams
+
+	// ------------- Required query parameter "path" -------------
+
+	if paramValue := c.Query("path"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument path is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "path", c.Request.URL.Query(), &params.Path)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter path: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetVolumesVolumeIDFilesDownload(c, volumeID, params)
+}
+
+// PutVolumesVolumeIDFilesUpload operation middleware
+func (siw *ServerInterfaceWrapper) PutVolumesVolumeIDFilesUpload(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "volumeID" -------------
+	var volumeID string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "volumeID", c.Param("volumeID"), &volumeID, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter volumeID: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PutVolumesVolumeIDFilesUploadParams
+
+	// ------------- Required query parameter "path" -------------
+
+	if paramValue := c.Query("path"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandler(c, fmt.Errorf("Query argument path is required, but not found"), http.StatusBadRequest)
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "path", c.Request.URL.Query(), &params.Path)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter path: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PutVolumesVolumeIDFilesUpload(c, volumeID, params)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -1728,4 +1949,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/volumes", wrapper.PostVolumes)
 	router.DELETE(options.BaseURL+"/volumes/:idOrName", wrapper.DeleteVolumesIdOrName)
 	router.GET(options.BaseURL+"/volumes/:idOrName", wrapper.GetVolumesIdOrName)
+	router.DELETE(options.BaseURL+"/volumes/:volumeID/files", wrapper.DeleteVolumesVolumeIDFiles)
+	router.GET(options.BaseURL+"/volumes/:volumeID/files", wrapper.GetVolumesVolumeIDFiles)
+	router.GET(options.BaseURL+"/volumes/:volumeID/files/download", wrapper.GetVolumesVolumeIDFilesDownload)
+	router.PUT(options.BaseURL+"/volumes/:volumeID/files/upload", wrapper.PutVolumesVolumeIDFilesUpload)
 }

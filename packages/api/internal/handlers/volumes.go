@@ -74,7 +74,7 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 	}
 
 	// Generate volume ID
-	volumeID := id.Generate(volumeIDPrefix)
+	volumeID := volumeIDPrefix + id.Generate()
 
 	// Generate secure random password (placeholder - needs crypto/rand)
 	// For now using a placeholder - this should be properly implemented
