@@ -169,6 +169,12 @@ type ConnectSandbox struct {
 	Timeout int32 `json:"timeout"`
 }
 
+// CreateVolumeRequest defines model for CreateVolumeRequest.
+type CreateVolumeRequest struct {
+	// Name Volume name (unique per team, slug format)
+	Name string `json:"name"`
+}
+
 // CreatedAccessToken defines model for CreatedAccessToken.
 type CreatedAccessToken struct {
 	// CreatedAt Timestamp of access token creation
@@ -1081,6 +1087,27 @@ type UpdateTeamAPIKey struct {
 	Name string `json:"name"`
 }
 
+// Volume defines model for Volume.
+type Volume struct {
+	// CreatedAt When the volume was created
+	CreatedAt time.Time `json:"createdAt"`
+
+	// Name Volume name
+	Name string `json:"name"`
+
+	// TotalFileCount Total number of files in volume
+	TotalFileCount *int64 `json:"totalFileCount,omitempty"`
+
+	// TotalSizeBytes Total size of files in volume (bytes)
+	TotalSizeBytes *int64 `json:"totalSizeBytes,omitempty"`
+
+	// UpdatedAt When the volume was last updated
+	UpdatedAt time.Time `json:"updatedAt"`
+
+	// VolumeID Unique volume identifier
+	VolumeID string `json:"volumeID"`
+}
+
 // AccessTokenID defines model for accessTokenID.
 type AccessTokenID = string
 
@@ -1107,6 +1134,9 @@ type TeamID = string
 
 // TemplateID defines model for templateID.
 type TemplateID = string
+
+// VolumeIdOrName defines model for volumeIdOrName.
+type VolumeIdOrName = string
 
 // N400 defines model for 400.
 type N400 = Error
@@ -1261,6 +1291,15 @@ type GetV2SandboxesParams struct {
 	Limit *PaginationLimit `form:"limit,omitempty" json:"limit,omitempty"`
 }
 
+// GetVolumesParams defines parameters for GetVolumes.
+type GetVolumesParams struct {
+	// Limit Maximum number of items to return per page
+	Limit *PaginationLimit `form:"limit,omitempty" json:"limit,omitempty"`
+
+	// NextToken Cursor to start the list from
+	NextToken *PaginationNextToken `form:"nextToken,omitempty" json:"nextToken,omitempty"`
+}
+
 // PostAccessTokensJSONRequestBody defines body for PostAccessTokens for application/json ContentType.
 type PostAccessTokensJSONRequestBody = NewAccessToken
 
@@ -1305,6 +1344,9 @@ type PostV2TemplatesTemplateIDBuildsBuildIDJSONRequestBody = TemplateBuildStartV
 
 // PostV3TemplatesJSONRequestBody defines body for PostV3Templates for application/json ContentType.
 type PostV3TemplatesJSONRequestBody = TemplateBuildRequestV3
+
+// PostVolumesJSONRequestBody defines body for PostVolumes for application/json ContentType.
+type PostVolumesJSONRequestBody = CreateVolumeRequest
 
 // AsAWSRegistry returns the union data inside the FromImageRegistry as a AWSRegistry
 func (t FromImageRegistry) AsAWSRegistry() (AWSRegistry, error) {

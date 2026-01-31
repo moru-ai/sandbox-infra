@@ -137,6 +137,18 @@ type ServerInterface interface {
 
 	// (POST /v3/templates)
 	PostV3Templates(c *gin.Context)
+	// List volumes
+	// (GET /volumes)
+	GetVolumes(c *gin.Context, params GetVolumesParams)
+	// Create volume (idempotent)
+	// (POST /volumes)
+	PostVolumes(c *gin.Context)
+	// Delete volume
+	// (DELETE /volumes/{idOrName})
+	DeleteVolumesIdOrName(c *gin.Context, idOrName VolumeIdOrName)
+	// Get volume
+	// (GET /volumes/{idOrName})
+	GetVolumesIdOrName(c *gin.Context, idOrName VolumeIdOrName)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1525,6 +1537,125 @@ func (siw *ServerInterfaceWrapper) PostV3Templates(c *gin.Context) {
 	siw.Handler.PostV3Templates(c)
 }
 
+// GetVolumes operation middleware
+func (siw *ServerInterfaceWrapper) GetVolumes(c *gin.Context) {
+
+	var err error
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetVolumesParams
+
+	// ------------- Optional query parameter "limit" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "limit", c.Request.URL.Query(), &params.Limit)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter limit: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Optional query parameter "nextToken" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "nextToken", c.Request.URL.Query(), &params.NextToken)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter nextToken: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetVolumes(c, params)
+}
+
+// PostVolumes operation middleware
+func (siw *ServerInterfaceWrapper) PostVolumes(c *gin.Context) {
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostVolumes(c)
+}
+
+// DeleteVolumesIdOrName operation middleware
+func (siw *ServerInterfaceWrapper) DeleteVolumesIdOrName(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "idOrName" -------------
+	var idOrName VolumeIdOrName
+
+	err = runtime.BindStyledParameterWithOptions("simple", "idOrName", c.Param("idOrName"), &idOrName, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter idOrName: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteVolumesIdOrName(c, idOrName)
+}
+
+// GetVolumesIdOrName operation middleware
+func (siw *ServerInterfaceWrapper) GetVolumesIdOrName(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "idOrName" -------------
+	var idOrName VolumeIdOrName
+
+	err = runtime.BindStyledParameterWithOptions("simple", "idOrName", c.Param("idOrName"), &idOrName, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter idOrName: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	c.Set(ApiKeyAuthScopes, []string{})
+
+	c.Set(Supabase1TokenAuthScopes, []string{})
+
+	c.Set(Supabase2TeamAuthScopes, []string{})
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetVolumesIdOrName(c, idOrName)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -1593,4 +1724,8 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/v2/templates", wrapper.PostV2Templates)
 	router.POST(options.BaseURL+"/v2/templates/:templateID/builds/:buildID", wrapper.PostV2TemplatesTemplateIDBuildsBuildID)
 	router.POST(options.BaseURL+"/v3/templates", wrapper.PostV3Templates)
+	router.GET(options.BaseURL+"/volumes", wrapper.GetVolumes)
+	router.POST(options.BaseURL+"/volumes", wrapper.PostVolumes)
+	router.DELETE(options.BaseURL+"/volumes/:idOrName", wrapper.DeleteVolumesIdOrName)
+	router.GET(options.BaseURL+"/volumes/:idOrName", wrapper.GetVolumesIdOrName)
 }
