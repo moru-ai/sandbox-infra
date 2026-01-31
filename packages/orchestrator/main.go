@@ -405,6 +405,15 @@ func run(config cfg.Config) (success bool) {
 	// sandbox factory
 	sandboxFactory := sandbox.NewFactory(config.BuilderConfig, networkPool, devicePool, featureFlags)
 
+	// Configure volumes support if enabled
+	if config.VolumesRedisURL != "" {
+		sandboxFactory.SetVolumesConfig(&sandbox.VolumesConfig{
+			RedisURL:      config.VolumesRedisURL,
+			RedisTLSCA:    config.VolumesRedisTLSCA,
+			RedisPassword: config.VolumesRedisPassword,
+		})
+	}
+
 	orchestratorService := server.New(ctx, server.ServiceConfig{
 		Config:           config,
 		SandboxFactory:   sandboxFactory,

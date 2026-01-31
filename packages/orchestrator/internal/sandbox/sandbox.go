@@ -17,6 +17,8 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/gcsproxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/redisproxy"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/build"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/fc"
@@ -147,11 +149,22 @@ type networkSlotRes struct {
 	err  error
 }
 
+// VolumesConfig contains configuration for volume proxy connections.
+type VolumesConfig struct {
+	// RedisURL is the upstream Redis cluster URL for volumes metadata.
+	RedisURL string
+	// RedisTLSCA is the base64-encoded TLS CA certificate for Redis.
+	RedisTLSCA string
+	// RedisPassword is the password for Redis ACL authentication.
+	RedisPassword string
+}
+
 type Factory struct {
 	config       cfg.BuilderConfig
 	networkPool  *network.Pool
 	devicePool   *nbd.DevicePool
 	featureFlags *featureflags.Client
+	volumes      *VolumesConfig
 }
 
 func NewFactory(
@@ -166,6 +179,12 @@ func NewFactory(
 		devicePool:   devicePool,
 		featureFlags: featureFlags,
 	}
+}
+
+// SetVolumesConfig configures the factory for volume support.
+// This is separate from NewFactory to maintain backward compatibility.
+func (f *Factory) SetVolumesConfig(cfg *VolumesConfig) {
+	f.volumes = cfg
 }
 
 // CreateSandbox creates the sandbox.
@@ -509,15 +528,50 @@ func (f *Factory) ResumeSandbox(
 	telemetry.ReportEvent(ctx, "got snapfile")
 
 	// Convert volume config to MMDS format if present
+	// ProxyHost is the vEth IP (host side of veth pair), which the sandbox can reach
 	var volumeConfig *fc.MmdsVolumeConfig
-	if config.Volume != nil {
+	if config.Volume != nil && f.volumes != nil {
+		vethIP := ips.slot.VethIP().String()
 		volumeConfig = &fc.MmdsVolumeConfig{
 			VolumeID:  config.Volume.GetVolumeId(),
 			MountPath: config.Volume.GetMountPath(),
 			RedisDB:   int(config.Volume.GetRedisDb()),
 			GCSBucket: config.Volume.GetGcsBucket(),
-			ProxyHost: ips.slot.VpeerIP().String(),
+			ProxyHost: vethIP,
 		}
+
+		// Start GCS proxy for this sandbox
+		gcsProxyCfg := gcsproxy.Config{
+			ListenAddr: fmt.Sprintf("%s:%d", vethIP, gcsproxy.Port),
+			VolumeID:   config.Volume.GetVolumeId(),
+			Bucket:     config.Volume.GetGcsBucket(),
+		}
+		gcsProxy, err := gcsproxy.StartInNamespace(execCtx, gcsProxyCfg, logger.L())
+		if err != nil {
+			return nil, fmt.Errorf("failed to start GCS proxy: %w", err)
+		}
+		cleanup.Add(ctx, func(ctx context.Context) error {
+			return gcsProxy.Close()
+		})
+		telemetry.ReportEvent(ctx, "started GCS proxy")
+
+		// Start Redis proxy for this sandbox
+		redisProxyCfg := redisproxy.Config{
+			ListenAddr:   fmt.Sprintf("%s:%d", vethIP, redisproxy.Port),
+			UpstreamAddr: f.volumes.RedisURL,
+			RedisDB:      int(config.Volume.GetRedisDb()),
+			Password:     f.volumes.RedisPassword,
+			// TLSConfig will be set up if TLS CA is provided
+		}
+		// TODO: Set up TLS config from f.volumes.RedisTLSCA if non-empty
+		redisProxy, err := redisproxy.StartInNamespace(execCtx, redisProxyCfg, logger.L())
+		if err != nil {
+			return nil, fmt.Errorf("failed to start Redis proxy: %w", err)
+		}
+		cleanup.Add(ctx, func(ctx context.Context) error {
+			return redisProxy.Close()
+		})
+		telemetry.ReportEvent(ctx, "started Redis proxy")
 	}
 
 	fcStartErr := fcHandle.Resume(
