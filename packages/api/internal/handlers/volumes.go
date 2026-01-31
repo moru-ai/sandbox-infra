@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
 	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/id"
 )
@@ -94,8 +95,25 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 		return
 	}
 
-	// TODO: Run juicefs format command here
-	// For now, just update status to available
+	// Format the JuiceFS volume if pool is configured
+	if a.juicefsPool != nil {
+		formatCfg := juicefs.FormatConfig{
+			VolumeID:   volumeID,
+			RedisDB:    redisDB,
+			PoolConfig: a.juicefsPool.Config(),
+		}
+		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
+			// Mark volume as failed
+			_, _ = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
+				ID:     volumeID,
+				Status: "failed",
+			})
+			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to format volume: "+err.Error())
+			return
+		}
+	}
+
+	// Update status to available
 	volume, err = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
 		ID:     volumeID,
 		Status: "available",
@@ -194,8 +212,18 @@ func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, idOrName api.VolumeIdOr
 		return
 	}
 
-	// TODO: Async cleanup (juicefs destroy, GCS delete, etc.)
-	// For now, just delete the record
+	// Destroy JuiceFS volume if pool is configured
+	if a.juicefsPool != nil {
+		destroyCfg := juicefs.FormatConfig{
+			VolumeID:   volume.ID,
+			RedisDB:    volume.RedisDb,
+			PoolConfig: a.juicefsPool.Config(),
+		}
+		// Best effort - don't fail if destroy fails
+		_ = juicefs.DestroyVolume(ctx, destroyCfg, true)
+	}
+
+	// Delete the record
 	if err := a.sqlcDB.DeleteVolume(ctx, volume.ID); err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to delete volume")
 		return

@@ -39,6 +39,9 @@ type Config struct {
 
 	// VolumesBucket is the GCS bucket for volume data storage.
 	VolumesBucket string `env:"VOLUMES_BUCKET"`
+
+	// VolumesRedisURL is the Redis URL for JuiceFS volume metadata.
+	VolumesRedisURL string `env:"VOLUMES_REDIS_URL"`
 }
 
 func Parse() (Config, error) {

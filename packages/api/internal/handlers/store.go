@@ -20,6 +20,7 @@ import (
 	authcache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/auth"
 	templatecache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/templates"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/cfg"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
 	dbapi "github.com/moru-ai/sandbox-infra/packages/api/internal/db"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
@@ -60,6 +61,7 @@ type APIStore struct {
 	accessTokenGenerator *sandbox.AccessTokenGenerator
 	featureFlags         *featureflags.Client
 	clustersPool         *edge.Pool
+	juicefsPool          *juicefs.Pool // For volume file operations
 }
 
 func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) *APIStore {
@@ -150,6 +152,18 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		go sandboxRunsConsumer.Run(ctx)
 	}
 
+	// Initialize JuiceFS pool for volume file operations
+	var juicefsPool *juicefs.Pool
+	if config.VolumesRedisURL != "" && config.VolumesBucket != "" {
+		juicefsPool = juicefs.NewPool(juicefs.Config{
+			RedisURL:  config.VolumesRedisURL,
+			GCSBucket: config.VolumesBucket,
+		})
+		logger.L().Info(ctx, "JuiceFS pool initialized for volume file operations")
+	} else {
+		logger.L().Info(ctx, "Volume file operations disabled (VOLUMES_REDIS_URL or VOLUMES_BUCKET not set)")
+	}
+
 	a := &APIStore{
 		config:               config,
 		Healthy:              false,
@@ -167,6 +181,7 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		clustersPool:         clustersPool,
 		featureFlags:         featureFlags,
 		redisClient:          redisClient,
+		juicefsPool:          juicefsPool,
 	}
 
 	// Wait till there's at least one, otherwise we can't create sandboxes yet
@@ -205,6 +220,12 @@ func (a *APIStore) Close(ctx context.Context) error {
 	if a.templateCache != nil {
 		if err := a.templateCache.Close(ctx); err != nil {
 			errs = append(errs, fmt.Errorf("closing template cache: %w", err))
+		}
+	}
+
+	if a.juicefsPool != nil {
+		if err := a.juicefsPool.Close(); err != nil {
+			errs = append(errs, fmt.Errorf("closing JuiceFS pool: %w", err))
 		}
 	}
 
