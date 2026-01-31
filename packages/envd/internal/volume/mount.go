@@ -48,7 +48,7 @@ func (m *Mounter) Mount(ctx context.Context) error {
 	}
 
 	// Create mount directory if it doesn't exist
-	if err := os.MkdirAll(m.mountPath, 0755); err != nil {
+	if err := os.MkdirAll(m.mountPath, 0o755); err != nil {
 		return fmt.Errorf("create mount directory: %w", err)
 	}
 
