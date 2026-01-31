@@ -10,6 +10,16 @@ import (
 	"time"
 )
 
+const deleteVolume = `-- name: DeleteVolume :exec
+DELETE FROM "public"."volumes"
+WHERE id = $1
+`
+
+func (q *Queries) DeleteVolume(ctx context.Context, id string) error {
+	_, err := q.db.Exec(ctx, deleteVolume, id)
+	return err
+}
+
 const endSandboxRun = `-- name: EndSandboxRun :exec
 UPDATE "public"."sandbox_runs"
 SET
@@ -64,4 +74,68 @@ type UpdateSandboxRunTimeoutParams struct {
 func (q *Queries) UpdateSandboxRunTimeout(ctx context.Context, arg UpdateSandboxRunTimeoutParams) error {
 	_, err := q.db.Exec(ctx, updateSandboxRunTimeout, arg.TimeoutAt, arg.SandboxID)
 	return err
+}
+
+const updateVolumeStats = `-- name: UpdateVolumeStats :one
+UPDATE "public"."volumes"
+SET total_size_bytes = $1,
+    total_file_count = $2,
+    updated_at = NOW()
+WHERE id = $3
+RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+`
+
+type UpdateVolumeStatsParams struct {
+	TotalSizeBytes *int64
+	TotalFileCount *int64
+	ID             string
+}
+
+func (q *Queries) UpdateVolumeStats(ctx context.Context, arg UpdateVolumeStatsParams) (Volume, error) {
+	row := q.db.QueryRow(ctx, updateVolumeStats, arg.TotalSizeBytes, arg.TotalFileCount, arg.ID)
+	var i Volume
+	err := row.Scan(
+		&i.ID,
+		&i.TeamID,
+		&i.Name,
+		&i.Status,
+		&i.RedisDb,
+		&i.RedisPasswordEncrypted,
+		&i.TotalSizeBytes,
+		&i.TotalFileCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const updateVolumeStatus = `-- name: UpdateVolumeStatus :one
+UPDATE "public"."volumes"
+SET status = $1,
+    updated_at = NOW()
+WHERE id = $2
+RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+`
+
+type UpdateVolumeStatusParams struct {
+	Status string
+	ID     string
+}
+
+func (q *Queries) UpdateVolumeStatus(ctx context.Context, arg UpdateVolumeStatusParams) (Volume, error) {
+	row := q.db.QueryRow(ctx, updateVolumeStatus, arg.Status, arg.ID)
+	var i Volume
+	err := row.Scan(
+		&i.ID,
+		&i.TeamID,
+		&i.Name,
+		&i.Status,
+		&i.RedisDb,
+		&i.RedisPasswordEncrypted,
+		&i.TotalSizeBytes,
+		&i.TotalFileCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
 }

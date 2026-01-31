@@ -103,18 +103,20 @@ type EnvBuild struct {
 }
 
 type SandboxRun struct {
-	ID         uuid.UUID
-	SandboxID  string
-	TeamID     uuid.UUID
-	TemplateID string
-	BuildID    *string
-	Status     string
-	EndReason  *string
-	CreatedAt  time.Time
-	UpdatedAt  time.Time
-	EndedAt    *time.Time
-	TimeoutAt  *time.Time
-	Metadata   types.JSONBStringMap
+	ID              uuid.UUID
+	SandboxID       string
+	TeamID          uuid.UUID
+	TemplateID      string
+	BuildID         *string
+	Status          string
+	EndReason       *string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	EndedAt         *time.Time
+	TimeoutAt       *time.Time
+	Metadata        types.JSONBStringMap
+	VolumeID        *string
+	VolumeMountPath *string
 }
 
 type Snapshot struct {
@@ -198,4 +200,17 @@ type UsersTeam struct {
 	IsDefault bool
 	AddedBy   *uuid.UUID
 	CreatedAt pgtype.Timestamp
+}
+
+type Volume struct {
+	ID                     string
+	TeamID                 uuid.UUID
+	Name                   string
+	Status                 string
+	RedisDb                int32
+	RedisPasswordEncrypted []byte
+	TotalSizeBytes         *int64
+	TotalFileCount         *int64
+	CreatedAt              time.Time
+	UpdatedAt              time.Time
 }

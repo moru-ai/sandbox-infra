@@ -13,7 +13,7 @@ import (
 )
 
 const getSandboxRun = `-- name: GetSandboxRun :one
-SELECT id, sandbox_id, team_id, template_id, build_id, status, end_reason, created_at, updated_at, ended_at, timeout_at, metadata FROM "public"."sandbox_runs"
+SELECT id, sandbox_id, team_id, template_id, build_id, status, end_reason, created_at, updated_at, ended_at, timeout_at, metadata, volume_id, volume_mount_path FROM "public"."sandbox_runs"
 WHERE sandbox_id = $1
 `
 
@@ -33,8 +33,98 @@ func (q *Queries) GetSandboxRun(ctx context.Context, sandboxID string) (SandboxR
 		&i.EndedAt,
 		&i.TimeoutAt,
 		&i.Metadata,
+		&i.VolumeID,
+		&i.VolumeMountPath,
 	)
 	return i, err
+}
+
+const getVolume = `-- name: GetVolume :one
+SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+WHERE id = $1
+`
+
+func (q *Queries) GetVolume(ctx context.Context, id string) (Volume, error) {
+	row := q.db.QueryRow(ctx, getVolume, id)
+	var i Volume
+	err := row.Scan(
+		&i.ID,
+		&i.TeamID,
+		&i.Name,
+		&i.Status,
+		&i.RedisDb,
+		&i.RedisPasswordEncrypted,
+		&i.TotalSizeBytes,
+		&i.TotalFileCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getVolumeByName = `-- name: GetVolumeByName :one
+SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+WHERE team_id = $1 AND name = $2
+`
+
+type GetVolumeByNameParams struct {
+	TeamID uuid.UUID
+	Name   string
+}
+
+func (q *Queries) GetVolumeByName(ctx context.Context, arg GetVolumeByNameParams) (Volume, error) {
+	row := q.db.QueryRow(ctx, getVolumeByName, arg.TeamID, arg.Name)
+	var i Volume
+	err := row.Scan(
+		&i.ID,
+		&i.TeamID,
+		&i.Name,
+		&i.Status,
+		&i.RedisDb,
+		&i.RedisPasswordEncrypted,
+		&i.TotalSizeBytes,
+		&i.TotalFileCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getVolumesByStatus = `-- name: GetVolumesByStatus :many
+SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+WHERE status = $1
+ORDER BY created_at ASC
+`
+
+func (q *Queries) GetVolumesByStatus(ctx context.Context, status string) ([]Volume, error) {
+	rows, err := q.db.Query(ctx, getVolumesByStatus, status)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Volume
+	for rows.Next() {
+		var i Volume
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeamID,
+			&i.Name,
+			&i.Status,
+			&i.RedisDb,
+			&i.RedisPasswordEncrypted,
+			&i.TotalSizeBytes,
+			&i.TotalFileCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const listSandboxRuns = `-- name: ListSandboxRuns :many
@@ -94,6 +184,52 @@ func (q *Queries) ListSandboxRuns(ctx context.Context, arg ListSandboxRunsParams
 			&i.EndReason,
 			&i.CreatedAt,
 			&i.EndedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listVolumes = `-- name: ListVolumes :many
+SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+FROM "public"."volumes"
+WHERE team_id = $1
+  AND ($2::text[] IS NULL OR status = ANY($2::text[]))
+ORDER BY created_at DESC
+LIMIT $3
+`
+
+type ListVolumesParams struct {
+	TeamID     uuid.UUID
+	Status     []string
+	QueryLimit int32
+}
+
+func (q *Queries) ListVolumes(ctx context.Context, arg ListVolumesParams) ([]Volume, error) {
+	rows, err := q.db.Query(ctx, listVolumes, arg.TeamID, arg.Status, arg.QueryLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Volume
+	for rows.Next() {
+		var i Volume
+		if err := rows.Scan(
+			&i.ID,
+			&i.TeamID,
+			&i.Name,
+			&i.Status,
+			&i.RedisDb,
+			&i.RedisPasswordEncrypted,
+			&i.TotalSizeBytes,
+			&i.TotalFileCount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

@@ -13,6 +13,17 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/db/types"
 )
 
+const allocateRedisDB = `-- name: AllocateRedisDB :one
+SELECT nextval('volumes_redis_db_seq')::INT AS redis_db
+`
+
+func (q *Queries) AllocateRedisDB(ctx context.Context) (int32, error) {
+	row := q.db.QueryRow(ctx, allocateRedisDB)
+	var redis_db int32
+	err := row.Scan(&redis_db)
+	return redis_db, err
+}
+
 const createSandboxRun = `-- name: CreateSandboxRun :one
 INSERT INTO "public"."sandbox_runs" (
     sandbox_id,
@@ -30,7 +41,7 @@ INSERT INTO "public"."sandbox_runs" (
     'running',
     $5,
     $6
-) RETURNING id, sandbox_id, team_id, template_id, build_id, status, end_reason, created_at, updated_at, ended_at, timeout_at, metadata
+) RETURNING id, sandbox_id, team_id, template_id, build_id, status, end_reason, created_at, updated_at, ended_at, timeout_at, metadata, volume_id, volume_mount_path
 `
 
 type CreateSandboxRunParams struct {
@@ -65,6 +76,60 @@ func (q *Queries) CreateSandboxRun(ctx context.Context, arg CreateSandboxRunPara
 		&i.EndedAt,
 		&i.TimeoutAt,
 		&i.Metadata,
+		&i.VolumeID,
+		&i.VolumeMountPath,
+	)
+	return i, err
+}
+
+const createVolume = `-- name: CreateVolume :one
+INSERT INTO "public"."volumes" (
+    id,
+    team_id,
+    name,
+    status,
+    redis_db,
+    redis_password_encrypted
+) VALUES (
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6
+) RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+`
+
+type CreateVolumeParams struct {
+	ID                     string
+	TeamID                 uuid.UUID
+	Name                   string
+	Status                 string
+	RedisDb                int32
+	RedisPasswordEncrypted []byte
+}
+
+func (q *Queries) CreateVolume(ctx context.Context, arg CreateVolumeParams) (Volume, error) {
+	row := q.db.QueryRow(ctx, createVolume,
+		arg.ID,
+		arg.TeamID,
+		arg.Name,
+		arg.Status,
+		arg.RedisDb,
+		arg.RedisPasswordEncrypted,
+	)
+	var i Volume
+	err := row.Scan(
+		&i.ID,
+		&i.TeamID,
+		&i.Name,
+		&i.Status,
+		&i.RedisDb,
+		&i.RedisPasswordEncrypted,
+		&i.TotalSizeBytes,
+		&i.TotalFileCount,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
