@@ -250,6 +250,11 @@ module "nomad" {
   redis_managed = var.redis_managed
   redis_port    = var.redis_port
 
+  # Volumes (JuiceFS)
+  volumes_enabled                  = var.volumes_enabled
+  volumes_redis_url_secret_version = module.init.volumes_redis_url_secret_version
+  volumes_bucket                   = module.init.volumes_bucket_name
+
   launch_darkly_api_key_secret_name = module.init.launch_darkly_api_key_secret_version.secret
 
   # Filestore

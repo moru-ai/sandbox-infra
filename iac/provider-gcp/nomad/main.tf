@@ -44,6 +44,11 @@ data "google_secret_manager_secret_version" "redis_tls_ca_base64" {
   secret = var.redis_tls_ca_base64_secret_version.secret
 }
 
+# Volumes Redis (JuiceFS metadata)
+data "google_secret_manager_secret_version" "volumes_redis_url" {
+  count  = var.volumes_enabled ? 1 : 0
+  secret = var.volumes_redis_url_secret_version.secret
+}
 
 resource "nomad_job" "ingress" {
   jobspec = templatefile("${path.module}/jobs/ingress.hcl",
@@ -104,6 +109,10 @@ resource "nomad_job" "api" {
 
     local_cluster_endpoint = "edge-api.service.consul:${var.edge_api_port.port}"
     local_cluster_token    = var.edge_api_secret
+
+    # Volumes (JuiceFS)
+    volumes_redis_url = var.volumes_enabled ? trimspace(data.google_secret_manager_secret_version.volumes_redis_url[0].secret_data) : ""
+    volumes_bucket    = var.volumes_bucket
   })
 }
 

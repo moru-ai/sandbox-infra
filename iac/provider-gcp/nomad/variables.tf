@@ -251,6 +251,22 @@ variable "redis_tls_ca_base64_secret_version" {
   type = any
 }
 
+# Volumes (JuiceFS)
+variable "volumes_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "volumes_redis_url_secret_version" {
+  type    = any
+  default = null
+}
+
+variable "volumes_bucket" {
+  type    = string
+  default = ""
+}
+
 # Docker reverse proxy
 variable "docker_reverse_proxy_port" {
   type = object({

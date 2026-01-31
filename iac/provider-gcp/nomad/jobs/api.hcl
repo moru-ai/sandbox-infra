@@ -103,6 +103,11 @@ job "api" {
         LAUNCH_DARKLY_API_KEY         = "${launch_darkly_api_key}"
 %{ endif }
 
+%{ if volumes_redis_url != "" }
+        VOLUMES_REDIS_URL             = "${volumes_redis_url}"
+        VOLUMES_BUCKET                = "${volumes_bucket}"
+%{ endif }
+
         # This is here just because it is required in some part of our code which is transitively imported
         TEMPLATE_BUCKET_NAME          = "skip"
       }
