@@ -26,12 +26,11 @@ resource "time_sleep" "memorystore_api_wait" {
   create_duration = "60s"
 }
 
-# Get the default network subnetwork
-resource "google_compute_subnetwork" "default" {
-  name                     = var.network_name
-  region                   = var.gcp_region
-  network                  = "projects/${var.gcp_project_id}/global/networks/${var.network_name}"
-  private_ip_google_access = true
+# Get the default network subnetwork (it already exists)
+data "google_compute_subnetwork" "default" {
+  name    = var.network_name
+  region  = var.gcp_region
+  project = var.gcp_project_id
 }
 
 # PSC policy for Valkey on default VPC
@@ -42,7 +41,7 @@ resource "google_network_connectivity_service_connection_policy" "volumes_valkey
   description   = "Connection policy for volumes Redis cluster"
   network       = "projects/${var.gcp_project_id}/global/networks/${var.network_name}"
   psc_config {
-    subnetworks = [google_compute_subnetwork.default.id]
+    subnetworks = [data.google_compute_subnetwork.default.id]
   }
 }
 
