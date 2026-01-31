@@ -3,7 +3,8 @@ ARG ALPINE_VERSION=3.22
 
 FROM golang:${GOLANG_VERSION}-alpine${ALPINE_VERSION} AS builder
 
-RUN apk add --no-cache make
+# Install make and CGO dependencies for JuiceFS compression (lz4, zstd)
+RUN apk add --no-cache make gcc musl-dev
 
 # Copy all go.mod and go.sum files first for dependency caching
 # This ensures replace directives work correctly
