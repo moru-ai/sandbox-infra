@@ -221,10 +221,12 @@ func (p *Proxy) handleConnection(clientConn net.Conn) {
 	}
 	defer upstreamConn.Close()
 
-	// Authenticate with upstream using per-volume ACL credentials
-	if err := p.authenticate(upstreamConn); err != nil {
-		p.logger.Error(ctx, "Redis proxy: authentication failed", zap.Error(err))
-		return
+	// Authenticate with upstream using per-volume ACL credentials (if password is set)
+	if p.config.Password != "" {
+		if err := p.authenticate(upstreamConn); err != nil {
+			p.logger.Error(ctx, "Redis proxy: authentication failed", zap.Error(err))
+			return
+		}
 	}
 
 	// Bidirectional copy
