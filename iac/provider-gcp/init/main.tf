@@ -328,3 +328,17 @@ resource "google_secret_manager_secret_version" "volumes_redis_tls_ca_base64" {
     ignore_changes = [secret_data]
   }
 }
+
+# Grant infra instances service account access to Volume Redis secrets
+# (used by API and orchestrator for JuiceFS volume operations)
+resource "google_secret_manager_secret_iam_member" "volumes_redis_url_access" {
+  secret_id = google_secret_manager_secret.volumes_redis_url.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+}
+
+resource "google_secret_manager_secret_iam_member" "volumes_redis_tls_ca_base64_access" {
+  secret_id = google_secret_manager_secret.volumes_redis_tls_ca_base64.id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+}

@@ -3,7 +3,9 @@ package handlers
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -16,6 +18,13 @@ import (
 
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
 	"github.com/moru-ai/sandbox-infra/packages/db/queries"
+)
+
+const (
+	// defaultFileListLimit is the default number of files to return per page
+	defaultFileListLimit = 100
+	// maxFileListLimit is the maximum number of files to return per page
+	maxFileListLimit = 1000
 )
 
 // GetVolumesVolumeIDFiles lists files in a volume.
@@ -60,6 +69,25 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 	// Normalize path
 	path = filepath.Clean(path)
 
+	// Parse pagination parameters
+	limit := defaultFileListLimit
+	if params.Limit != nil && *params.Limit > 0 {
+		limit = int(*params.Limit)
+		if limit > maxFileListLimit {
+			limit = maxFileListLimit
+		}
+	}
+
+	offset := 0
+	if params.NextToken != nil && *params.NextToken != "" {
+		decodedOffset, err := decodeNextToken(*params.NextToken)
+		if err != nil {
+			a.sendAPIStoreError(c, http.StatusBadRequest, "Invalid next token")
+			return
+		}
+		offset = decodedOffset
+	}
+
 	// Get JuiceFS client for this volume
 	client, err := a.juicefsPool.Get(ctx, volume.ID, volume.RedisDb)
 	if err != nil {
@@ -67,8 +95,8 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 		return
 	}
 
-	// List directory
-	files, err := client.ListDir(ctx, path)
+	// List directory with pagination
+	result, err := client.ListDir(ctx, path, limit, offset)
 	if err != nil {
 		if strings.Contains(err.Error(), "not found") {
 			a.sendAPIStoreError(c, http.StatusNotFound, "Path not found")
@@ -79,8 +107,8 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 	}
 
 	// Convert to API response
-	apiFiles := make([]api.FileInfo, 0, len(files))
-	for _, f := range files {
+	apiFiles := make([]api.FileInfo, 0, len(result.Files))
+	for _, f := range result.Files {
 		apiFile := api.FileInfo{
 			Name:       f.Name,
 			Path:       f.Path,
@@ -93,9 +121,18 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 		apiFiles = append(apiFiles, apiFile)
 	}
 
-	c.JSON(http.StatusOK, api.FileListResponse{
+	response := api.FileListResponse{
 		Files: apiFiles,
-	})
+	}
+
+	// Generate next token if there are more results
+	if result.HasMore {
+		nextOffset := offset + limit
+		nextToken := encodeNextToken(nextOffset)
+		response.NextToken = &nextToken
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 // GetVolumesVolumeIDFilesDownload streams file content from a volume.
@@ -206,8 +243,15 @@ func (a *APIStore) PutVolumesVolumeIDFilesUpload(c *gin.Context, volumeID string
 		return
 	}
 
+	// Handle empty file uploads (Content-Length: 0)
+	// When body is nil or empty, use an empty reader to create an empty file
+	var body io.Reader = c.Request.Body
+	if body == nil {
+		body = strings.NewReader("")
+	}
+
 	// Upload file
-	written, err := client.Upload(ctx, path, c.Request.Body)
+	written, err := client.Upload(ctx, path, body)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to upload file: "+err.Error())
 		return
@@ -308,3 +352,28 @@ func ptr[T any](v T) *T {
 
 // Ensure time.Time is used
 var _ = time.Time{}
+
+// encodeNextToken encodes an offset into a base64 next token.
+func encodeNextToken(offset int) string {
+	return base64.StdEncoding.EncodeToString([]byte(fmt.Sprintf("offset:%d", offset)))
+}
+
+// decodeNextToken decodes a base64 next token into an offset.
+func decodeNextToken(token string) (int, error) {
+	decoded, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return 0, err
+	}
+
+	var offset int
+	_, err = fmt.Sscanf(string(decoded), "offset:%d", &offset)
+	if err != nil {
+		return 0, err
+	}
+
+	if offset < 0 {
+		return 0, fmt.Errorf("invalid offset: %d", offset)
+	}
+
+	return offset, nil
+}

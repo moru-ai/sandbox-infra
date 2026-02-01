@@ -191,6 +191,10 @@ func main() {
 	processService := processRpc.Handle(m, &processLogger, defaults, cgroupManager)
 
 	service := api.New(&envLogger, defaults, mmdsChan, isNotFC)
+
+	// Register the shutdown endpoint (not part of OpenAPI spec)
+	m.Post("/shutdown", service.PostShutdown)
+
 	handler := api.HandlerFromMux(service, m)
 	middleware := authn.NewMiddleware(permissions.AuthenticateUsername)
 

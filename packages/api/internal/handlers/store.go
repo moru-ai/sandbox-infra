@@ -20,10 +20,11 @@ import (
 	authcache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/auth"
 	templatecache "github.com/moru-ai/sandbox-infra/packages/api/internal/cache/templates"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/cfg"
-	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/crypto"
 	dbapi "github.com/moru-ai/sandbox-infra/packages/api/internal/db"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/db/types"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/edge"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/orchestrator"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox"
 	sandboxruns "github.com/moru-ai/sandbox-infra/packages/api/internal/sandbox-runs"
@@ -31,6 +32,7 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/utils"
 	clickhouse "github.com/moru-ai/sandbox-infra/packages/clickhouse/pkg"
 	sqlcdb "github.com/moru-ai/sandbox-infra/packages/db/client"
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/events"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/factories"
 	featureflags "github.com/moru-ai/sandbox-infra/packages/shared/pkg/feature-flags"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/keys"
@@ -61,7 +63,10 @@ type APIStore struct {
 	accessTokenGenerator *sandbox.AccessTokenGenerator
 	featureFlags         *featureflags.Client
 	clustersPool         *edge.Pool
-	juicefsPool          *juicefs.Pool // For volume file operations
+	juicefsPool          *juicefs.Pool         // For volume file operations
+	volumesEncryptor     *crypto.Encryptor     // For encrypting volume passwords
+	volumesRedisClient   redis.UniversalClient // For Redis ACL operations
+	volEventsDelivery    events.Delivery[events.VolumeEvent]
 }
 
 func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) *APIStore {
@@ -152,14 +157,44 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		go sandboxRunsConsumer.Run(ctx)
 	}
 
-	// Initialize JuiceFS pool for volume file operations
+	// Initialize volume events delivery for Redis Streams
+	var volEventsDelivery events.Delivery[events.VolumeEvent]
+	if redisClient != nil {
+		volEventsDelivery = events.NewRedisStreamsDelivery[events.VolumeEvent](redisClient, events.VolumeEventsStreamName)
+		logger.L().Info(ctx, "Volume events delivery initialized for Redis Streams")
+	}
+
+	// Initialize JuiceFS pool and related components for volume operations
 	var juicefsPool *juicefs.Pool
+	var volumesEncryptor *crypto.Encryptor
+	var volumesRedisClient redis.UniversalClient
 	if config.VolumesRedisURL != "" && config.VolumesBucket != "" {
 		juicefsPool = juicefs.NewPool(juicefs.Config{
 			RedisURL:  config.VolumesRedisURL,
 			GCSBucket: config.VolumesBucket,
 		})
 		logger.L().Info(ctx, "JuiceFS pool initialized for volume file operations")
+
+		// Initialize volumes encryptor for password encryption
+		if config.VolumesEncryptionKey != "" {
+			var encErr error
+			volumesEncryptor, encErr = crypto.NewEncryptor(config.VolumesEncryptionKey)
+			if encErr != nil {
+				logger.L().Fatal(ctx, "Initializing volumes encryptor failed", zap.Error(encErr))
+			}
+			logger.L().Info(ctx, "Volumes encryptor initialized")
+		} else {
+			logger.L().Warn(ctx, "VOLUMES_ENCRYPTION_KEY not set, volume passwords will not be encrypted")
+		}
+
+		// Initialize volumes Redis client for ACL operations
+		volumesRedisClient, err = factories.NewRedisClient(ctx, factories.RedisConfig{
+			RedisURL: config.VolumesRedisURL,
+		})
+		if err != nil {
+			logger.L().Fatal(ctx, "Initializing volumes Redis client failed", zap.Error(err))
+		}
+		logger.L().Info(ctx, "Volumes Redis client initialized for ACL operations")
 	} else {
 		logger.L().Info(ctx, "Volume file operations disabled (VOLUMES_REDIS_URL or VOLUMES_BUCKET not set)")
 	}
@@ -182,6 +217,9 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		featureFlags:         featureFlags,
 		redisClient:          redisClient,
 		juicefsPool:          juicefsPool,
+		volumesEncryptor:     volumesEncryptor,
+		volumesRedisClient:   volumesRedisClient,
+		volEventsDelivery:    volEventsDelivery,
 	}
 
 	// Wait till there's at least one, otherwise we can't create sandboxes yet
@@ -242,6 +280,18 @@ func (a *APIStore) Close(ctx context.Context) error {
 	if a.redisClient != nil {
 		if err := a.redisClient.Close(); err != nil {
 			errs = append(errs, fmt.Errorf("closing redis client: %w", err))
+		}
+	}
+
+	if a.volumesRedisClient != nil {
+		if err := a.volumesRedisClient.Close(); err != nil {
+			errs = append(errs, fmt.Errorf("closing volumes redis client: %w", err))
+		}
+	}
+
+	if a.volEventsDelivery != nil {
+		if err := a.volEventsDelivery.Close(ctx); err != nil {
+			errs = append(errs, fmt.Errorf("closing volume events delivery: %w", err))
 		}
 	}
 

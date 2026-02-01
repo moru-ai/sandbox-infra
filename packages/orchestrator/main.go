@@ -343,6 +343,14 @@ func run(config cfg.Config) (success bool) {
 		closers = append(closers, closer{"sandbox events delivery for redis", sbxEventsDeliveryRedis.Close})
 	}
 
+	// Volume events delivery targets
+	volEventsDeliveryTargets := make([]event.Delivery[event.VolumeEvent], 0)
+	if redisClient != nil {
+		volEventsDeliveryRedis := event.NewRedisStreamsDelivery[event.VolumeEvent](redisClient, event.VolumeEventsStreamName)
+		volEventsDeliveryTargets = append(volEventsDeliveryTargets, volEventsDeliveryRedis)
+		closers = append(closers, closer{"volume events delivery for redis", volEventsDeliveryRedis.Close})
+	}
+
 	// sandbox observer
 	sandboxObserver, err := metrics.NewSandboxObserver(ctx, nodeID, serviceName, commitSHA, version, serviceInstanceID, sandboxes)
 	if err != nil {
@@ -427,6 +435,7 @@ func run(config cfg.Config) (success bool) {
 		Persistence:      persistence,
 		FeatureFlags:     featureFlags,
 		SbxEventsService: events.NewEventsService(sbxEventsDeliveryTargets),
+		VolEventsService: events.NewVolumeEventsService(volEventsDeliveryTargets),
 	})
 
 	// template manager sandbox logger

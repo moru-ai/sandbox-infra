@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"syscall"
 	"time"
@@ -175,8 +176,15 @@ func (c *Client) metaCtx(ctx context.Context) meta.Context {
 	return meta.NewContext(uint32(os.Getpid()), 0, []uint32{0})
 }
 
-// ListDir lists files and directories at the given path.
-func (c *Client) ListDir(ctx context.Context, path string) ([]FileInfo, error) {
+// ListDirResult contains the result of a directory listing with pagination info.
+type ListDirResult struct {
+	Files   []FileInfo
+	HasMore bool
+}
+
+// ListDir lists files and directories at the given path with optional pagination.
+// If limit is 0, all entries are returned. offset specifies how many entries to skip.
+func (c *Client) ListDir(ctx context.Context, path string, limit, offset int) (*ListDirResult, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -202,6 +210,29 @@ func (c *Client) ListDir(ctx context.Context, path string) ([]FileInfo, error) {
 		return nil, fmt.Errorf("read directory: %s", errno)
 	}
 
+	// Sort entries by name for consistent pagination
+	sort.Slice(entries, func(i, j int) bool {
+		return string(entries[i].Name) < string(entries[j].Name)
+	})
+
+	// Apply pagination
+	totalEntries := len(entries)
+	hasMore := false
+
+	// Apply offset
+	if offset > 0 {
+		if offset >= totalEntries {
+			return &ListDirResult{Files: []FileInfo{}, HasMore: false}, nil
+		}
+		entries = entries[offset:]
+	}
+
+	// Apply limit
+	if limit > 0 && len(entries) > limit {
+		hasMore = true
+		entries = entries[:limit]
+	}
+
 	// Convert to FileInfo slice
 	result := make([]FileInfo, 0, len(entries))
 	for _, entry := range entries {
@@ -219,7 +250,7 @@ func (c *Client) ListDir(ctx context.Context, path string) ([]FileInfo, error) {
 		result = append(result, fi)
 	}
 
-	return result, nil
+	return &ListDirResult{Files: result, HasMore: hasMore}, nil
 }
 
 // jfsReader wraps a JuiceFS file handle for reading.
@@ -323,6 +354,12 @@ func (c *Client) Upload(ctx context.Context, path string, content io.Reader) (in
 		return 0, fmt.Errorf("create file: %s", errno)
 	}
 	defer f.Close(mctx)
+
+	// Truncate to 0 to handle overwrites (Create doesn't truncate existing files)
+	errno = c.jfs.Truncate(mctx, path, 0)
+	if errno != 0 {
+		return 0, fmt.Errorf("truncate file: %s", errno)
+	}
 
 	// Write content
 	buf := make([]byte, 128*1024) // 128 KiB buffer

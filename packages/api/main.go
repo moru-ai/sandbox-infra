@@ -176,6 +176,30 @@ func NewGinServer(ctx context.Context, config cfg.Config, tel *telemetry.Client,
 		),
 	)
 
+	// Rate limiting for file API endpoints
+	r.Use(
+		// List files (GET /volumes/:volumeID/files): 100 requests/min
+		customMiddleware.IncludeRoutes(
+			customMiddleware.RateLimitForMethod(customMiddleware.FileAPIRateLimits.List, customMiddleware.ByTeamID, http.MethodGet),
+			"/volumes/:volumeID/files",
+		),
+		// Delete files (DELETE /volumes/:volumeID/files): 30 requests/min
+		customMiddleware.IncludeRoutes(
+			customMiddleware.RateLimitForMethod(customMiddleware.FileAPIRateLimits.Delete, customMiddleware.ByTeamID, http.MethodDelete),
+			"/volumes/:volumeID/files",
+		),
+		// Download files (GET /volumes/:volumeID/files/download): 60 requests/min
+		customMiddleware.IncludeRoutes(
+			customMiddleware.RateLimitMiddleware(customMiddleware.FileAPIRateLimits.Download, customMiddleware.ByTeamID),
+			"/volumes/:volumeID/files/download",
+		),
+		// Upload files (PUT /volumes/:volumeID/files/upload): 60 requests/min
+		customMiddleware.IncludeRoutes(
+			customMiddleware.RateLimitMiddleware(customMiddleware.FileAPIRateLimits.Upload, customMiddleware.ByTeamID),
+			"/volumes/:volumeID/files/upload",
+		),
+	)
+
 	// We now register our store above as the handler for the interface
 	api.RegisterHandlersWithOptions(r, apiStore, api.GinServerOptions{
 		ErrorHandler: func(c *gin.Context, err error, statusCode int) {

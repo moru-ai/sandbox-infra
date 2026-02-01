@@ -3,11 +3,16 @@ package juicefs
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/google/uuid"
 	"github.com/juicedata/juicefs/pkg/meta"
 	"github.com/juicedata/juicefs/pkg/object"
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
+
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 // FormatConfig holds configuration for formatting a new JuiceFS volume.
@@ -18,15 +23,44 @@ type FormatConfig struct {
 	// RedisDB is the Redis database number for this volume's metadata
 	RedisDB int32
 
+	// Password is the per-volume Redis ACL password for db_{RedisDB} user
+	Password string
+
 	// PoolConfig contains the shared Redis/GCS configuration
 	PoolConfig Config
+
+	// MetadataRedisClient is the Redis client for metadata cleanup operations.
+	// This should be the volumesRedisClient from the handler.
+	// If nil, metadata cleanup will be skipped during destroy.
+	MetadataRedisClient redis.UniversalClient
+}
+
+// buildRedisURL constructs a Redis URL with per-volume ACL credentials.
+// Input: rediss://host:port?query -> rediss://db_{redisDB}:{password}@host:port/{redisDB}?query
+func buildRedisURL(baseURL string, redisDB int32, password string) (string, error) {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return "", fmt.Errorf("parse redis URL: %w", err)
+	}
+
+	// Set per-volume ACL credentials: username=db_{redisDB}, password=password
+	aclUser := fmt.Sprintf("db_%d", redisDB)
+	u.User = url.UserPassword(aclUser, password)
+
+	// Append database number to path
+	u.Path = fmt.Sprintf("/%d", redisDB)
+
+	return u.String(), nil
 }
 
 // FormatVolume initializes a new JuiceFS volume with the given configuration.
 // This creates the metadata structure in Redis and prepares GCS for data storage.
 func FormatVolume(ctx context.Context, cfg FormatConfig) error {
-	// Build Redis URL with database number
-	redisURL := fmt.Sprintf("%s/%d", cfg.PoolConfig.RedisURL, cfg.RedisDB)
+	// Build Redis URL with per-volume ACL credentials
+	redisURL, err := buildRedisURL(cfg.PoolConfig.RedisURL, cfg.RedisDB, cfg.Password)
+	if err != nil {
+		return fmt.Errorf("build redis URL: %w", err)
+	}
 
 	// Create metadata client
 	metaConf := meta.DefaultConf()
@@ -34,7 +68,7 @@ func FormatVolume(ctx context.Context, cfg FormatConfig) error {
 	m := meta.NewClient(redisURL, metaConf)
 
 	// Check if already formatted
-	_, err := m.Load(false)
+	_, err = m.Load(false)
 	if err == nil {
 		// Already formatted - this is idempotent, return success
 		return nil
@@ -87,8 +121,11 @@ func FormatVolume(ctx context.Context, cfg FormatConfig) error {
 // DestroyVolume removes all JuiceFS data for a volume.
 // This deletes metadata from Redis and can optionally clean up GCS data.
 func DestroyVolume(ctx context.Context, cfg FormatConfig, deleteData bool) error {
-	// Build Redis URL with database number
-	redisURL := fmt.Sprintf("%s/%d", cfg.PoolConfig.RedisURL, cfg.RedisDB)
+	// Build Redis URL with per-volume ACL credentials
+	redisURL, err := buildRedisURL(cfg.PoolConfig.RedisURL, cfg.RedisDB, cfg.Password)
+	if err != nil {
+		return fmt.Errorf("build redis URL: %w", err)
+	}
 
 	// Create metadata client
 	metaConf := meta.DefaultConf()
@@ -145,11 +182,62 @@ func DestroyVolume(ctx context.Context, cfg FormatConfig, deleteData bool) error
 		}
 	}
 
-	// Reset the Redis database (flush all keys in this DB)
-	// Note: This uses the meta client's internal connection
-	// The meta package doesn't expose a destroy method, so we just
-	// rely on the Redis DB being reused for a new volume eventually
-	// For now, the DB isolation means old data won't interfere
+	// Clean up Redis metadata keys for this volume
+	// JuiceFS uses keys with pattern {N}* where N is the Redis DB number
+	// e.g., {123}setting, {123}i1, {123}d1
+	if cfg.MetadataRedisClient != nil {
+		if err := cleanupRedisMetadata(ctx, cfg.MetadataRedisClient, cfg.RedisDB); err != nil {
+			// Log but don't fail - best effort cleanup
+			logger.L().Warn(ctx, "Failed to cleanup Redis metadata",
+				zap.Error(err),
+				zap.String("volume_id", cfg.VolumeID),
+				zap.Int32("redis_db", cfg.RedisDB))
+		} else {
+			logger.L().Info(ctx, "Cleaned up Redis metadata",
+				zap.String("volume_id", cfg.VolumeID),
+				zap.Int32("redis_db", cfg.RedisDB))
+		}
+	}
+
+	return nil
+}
+
+// cleanupRedisMetadata safely removes all JuiceFS metadata keys for a volume.
+// Keys are stored with pattern {N}* where N is the Redis DB number.
+// Uses SCAN to iterate (not KEYS) to avoid blocking in production.
+func cleanupRedisMetadata(ctx context.Context, client redis.UniversalClient, redisDB int32) error {
+	pattern := fmt.Sprintf("{%d}*", redisDB)
+	cursor := uint64(0)
+	totalDeleted := 0
+	batchSize := int64(100)
+
+	for {
+		// SCAN with pattern to find matching keys
+		keys, nextCursor, err := client.Scan(ctx, cursor, pattern, batchSize).Result()
+		if err != nil {
+			return fmt.Errorf("scan redis keys with pattern %s: %w", pattern, err)
+		}
+
+		// Delete found keys in batch
+		if len(keys) > 0 {
+			deleted, err := client.Del(ctx, keys...).Result()
+			if err != nil {
+				return fmt.Errorf("delete redis keys: %w", err)
+			}
+			totalDeleted += int(deleted)
+		}
+
+		cursor = nextCursor
+		if cursor == 0 {
+			break
+		}
+	}
+
+	if totalDeleted > 0 {
+		logger.L().Debug(ctx, "Deleted Redis metadata keys",
+			zap.Int("count", totalDeleted),
+			zap.String("pattern", pattern))
+	}
 
 	return nil
 }

@@ -9,12 +9,18 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/moru-ai/sandbox-infra/packages/envd/internal/api"
 	"github.com/moru-ai/sandbox-infra/packages/envd/internal/host"
 )
 
 func init() {
 	// Register the volume mounter factory with the host package
 	host.DefaultVolumeMounterFactory = func(config *host.VolumeConfig) host.VolumeMounter {
+		return NewMounter(config)
+	}
+
+	// Register the volume unmounter factory with the api package for graceful shutdown
+	api.DefaultVolumeUnmounterFactory = func(config *host.VolumeConfig) api.VolumeUnmounter {
 		return NewMounter(config)
 	}
 }
@@ -49,13 +55,24 @@ func NewMounter(config *host.VolumeConfig) *Mounter {
 
 // Mount mounts the JuiceFS volume at the configured path.
 func (m *Mounter) Mount(ctx context.Context) error {
+	// TODO: Emit volume.mount.started analytics event when envd events delivery is added
+	// Event should use events.VolumeMountStartedEvent type from shared/pkg/events/volume.go
+	fmt.Fprintf(os.Stderr, "[volume.mount.started] volume_id=%s mount_path=%s\n",
+		m.config.VolumeID, m.mountPath)
+
 	// Check if JuiceFS binary exists
 	if _, err := os.Stat(JuiceFSBinary); os.IsNotExist(err) {
+		// TODO: Emit volume.mount.failed analytics event when envd events delivery is added
+		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
+			m.config.VolumeID, m.mountPath, err)
 		return fmt.Errorf("JuiceFS binary not found at %s", JuiceFSBinary)
 	}
 
 	// Create mount directory if it doesn't exist
 	if err := os.MkdirAll(m.mountPath, 0o755); err != nil {
+		// TODO: Emit volume.mount.failed analytics event when envd events delivery is added
+		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
+			m.config.VolumeID, m.mountPath, err)
 		return fmt.Errorf("create mount directory: %w", err)
 	}
 
@@ -92,13 +109,23 @@ func (m *Mounter) Mount(ctx context.Context) error {
 	// Capture output
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		// TODO: Emit volume.mount.failed analytics event when envd events delivery is added
+		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v output=%s\n",
+			m.config.VolumeID, m.mountPath, err, string(output))
 		return fmt.Errorf("juicefs mount failed: %w\nOutput: %s", err, string(output))
 	}
 
 	// Verify mount is accessible
 	if err := m.verifyMount(); err != nil {
+		// TODO: Emit volume.mount.failed analytics event when envd events delivery is added
+		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
+			m.config.VolumeID, m.mountPath, err)
 		return fmt.Errorf("mount verification failed: %w", err)
 	}
+
+	// TODO: Emit volume.mount.completed analytics event when envd events delivery is added
+	fmt.Fprintf(os.Stderr, "[volume.mount.completed] volume_id=%s mount_path=%s\n",
+		m.config.VolumeID, m.mountPath)
 
 	return nil
 }

@@ -243,6 +243,17 @@ func (s *Server) Create(ctx context.Context, req *orchestrator.SandboxCreateRequ
 		},
 	)
 
+	// Emit volume.attached event if sandbox has a volume
+	if volumeProto != nil && s.volEventsService != nil {
+		go s.volEventsService.Publish(
+			context.WithoutCancel(ctx),
+			teamID,
+			events.NewVolumeEvent(events.VolumeAttachedEvent, volumeProto.GetVolumeId()).
+				WithSandboxContext(sbx.Runtime.SandboxID, sbx.Runtime.ExecutionID, teamID).
+				WithMountPath(volumeProto.GetMountPath()),
+		)
+	}
+
 	return &orchestrator.SandboxCreateResponse{
 		ClientId: s.info.ClientId,
 	}, nil
@@ -386,6 +397,17 @@ func (s *Server) Delete(ctxConn context.Context, in *orchestrator.SandboxDeleteR
 			SandboxTeamID:      teamID,
 		},
 	)
+
+	// Emit volume.detached event if sandbox had a volume
+	if sbx.Config.Volume != nil && s.volEventsService != nil {
+		go s.volEventsService.Publish(
+			context.WithoutCancel(ctx),
+			teamID,
+			events.NewVolumeEvent(events.VolumeDetachedEvent, sbx.Config.Volume.GetVolumeId()).
+				WithSandboxContext(sbx.Runtime.SandboxID, sbx.Runtime.ExecutionID, teamID).
+				WithMountPath(sbx.Config.Volume.GetMountPath()),
+		)
+	}
 
 	return &emptypb.Empty{}, nil
 }

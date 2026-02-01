@@ -140,6 +140,10 @@ type VolumeMounterFactory func(config *VolumeConfig) VolumeMounter
 // DefaultVolumeMounterFactory is set by the volume package during init.
 var DefaultVolumeMounterFactory VolumeMounterFactory
 
+// CurrentVolumeConfig stores the volume config for the current sandbox.
+// This is set when the volume is mounted during init.
+var CurrentVolumeConfig *VolumeConfig
+
 func PollForMMDSOpts(ctx context.Context, mmdsChan chan<- *MMDSOpts, envVars *utils.Map[string, string]) {
 	httpClient := &http.Client{}
 	defer httpClient.CloseIdleConnections()
@@ -189,6 +193,8 @@ func PollForMMDSOpts(ctx context.Context, mmdsChan chan<- *MMDSOpts, envVars *ut
 						mmdsOpts.Volume.VolumeID, mmdsOpts.Volume.MountPath)
 					envVars.Store("MORU_VOLUME_ID", mmdsOpts.Volume.VolumeID)
 					envVars.Store("MORU_VOLUME_MOUNT_PATH", mmdsOpts.Volume.MountPath)
+					// Store the volume config for graceful shutdown
+					CurrentVolumeConfig = mmdsOpts.Volume
 				}
 			}
 

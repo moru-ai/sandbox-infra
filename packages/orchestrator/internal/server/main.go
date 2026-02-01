@@ -38,6 +38,7 @@ type Server struct {
 	persistence       storage.StorageProvider
 	featureFlags      *featureflags.Client
 	sbxEventsService  *events.EventsService
+	volEventsService  *events.VolumeEventsService
 	startingSandboxes *semaphore.Weighted
 }
 
@@ -54,6 +55,7 @@ type ServiceConfig struct {
 	Persistence      storage.StorageProvider
 	FeatureFlags     *featureflags.Client
 	SbxEventsService *events.EventsService
+	VolEventsService *events.VolumeEventsService
 }
 
 func New(ctx context.Context, cfg ServiceConfig) *Server {
@@ -69,6 +71,7 @@ func New(ctx context.Context, cfg ServiceConfig) *Server {
 		persistence:       cfg.Persistence,
 		featureFlags:      cfg.FeatureFlags,
 		sbxEventsService:  cfg.SbxEventsService,
+		volEventsService:  cfg.VolEventsService,
 		startingSandboxes: semaphore.NewWeighted(maxStartingInstancesPerNode),
 	}
 

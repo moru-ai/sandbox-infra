@@ -42,6 +42,10 @@ type Config struct {
 
 	// VolumesRedisURL is the Redis URL for JuiceFS volume metadata.
 	VolumesRedisURL string `env:"VOLUMES_REDIS_URL"`
+
+	// VolumesEncryptionKey is the base64-encoded 256-bit key for encrypting volume passwords.
+	// Generate with: openssl rand -base64 32
+	VolumesEncryptionKey string `env:"VOLUMES_ENCRYPTION_KEY"`
 }
 
 func Parse() (Config, error) {

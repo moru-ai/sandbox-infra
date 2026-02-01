@@ -164,3 +164,49 @@ func (s *Sandbox) initEnvd(ctx context.Context) (e error) {
 
 	return nil
 }
+
+const (
+	// shutdownTimeout is the maximum time to wait for the envd shutdown endpoint.
+	// JuiceFS has a 300MB write buffer that needs to be flushed.
+	shutdownTimeout = 30 * time.Second
+)
+
+// callEnvdShutdown calls the envd shutdown endpoint to flush volume buffers.
+// This should be called before terminating the sandbox to prevent data loss.
+func (s *Sandbox) callEnvdShutdown(ctx context.Context) error {
+	ctx, span := tracer.Start(ctx, "envd-shutdown")
+	defer span.End()
+
+	// Use a timeout for the shutdown call
+	ctx, cancel := context.WithTimeout(ctx, shutdownTimeout)
+	defer cancel()
+
+	address := fmt.Sprintf("http://%s:%d/shutdown", s.Slot.HostIPString(), consts.DefaultEnvdServerPort)
+
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, address, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create shutdown request: %w", err)
+	}
+
+	// Include access token if set
+	if s.Config.Envd.AccessToken != nil {
+		request.Header.Set("X-Access-Token", *s.Config.Envd.AccessToken)
+	}
+
+	response, err := sandboxHttpClient.Do(request)
+	if err != nil {
+		return fmt.Errorf("failed to call envd shutdown: %w", err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent && response.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(response.Body)
+		return fmt.Errorf("envd shutdown returned status %d: %s", response.StatusCode, string(body))
+	}
+
+	logger.L().Info(ctx, "envd shutdown completed successfully",
+		zap.String("sandbox_id", s.Runtime.SandboxID),
+	)
+
+	return nil
+}

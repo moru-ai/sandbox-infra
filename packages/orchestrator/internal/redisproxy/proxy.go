@@ -5,6 +5,8 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	"crypto/x509"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"net"
@@ -38,6 +40,10 @@ type Config struct {
 
 	// Password is the per-volume password for Redis ACL authentication.
 	Password string
+
+	// TLSCABase64 is the base64-encoded TLS CA certificate for verifying the Redis server.
+	// If set, proper TLS verification is used instead of insecure-skip-verify.
+	TLSCABase64 string
 }
 
 // upstreamConfig holds parsed upstream connection configuration.
@@ -47,7 +53,8 @@ type upstreamConfig struct {
 }
 
 // parseUpstreamURL parses the upstream URL and returns connection configuration.
-func parseUpstreamURL(rawURL string) (*upstreamConfig, error) {
+// If tlsCABase64 is provided, it will be used to verify the server certificate.
+func parseUpstreamURL(rawURL string, tlsCABase64 string) (*upstreamConfig, error) {
 	u, err := url.Parse(rawURL)
 	if err != nil {
 		return nil, fmt.Errorf("parse URL: %w", err)
@@ -77,8 +84,22 @@ func parseUpstreamURL(rawURL string) (*upstreamConfig, error) {
 		cfg.tlsConfig = &tls.Config{
 			MinVersion: tls.VersionTLS12,
 		}
-		// Check for insecure-skip-verify query param
-		if u.Query().Get("insecure-skip-verify") == "true" {
+
+		// If TLS CA is provided, use it for verification
+		if tlsCABase64 != "" {
+			caBytes, err := base64.StdEncoding.DecodeString(tlsCABase64)
+			if err != nil {
+				return nil, fmt.Errorf("decode TLS CA certificate: %w", err)
+			}
+
+			certPool := x509.NewCertPool()
+			if !certPool.AppendCertsFromPEM(caBytes) {
+				return nil, fmt.Errorf("failed to parse TLS CA certificate")
+			}
+
+			cfg.tlsConfig.RootCAs = certPool
+		} else if u.Query().Get("insecure-skip-verify") == "true" {
+			// Fall back to insecure-skip-verify if no CA is provided and URL requests it
 			cfg.tlsConfig.InsecureSkipVerify = true
 		}
 	default:
@@ -124,7 +145,7 @@ func (p *Proxy) Start(ctx context.Context) error {
 
 	// Parse upstream URL once at startup
 	var err error
-	p.upstream, err = parseUpstreamURL(p.config.UpstreamURL)
+	p.upstream, err = parseUpstreamURL(p.config.UpstreamURL, p.config.TLSCABase64)
 	if err != nil {
 		return fmt.Errorf("invalid upstream URL: %w", err)
 	}
