@@ -457,6 +457,23 @@ resource "nomad_job" "orchestrator" {
   depends_on = [nomad_variable.orchestrator_hash, random_id.orchestrator_job]
 }
 
+# Deploy orchestrator on build nodes too - template builds need local orchestrator
+resource "nomad_job" "orchestrator_build" {
+  count = var.template_manager_machine_count > 0 ? 1 : 0
+
+  deregister_on_id_change = false
+
+  jobspec = templatefile("${path.module}/jobs/orchestrator.hcl", merge(
+    local.orchestrator_envs,
+    {
+      latest_orchestrator_job_id = local.latest_orchestrator_job_id
+      node_pool                  = var.builder_node_pool
+    }
+  ))
+
+  depends_on = [nomad_variable.orchestrator_hash, random_id.orchestrator_job]
+}
+
 data "google_storage_bucket_object" "template_manager" {
   name   = "template-manager"
   bucket = var.fc_env_pipeline_bucket_name
