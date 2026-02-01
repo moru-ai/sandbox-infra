@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"net"
 	"net/netip"
 
 	"github.com/google/nftables"
@@ -390,6 +391,61 @@ func (fw *Firewall) SetTCPFirewall(useTCPFirewall bool) error {
 	}
 
 	fw.useTCPFirewall = useTCPFirewall
+
+	return nil
+}
+
+// AllowTCPPort adds a rule to allow TCP traffic to a specific IP:port.
+// This is used to allow sandbox access to volume proxies (GCS, Redis) on the veth interface.
+// The rule is inserted at the beginning of the filter chain (before deny rules).
+func (fw *Firewall) AllowTCPPort(ip net.IP, port uint16) error {
+	ipBytes := ip.To4()
+	if ipBytes == nil {
+		return fmt.Errorf("invalid IPv4 address: %s", ip)
+	}
+
+	fw.conn.InsertRule(&nftables.Rule{
+		Table: fw.table,
+		Chain: fw.filterChain,
+		Exprs: append(append(fw.tapIfaceMatch(),
+			// Match TCP protocol
+			&expr.Meta{Key: expr.MetaKeyL4PROTO, Register: 1},
+			&expr.Cmp{
+				Op:       expr.CmpOpEq,
+				Register: 1,
+				Data:     []byte{unix.IPPROTO_TCP},
+			},
+			// Match destination IP
+			&expr.Payload{
+				DestRegister: 1,
+				Base:         expr.PayloadBaseNetworkHeader,
+				Offset:       16, // IPv4 destination address offset
+				Len:          4,
+			},
+			&expr.Cmp{
+				Op:       expr.CmpOpEq,
+				Register: 1,
+				Data:     ipBytes,
+			},
+			// Match destination port
+			&expr.Payload{
+				DestRegister: 1,
+				Base:         expr.PayloadBaseTransportHeader,
+				Offset:       2, // TCP destination port offset
+				Len:          2,
+			},
+			&expr.Cmp{
+				Op:       expr.CmpOpEq,
+				Register: 1,
+				Data:     binaryutil.BigEndian.PutUint16(port),
+			}),
+			markAndAccept()...,
+		),
+	})
+
+	if err := fw.conn.Flush(); err != nil {
+		return fmt.Errorf("flush allow TCP port rule: %w", err)
+	}
 
 	return nil
 }

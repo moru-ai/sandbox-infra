@@ -253,6 +253,16 @@ func (s *Slot) CloseFirewall() error {
 	return nil
 }
 
+// AllowProxyPort allows TCP traffic from the sandbox to a specific port on the veth interface.
+// This is used to enable access to volume proxies (GCS on 5017, Redis on 5018).
+func (s *Slot) AllowProxyPort(port uint16) error {
+	if s.Firewall == nil {
+		return fmt.Errorf("firewall not initialized for slot %s", s.Key)
+	}
+
+	return s.Firewall.AllowTCPPort(s.VethIP(), port)
+}
+
 func (s *Slot) ConfigureInternet(ctx context.Context, network *orchestrator.SandboxNetworkConfig) (e error) {
 	_, span := tracer.Start(ctx, "slot-internet-configure", trace.WithAttributes(
 		attribute.String("namespace_id", s.NamespaceID()),

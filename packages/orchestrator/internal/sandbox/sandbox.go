@@ -561,6 +561,7 @@ func (f *Factory) ResumeSandbox(
 			UpstreamURL: f.volumes.RedisURL,
 			RedisDB:     int(config.Volume.GetRedisDb()),
 			Password:    f.volumes.RedisPassword,
+			TLSCABase64: f.volumes.RedisTLSCA,
 		}
 		redisProxy, err := redisproxy.StartInNamespace(execCtx, redisProxyCfg, logger.L())
 		if err != nil {
@@ -570,6 +571,14 @@ func (f *Factory) ResumeSandbox(
 			return redisProxy.Close()
 		})
 		telemetry.ReportEvent(ctx, "started Redis proxy")
+
+		// Allow sandbox to reach the volume proxies through the firewall
+		if err := ips.slot.AllowProxyPort(gcsproxy.Port); err != nil {
+			return nil, fmt.Errorf("failed to allow GCS proxy port: %w", err)
+		}
+		if err := ips.slot.AllowProxyPort(redisproxy.Port); err != nil {
+			return nil, fmt.Errorf("failed to allow Redis proxy port: %w", err)
+		}
 	}
 
 	fcStartErr := fcHandle.Resume(
@@ -715,6 +724,18 @@ func (s *Sandbox) doStop(ctx context.Context) error {
 
 	// Stop the health checks before stopping the sandbox
 	s.Checks.Stop()
+
+	// Call envd shutdown to flush volume buffers before killing the process
+	// This is best-effort: we log errors but don't fail the stop operation
+	if s.Config.Volume != nil {
+		if err := s.callEnvdShutdown(ctx); err != nil {
+			logger.L().Warn(ctx, "failed to call envd shutdown (volume data may be lost)",
+				zap.Error(err),
+				zap.String("sandbox_id", s.Runtime.SandboxID),
+				zap.String("volume_id", s.Config.Volume.GetVolumeId()),
+			)
+		}
+	}
 
 	fcStopErr := s.process.Stop(ctx)
 	if fcStopErr != nil {
