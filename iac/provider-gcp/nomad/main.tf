@@ -458,6 +458,7 @@ resource "nomad_job" "orchestrator" {
 }
 
 # Deploy orchestrator on build nodes too - template builds need local orchestrator
+# Uses different port (5009) to avoid conflict with template-manager on port 5008
 resource "nomad_job" "orchestrator_build" {
   count = var.template_manager_machine_count > 0 ? 1 : 0
 
@@ -468,6 +469,7 @@ resource "nomad_job" "orchestrator_build" {
     {
       latest_orchestrator_job_id = local.latest_orchestrator_job_id
       node_pool                  = var.builder_node_pool
+      port                       = 5009 # Override to avoid conflict with template-manager (5008)
     }
   ))
 
