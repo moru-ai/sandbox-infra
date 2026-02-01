@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -27,8 +28,9 @@ type Config struct {
 	// ListenAddr is the address to listen on (e.g., "10.12.0.1:5018").
 	ListenAddr string
 
-	// UpstreamAddr is the Redis cluster endpoint (e.g., "10.0.0.1:6379").
-	UpstreamAddr string
+	// UpstreamURL is the Redis URL (e.g., "redis://10.0.0.1:6379" or "rediss://10.0.0.1:6379?insecure-skip-verify=true").
+	// Supports redis:// (plain) and rediss:// (TLS) schemes.
+	UpstreamURL string
 
 	// RedisDB is the database number for key prefix isolation.
 	// Used to construct username: db_{RedisDB}
@@ -36,10 +38,54 @@ type Config struct {
 
 	// Password is the per-volume password for Redis ACL authentication.
 	Password string
+}
 
-	// TLSConfig is the TLS configuration for upstream connection.
-	// If nil, TLS is disabled.
-	TLSConfig *tls.Config
+// upstreamConfig holds parsed upstream connection configuration.
+type upstreamConfig struct {
+	host      string
+	tlsConfig *tls.Config
+}
+
+// parseUpstreamURL parses the upstream URL and returns connection configuration.
+func parseUpstreamURL(rawURL string) (*upstreamConfig, error) {
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		return nil, fmt.Errorf("parse URL: %w", err)
+	}
+
+	host := u.Host
+	if host == "" {
+		return nil, fmt.Errorf("empty host in URL: %s", rawURL)
+	}
+
+	// Add default port if not specified
+	if !strings.Contains(host, ":") {
+		host = host + ":6379"
+	}
+
+	cfg := &upstreamConfig{
+		host: host,
+	}
+
+	// Check scheme for TLS
+	switch u.Scheme {
+	case "redis":
+		// Plain TCP, no TLS
+		cfg.tlsConfig = nil
+	case "rediss":
+		// TLS enabled
+		cfg.tlsConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+		// Check for insecure-skip-verify query param
+		if u.Query().Get("insecure-skip-verify") == "true" {
+			cfg.tlsConfig.InsecureSkipVerify = true
+		}
+	default:
+		return nil, fmt.Errorf("unsupported scheme: %s (expected redis:// or rediss://)", u.Scheme)
+	}
+
+	return cfg, nil
 }
 
 // Proxy is a TCP proxy that injects Redis ACL authentication.
@@ -47,6 +93,9 @@ type Proxy struct {
 	config   Config
 	logger   logger.Logger
 	listener net.Listener
+
+	// upstream holds parsed upstream configuration (parsed once at start)
+	upstream *upstreamConfig
 
 	mu      sync.Mutex
 	running bool
@@ -73,8 +122,14 @@ func (p *Proxy) Start(ctx context.Context) error {
 	p.ctx, p.cancel = context.WithCancel(ctx)
 	p.mu.Unlock()
 
-	// Create listener
+	// Parse upstream URL once at startup
 	var err error
+	p.upstream, err = parseUpstreamURL(p.config.UpstreamURL)
+	if err != nil {
+		return fmt.Errorf("invalid upstream URL: %w", err)
+	}
+
+	// Create listener
 	p.listener, err = net.Listen("tcp", p.config.ListenAddr)
 	if err != nil {
 		return fmt.Errorf("listen on %s: %w", p.config.ListenAddr, err)
@@ -82,7 +137,8 @@ func (p *Proxy) Start(ctx context.Context) error {
 
 	p.logger.Info(ctx, "Redis proxy started",
 		zap.String("addr", p.config.ListenAddr),
-		zap.String("upstream", p.config.UpstreamAddr),
+		zap.String("upstream", p.upstream.host),
+		zap.Bool("tls", p.upstream.tlsConfig != nil),
 		zap.Int("redisDb", p.config.RedisDB),
 	)
 
@@ -132,11 +188,11 @@ func (p *Proxy) handleConnection(clientConn net.Conn) {
 	var upstreamConn net.Conn
 	var err error
 
-	if p.config.TLSConfig != nil {
+	if p.upstream.tlsConfig != nil {
 		dialer := &net.Dialer{Timeout: 10 * time.Second}
-		upstreamConn, err = tls.DialWithDialer(dialer, "tcp", p.config.UpstreamAddr, p.config.TLSConfig)
+		upstreamConn, err = tls.DialWithDialer(dialer, "tcp", p.upstream.host, p.upstream.tlsConfig)
 	} else {
-		upstreamConn, err = net.DialTimeout("tcp", p.config.UpstreamAddr, 10*time.Second)
+		upstreamConn, err = net.DialTimeout("tcp", p.upstream.host, 10*time.Second)
 	}
 	if err != nil {
 		p.logger.Error(ctx, "Redis proxy: failed to connect to upstream", zap.Error(err))
@@ -201,17 +257,27 @@ func (p *Proxy) authenticate(conn net.Conn) error {
 
 // StartInNamespace starts the Redis proxy in the given network namespace.
 // This is a helper that runs the proxy in a goroutine and returns immediately.
+// Returns an error if the proxy fails to start (e.g., listen fails).
 func StartInNamespace(ctx context.Context, cfg Config, log logger.Logger) (*Proxy, error) {
 	proxy := New(cfg, log)
 
+	// Channel to receive startup error
+	errCh := make(chan error, 1)
+
 	go func() {
-		if err := proxy.Start(ctx); err != nil {
-			log.Error(ctx, "Redis proxy error", zap.Error(err))
+		err := proxy.Start(ctx)
+		if err != nil {
+			errCh <- err
 		}
+		// If Start returns nil, proxy is shutting down normally
 	}()
 
-	// Give the proxy a moment to start
-	time.Sleep(10 * time.Millisecond)
-
-	return proxy, nil
+	// Wait for proxy to start or fail
+	select {
+	case err := <-errCh:
+		return nil, fmt.Errorf("proxy startup failed: %w", err)
+	case <-time.After(100 * time.Millisecond):
+		// Proxy started successfully (blocking in accept loop)
+		return proxy, nil
+	}
 }

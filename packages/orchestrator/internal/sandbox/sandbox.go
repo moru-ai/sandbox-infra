@@ -557,13 +557,11 @@ func (f *Factory) ResumeSandbox(
 
 		// Start Redis proxy for this sandbox
 		redisProxyCfg := redisproxy.Config{
-			ListenAddr:   fmt.Sprintf("%s:%d", vethIP, redisproxy.Port),
-			UpstreamAddr: f.volumes.RedisURL,
-			RedisDB:      int(config.Volume.GetRedisDb()),
-			Password:     f.volumes.RedisPassword,
-			// TLSConfig will be set up if TLS CA is provided
+			ListenAddr:  fmt.Sprintf("%s:%d", vethIP, redisproxy.Port),
+			UpstreamURL: f.volumes.RedisURL,
+			RedisDB:     int(config.Volume.GetRedisDb()),
+			Password:    f.volumes.RedisPassword,
 		}
-		// TODO: Set up TLS config from f.volumes.RedisTLSCA if non-empty
 		redisProxy, err := redisproxy.StartInNamespace(execCtx, redisProxyCfg, logger.L())
 		if err != nil {
 			return nil, fmt.Errorf("failed to start Redis proxy: %w", err)
