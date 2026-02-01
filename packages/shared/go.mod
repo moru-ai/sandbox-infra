@@ -17,6 +17,9 @@ exclude k8s.io/client-go v8.0.0+incompatible
 // https://github.com/grafana/loki/issues/2826
 replace github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.47.2-0.20231010075449-4b9c19fe5510
 
+// Pin prometheus/common to v0.59.1 to keep promlog package (removed in v0.60.0+)
+replace github.com/prometheus/common => github.com/prometheus/common v0.59.1
+
 // Local workspace packages - used during Docker builds
 replace github.com/moru-ai/sandbox-infra/packages/db => ../db
 

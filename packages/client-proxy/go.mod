@@ -19,6 +19,9 @@ exclude k8s.io/client-go v8.0.0+incompatible
 // https://github.com/grafana/loki/issues/2826
 replace github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.47.2-0.20231010075449-4b9c19fe5510
 
+// Pin prometheus/common to v0.59.1 to keep promlog package (removed in v0.60.0+)
+replace github.com/prometheus/common => github.com/prometheus/common v0.59.1
+
 replace (
 	github.com/moru-ai/sandbox-infra/packages/clickhouse v0.0.0 => ../clickhouse
 	github.com/moru-ai/sandbox-infra/packages/shared v0.0.0 => ../shared
@@ -109,7 +112,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.26.0 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
-	github.com/go-resty/resty/v2 v2.13.1 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gogo/googleapis v1.4.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
