@@ -89,7 +89,7 @@ func FormatVolume(ctx context.Context, cfg FormatConfig) error {
 		Bucket:           bucketURL + volumePrefix, // Store full path in format for reference
 		BlockSize:        4096,                     // 4 MiB blocks (in KiB units)
 		Compression:      "lz4",
-		TrashDays:        0,  // Disable trash for API volumes
+		TrashDays:        0, // Disable trash for API volumes
 		DirStats:         true,
 		MetaVersion:      meta.MaxVersion,
 		MinClientVersion: "1.1.0-A",

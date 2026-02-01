@@ -94,17 +94,17 @@ resource "google_memorystore_instance" "valkey_cluster" {
     weekly_maintenance_window {
       day = "SUNDAY"
       start_time {
-        hours = 3  # 03:00 UTC - low traffic window
+        hours = 3 # 03:00 UTC - low traffic window
       }
     }
   }
 
   # Automated backups - critical for data safety
   automated_backup_config {
-    retention = "604800s"  # 7 days retention
+    retention = "604800s" # 7 days retention
     fixed_frequency_schedule {
       start_time {
-        hours = 4  # 04:00 UTC - after maintenance window
+        hours = 4 # 04:00 UTC - after maintenance window
       }
     }
   }
@@ -180,17 +180,17 @@ resource "google_memorystore_instance" "volumes" {
     weekly_maintenance_window {
       day = "SUNDAY"
       start_time {
-        hours = 3  # 03:00 UTC - low traffic window
+        hours = 3 # 03:00 UTC - low traffic window
       }
     }
   }
 
   # Automated backups - critical for volume metadata recovery
   automated_backup_config {
-    retention = "604800s"  # 7 days retention
+    retention = "604800s" # 7 days retention
     fixed_frequency_schedule {
       start_time {
-        hours = 4  # 04:00 UTC - after maintenance window
+        hours = 4 # 04:00 UTC - after maintenance window
       }
     }
   }
