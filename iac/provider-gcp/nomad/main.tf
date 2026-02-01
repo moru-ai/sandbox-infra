@@ -457,25 +457,6 @@ resource "nomad_job" "orchestrator" {
   depends_on = [nomad_variable.orchestrator_hash, random_id.orchestrator_job]
 }
 
-# Deploy orchestrator on build nodes too - template builds need local orchestrator
-# Uses different port (5009) to avoid conflict with template-manager on port 5008
-resource "nomad_job" "orchestrator_build" {
-  count = var.template_manager_machine_count > 0 ? 1 : 0
-
-  deregister_on_id_change = false
-
-  jobspec = templatefile("${path.module}/jobs/orchestrator.hcl", merge(
-    local.orchestrator_envs,
-    {
-      latest_orchestrator_job_id = local.latest_orchestrator_job_id
-      node_pool                  = var.builder_node_pool
-      port                       = 5009 # Override to avoid conflict with template-manager (5008)
-    }
-  ))
-
-  depends_on = [nomad_variable.orchestrator_hash, random_id.orchestrator_job]
-}
-
 data "google_storage_bucket_object" "template_manager" {
   name   = "template-manager"
   bucket = var.fc_env_pipeline_bucket_name
@@ -499,7 +480,6 @@ resource "nomad_job" "template_manager" {
     gcp_region       = var.gcp_region
     gcp_zone         = var.gcp_zone
     port             = var.template_manager_port
-    proxy_port       = 5010  # Use different port from orchestrator (5007) to avoid conflict
     environment      = var.environment
     consul_acl_token = var.consul_acl_token_secret
 
