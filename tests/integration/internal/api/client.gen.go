@@ -252,10 +252,10 @@ type ClientInterface interface {
 	PostVolumes(ctx context.Context, body PostVolumesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVolumesIdOrName request
-	DeleteVolumesIdOrName(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteVolumesIdOrName(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetVolumesIdOrName request
-	GetVolumesIdOrName(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error)
+	GetVolumesIdOrName(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteVolumesVolumeIDFiles request
 	DeleteVolumesVolumeIDFiles(ctx context.Context, volumeID string, params *DeleteVolumesVolumeIDFilesParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -978,8 +978,8 @@ func (c *Client) PostVolumes(ctx context.Context, body PostVolumesJSONRequestBod
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteVolumesIdOrName(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteVolumesIdOrNameRequest(c.Server, idOrName)
+func (c *Client) DeleteVolumesIdOrName(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteVolumesIdOrNameRequest(c.Server, volumeID)
 	if err != nil {
 		return nil, err
 	}
@@ -990,8 +990,8 @@ func (c *Client) DeleteVolumesIdOrName(ctx context.Context, idOrName VolumeIdOrN
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetVolumesIdOrName(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetVolumesIdOrNameRequest(c.Server, idOrName)
+func (c *Client) GetVolumesIdOrName(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetVolumesIdOrNameRequest(c.Server, volumeID)
 	if err != nil {
 		return nil, err
 	}
@@ -3257,12 +3257,12 @@ func NewPostVolumesRequestWithBody(server string, contentType string, body io.Re
 }
 
 // NewDeleteVolumesIdOrNameRequest generates requests for DeleteVolumesIdOrName
-func NewDeleteVolumesIdOrNameRequest(server string, idOrName VolumeIdOrName) (*http.Request, error) {
+func NewDeleteVolumesIdOrNameRequest(server string, volumeID VolumeIdOrName) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "idOrName", runtime.ParamLocationPath, idOrName)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "volumeID", runtime.ParamLocationPath, volumeID)
 	if err != nil {
 		return nil, err
 	}
@@ -3291,12 +3291,12 @@ func NewDeleteVolumesIdOrNameRequest(server string, idOrName VolumeIdOrName) (*h
 }
 
 // NewGetVolumesIdOrNameRequest generates requests for GetVolumesIdOrName
-func NewGetVolumesIdOrNameRequest(server string, idOrName VolumeIdOrName) (*http.Request, error) {
+func NewGetVolumesIdOrNameRequest(server string, volumeID VolumeIdOrName) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "idOrName", runtime.ParamLocationPath, idOrName)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "volumeID", runtime.ParamLocationPath, volumeID)
 	if err != nil {
 		return nil, err
 	}
@@ -3791,10 +3791,10 @@ type ClientWithResponsesInterface interface {
 	PostVolumesWithResponse(ctx context.Context, body PostVolumesJSONRequestBody, reqEditors ...RequestEditorFn) (*PostVolumesResponse, error)
 
 	// DeleteVolumesIdOrNameWithResponse request
-	DeleteVolumesIdOrNameWithResponse(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*DeleteVolumesIdOrNameResponse, error)
+	DeleteVolumesIdOrNameWithResponse(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*DeleteVolumesIdOrNameResponse, error)
 
 	// GetVolumesIdOrNameWithResponse request
-	GetVolumesIdOrNameWithResponse(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*GetVolumesIdOrNameResponse, error)
+	GetVolumesIdOrNameWithResponse(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*GetVolumesIdOrNameResponse, error)
 
 	// DeleteVolumesVolumeIDFilesWithResponse request
 	DeleteVolumesVolumeIDFilesWithResponse(ctx context.Context, volumeID string, params *DeleteVolumesVolumeIDFilesParams, reqEditors ...RequestEditorFn) (*DeleteVolumesVolumeIDFilesResponse, error)
@@ -5528,8 +5528,8 @@ func (c *ClientWithResponses) PostVolumesWithResponse(ctx context.Context, body 
 }
 
 // DeleteVolumesIdOrNameWithResponse request returning *DeleteVolumesIdOrNameResponse
-func (c *ClientWithResponses) DeleteVolumesIdOrNameWithResponse(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*DeleteVolumesIdOrNameResponse, error) {
-	rsp, err := c.DeleteVolumesIdOrName(ctx, idOrName, reqEditors...)
+func (c *ClientWithResponses) DeleteVolumesIdOrNameWithResponse(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*DeleteVolumesIdOrNameResponse, error) {
+	rsp, err := c.DeleteVolumesIdOrName(ctx, volumeID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -5537,8 +5537,8 @@ func (c *ClientWithResponses) DeleteVolumesIdOrNameWithResponse(ctx context.Cont
 }
 
 // GetVolumesIdOrNameWithResponse request returning *GetVolumesIdOrNameResponse
-func (c *ClientWithResponses) GetVolumesIdOrNameWithResponse(ctx context.Context, idOrName VolumeIdOrName, reqEditors ...RequestEditorFn) (*GetVolumesIdOrNameResponse, error) {
-	rsp, err := c.GetVolumesIdOrName(ctx, idOrName, reqEditors...)
+func (c *ClientWithResponses) GetVolumesIdOrNameWithResponse(ctx context.Context, volumeID VolumeIdOrName, reqEditors ...RequestEditorFn) (*GetVolumesIdOrNameResponse, error) {
+	rsp, err := c.GetVolumesIdOrName(ctx, volumeID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
