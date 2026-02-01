@@ -103,8 +103,11 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		m.mountPath,
 	)
 
-	// Set environment variable for GCS endpoint
-	cmd.Env = append(os.Environ(), "JFS_GCS_ENDPOINT="+gcsEndpoint)
+	// Set environment variables for JuiceFS
+	cmd.Env = append(os.Environ(),
+		"JFS_GCS_ENDPOINT="+gcsEndpoint,
+		"JFS_REDIS_NO_CLUSTER=1", // Disable cluster mode - proxy handles cluster communication
+	)
 
 	// Capture output
 	output, err := cmd.CombinedOutput()
