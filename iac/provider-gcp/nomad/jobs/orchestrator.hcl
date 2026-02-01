@@ -92,6 +92,11 @@ EOT
 %{ if launch_darkly_api_key != "" }
         LAUNCH_DARKLY_API_KEY         = "${launch_darkly_api_key}"
 %{ endif }
+
+%{ if volumes_redis_url != "" }
+        VOLUMES_REDIS_URL             = "${volumes_redis_url}"
+        VOLUMES_BUCKET                = "${volumes_bucket}"
+%{ endif }
       }
 
       config {

@@ -412,6 +412,10 @@ locals {
     redis_cluster_url            = local.redis_cluster_url
     redis_tls_ca_base64          = trimspace(data.google_secret_manager_secret_version.redis_tls_ca_base64.secret_data)
     shared_chunk_cache_path      = var.shared_chunk_cache_path
+
+    # Volume support
+    volumes_redis_url = var.volumes_enabled ? trimspace(data.google_secret_manager_secret_version.volumes_redis_url[0].secret_data) : ""
+    volumes_bucket    = var.volumes_bucket
   }
 
   orchestrator_job_check = templatefile("${path.module}/jobs/orchestrator.hcl", merge(
