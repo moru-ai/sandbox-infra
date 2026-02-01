@@ -499,6 +499,7 @@ resource "nomad_job" "template_manager" {
     gcp_region       = var.gcp_region
     gcp_zone         = var.gcp_zone
     port             = var.template_manager_port
+    proxy_port       = 5010  # Use different port from orchestrator (5007) to avoid conflict
     environment      = var.environment
     consul_acl_token = var.consul_acl_token_secret
 
