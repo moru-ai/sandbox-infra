@@ -131,6 +131,19 @@ func (s *Server) Create(ctx context.Context, req *orchestrator.SandboxCreateRequ
 		network.Egress.DeniedCidrs = []string{sandbox_network.AllInternetTrafficCIDR}
 	}
 
+	// Debug: Log volume config presence
+	volumeProto := req.GetSandbox().GetVolume()
+	if volumeProto != nil {
+		logger.L().Info(ctx, "Volume config received from API",
+			zap.String("volume_id", volumeProto.GetVolumeId()),
+			zap.String("mount_path", volumeProto.GetMountPath()),
+			zap.Int32("redis_db", volumeProto.GetRedisDb()),
+			zap.String("gcs_bucket", volumeProto.GetGcsBucket()),
+		)
+	} else {
+		logger.L().Info(ctx, "No volume config in request")
+	}
+
 	sbx, err := s.sandboxFactory.ResumeSandbox(
 		ctx,
 		template,
@@ -150,7 +163,7 @@ func (s *Server) Create(ctx context.Context, req *orchestrator.SandboxCreateRequ
 				Vars:        req.GetSandbox().GetEnvVars(),
 			},
 
-			Volume: req.GetSandbox().GetVolume(),
+			Volume: volumeProto,
 		},
 		sandbox.RuntimeMetadata{
 			TemplateID:  req.GetSandbox().GetTemplateId(),

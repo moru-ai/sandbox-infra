@@ -222,6 +222,14 @@ func (o *Orchestrator) CreateSandbox(
 			RedisDb:   int32(volumeConfig.RedisDB),
 			GcsBucket: o.volumesBucket, // Set from orchestrator config
 		}
+		telemetry.ReportEvent(ctx, "Volume config set for sandbox",
+			attribute.String("volume.id", volumeConfig.VolumeID),
+			attribute.String("volume.mount_path", volumeConfig.MountPath),
+			attribute.Int("volume.redis_db", volumeConfig.RedisDB),
+			attribute.String("volume.gcs_bucket", o.volumesBucket),
+		)
+	} else {
+		telemetry.ReportEvent(ctx, "No volume config for sandbox")
 	}
 
 	sbxRequest := &orchestrator.SandboxCreateRequest{
