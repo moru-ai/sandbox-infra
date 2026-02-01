@@ -200,6 +200,14 @@ func additionalOCILayers(
 		BusyBoxInitPath: {Bytes: systeminit.BusyboxBinary, Mode: 0o755},
 	}
 
+	// Add JuiceFS binary for volume mounting (optional - skip if not present)
+	if buildContext.BuilderConfig.HostJuiceFSPath != "" {
+		juicefsFileData, err := os.ReadFile(buildContext.BuilderConfig.HostJuiceFSPath)
+		if err == nil {
+			filesMap["usr/local/bin/juicefs"] = oci.File{Bytes: juicefsFileData, Mode: 0o755}
+		}
+	}
+
 	// add templates
 	for _, t := range fileTemplates.Templates() {
 		model := newTemplateModel(buildContext, provisionLogPrefix, provisionResultPath)
