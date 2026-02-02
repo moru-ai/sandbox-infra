@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -188,8 +189,13 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		}
 
 		// Initialize volumes Redis client for ACL operations
+		// Parse the URL to extract host:port (VolumesRedisURL may be in URL format like rediss://host:port)
+		redisAddr := config.VolumesRedisURL
+		if parsedURL, parseErr := url.Parse(config.VolumesRedisURL); parseErr == nil && parsedURL.Host != "" {
+			redisAddr = parsedURL.Host
+		}
 		volumesRedisClient, err = factories.NewRedisClient(ctx, factories.RedisConfig{
-			RedisURL: config.VolumesRedisURL,
+			RedisURL: redisAddr,
 		})
 		if err != nil {
 			logger.L().Fatal(ctx, "Initializing volumes Redis client failed", zap.Error(err))
