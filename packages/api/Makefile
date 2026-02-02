@@ -22,10 +22,10 @@ build:
 	# Allow for passing commit sha directly for docker builds
 	$(eval COMMIT_SHA ?= $(shell git rev-parse --short HEAD))
 	$(eval EXPECTED_MIGRATION_TIMESTAMP ?= $(expectedMigration))
-	# Build with JuiceFS tags: exclude storage backends (nonfs noobs) and metadata backends (nosqlite nomysql nopg nobadger notikv noetcd)
-	# We only use Redis for metadata and GCS for object storage
-	# CGO_ENABLED=1 required for JuiceFS compression libraries (lz4, zstd)
-	CGO_ENABLED=1 go build -tags 'nonfs noobs nosqlite nomysql nopg nobadger notikv noetcd' -o bin/api -ldflags "-X=main.commitSHA=$(COMMIT_SHA) -X=main.expectedMigrationTimestamp=$(EXPECTED_MIGRATION_TIMESTAMP) -linkmode external -extldflags '-static'" .
+	# Build with JuiceFS tags: exclude unused storage backends (nonfs noobs) and metadata backends (nomysql nopg nobadger notikv noetcd)
+	# We use SQLite for metadata (stored in GCS) and GCS for object storage
+	# CGO_ENABLED=1 required for JuiceFS compression libraries (lz4, zstd) and SQLite
+	CGO_ENABLED=1 go build -tags 'nonfs noobs nomysql nopg nobadger notikv noetcd' -o bin/api -ldflags "-X=main.commitSHA=$(COMMIT_SHA) -X=main.expectedMigrationTimestamp=$(EXPECTED_MIGRATION_TIMESTAMP) -linkmode external -extldflags '-static'" .
 
 .PHONY: build-debug
 build-debug:
