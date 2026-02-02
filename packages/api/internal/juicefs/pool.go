@@ -41,7 +41,8 @@ func NewPool(config Config) *Pool {
 }
 
 // Get returns a client for the given volume, creating one if needed.
-func (p *Pool) Get(ctx context.Context, volumeID string, redisDB int32) (*Client, error) {
+// The redisDB parameter is deprecated and ignored (kept for API compatibility).
+func (p *Pool) Get(ctx context.Context, volumeID string, _ int32) (*Client, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -52,7 +53,7 @@ func (p *Pool) Get(ctx context.Context, volumeID string, redisDB int32) (*Client
 	}
 
 	// Create new client
-	client, err := NewClient(volumeID, redisDB, p.config)
+	client, err := NewClient(volumeID, 0, p.config)
 	if err != nil {
 		return nil, fmt.Errorf("create client for volume %s: %w", volumeID, err)
 	}

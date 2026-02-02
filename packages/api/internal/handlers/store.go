@@ -163,14 +163,17 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 	}
 
 	// JuiceFS pool for volume file operations (list, download, upload, delete)
-	// Currently disabled - file operations require SQLite-based client (TODO)
-	// Volume create/delete still work via FormatVolume/DestroyVolume in format.go
+	// Uses SQLite metadata downloaded from GCS for each volume
 	var juicefsPool *juicefs.Pool
 	if config.VolumesBucket != "" {
-		logger.L().Info(ctx, "Volume operations enabled",
+		juicefsPool = juicefs.NewPool(juicefs.Config{
+			GCSBucket: config.VolumesBucket,
+		})
+		logger.L().Info(ctx, "Volume file operations enabled",
 			zap.String("bucket", config.VolumesBucket))
+	} else {
+		logger.L().Info(ctx, "Volume file operations disabled (no VOLUMES_BUCKET configured)")
 	}
-	logger.L().Info(ctx, "Volume file operations disabled (SQLite client not yet implemented)")
 
 	a := &APIStore{
 		config:               config,
