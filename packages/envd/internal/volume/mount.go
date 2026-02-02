@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -239,6 +240,10 @@ func (m *Mounter) formatVolume(ctx context.Context) error {
 	metaURL := fmt.Sprintf("sqlite3://%s", MetaDBPath)
 	dataURL := fmt.Sprintf("gs://%s/%s", m.config.GCSBucket, m.config.VolumeID)
 
+	// JuiceFS volume names only allow alphanumeric and hyphens (3-63 chars)
+	// Replace underscores with hyphens
+	volumeName := strings.ReplaceAll(m.config.VolumeID, "_", "-")
+
 	ctx, cancel := context.WithTimeout(ctx, MountTimeout)
 	defer cancel()
 
@@ -249,7 +254,7 @@ func (m *Mounter) formatVolume(ctx context.Context) error {
 		"--bucket", dataURL,
 		"--no-update",
 		metaURL,
-		m.config.VolumeID, // volume name
+		volumeName, // volume name (sanitized)
 	)
 
 	cmd.Env = append(os.Environ(),
