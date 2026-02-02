@@ -27,4 +27,12 @@ type MmdsVolumeConfig struct {
 
 	// ProxyHost is the host address for GCS and Redis proxies (e.g., "10.12.0.1").
 	ProxyHost string `json:"proxyHost"`
+
+	// GCSToken is the downscoped access token for direct GCS access.
+	// When set, the sandbox can access GCS directly without the proxy.
+	// The token is scoped to only this volume's prefix in the bucket.
+	GCSToken string `json:"gcsToken,omitempty"`
+
+	// GCSTokenExpiry is the Unix timestamp when the GCS token expires.
+	GCSTokenExpiry int64 `json:"gcsTokenExpiry,omitempty"`
 }

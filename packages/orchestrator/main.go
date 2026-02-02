@@ -419,6 +419,7 @@ func run(config cfg.Config) (success bool) {
 			RedisURL:      config.VolumesRedisURL,
 			RedisTLSCA:    config.VolumesRedisTLSCA,
 			RedisPassword: config.VolumesRedisPassword,
+			GCSBucket:     config.VolumesGCSBucket,
 		})
 	}
 

@@ -18,6 +18,7 @@ import (
 
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/cfg"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/gcsproxy"
+	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/gcstoken"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/redisproxy"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/block"
 	"github.com/moru-ai/sandbox-infra/packages/orchestrator/internal/sandbox/build"
@@ -157,6 +158,9 @@ type VolumesConfig struct {
 	RedisTLSCA string
 	// RedisPassword is the password for Redis ACL authentication.
 	RedisPassword string
+	// GCSBucket is the GCS bucket name for volume data storage.
+	// Used for minting downscoped tokens.
+	GCSBucket string
 }
 
 type Factory struct {
@@ -165,6 +169,7 @@ type Factory struct {
 	devicePool   *nbd.DevicePool
 	featureFlags *featureflags.Client
 	volumes      *VolumesConfig
+	tokenMinter  *gcstoken.Minter
 }
 
 func NewFactory(
@@ -185,6 +190,9 @@ func NewFactory(
 // This is separate from NewFactory to maintain backward compatibility.
 func (f *Factory) SetVolumesConfig(cfg *VolumesConfig) {
 	f.volumes = cfg
+	if cfg.GCSBucket != "" {
+		f.tokenMinter = gcstoken.NewMinter(cfg.GCSBucket)
+	}
 }
 
 // CreateSandbox creates the sandbox.
@@ -540,7 +548,26 @@ func (f *Factory) ResumeSandbox(
 			ProxyHost: vethIP,
 		}
 
-		// Start GCS proxy for this sandbox
+		// Mint downscoped GCS token for this volume
+		if f.tokenMinter != nil {
+			token, err := f.tokenMinter.MintDownscopedToken(ctx, config.Volume.GetVolumeId())
+			if err != nil {
+				logger.L().Warn(ctx, "failed to mint GCS token, falling back to proxy",
+					zap.Error(err),
+					zap.String("volume_id", config.Volume.GetVolumeId()),
+				)
+			} else {
+				volumeConfig.GCSToken = token.AccessToken
+				volumeConfig.GCSTokenExpiry = token.ExpiresAt.Unix()
+				logger.L().Info(ctx, "minted downscoped GCS token",
+					zap.String("volume_id", config.Volume.GetVolumeId()),
+					zap.Int("expires_in_seconds", token.ExpiresIn),
+				)
+				telemetry.ReportEvent(ctx, "minted GCS token")
+			}
+		}
+
+		// Start GCS proxy for this sandbox (still needed until envd uses token directly)
 		gcsProxyCfg := gcsproxy.Config{
 			ListenAddr: fmt.Sprintf("%s:%d", vethIP, gcsproxy.Port),
 			VolumeID:   config.Volume.GetVolumeId(),

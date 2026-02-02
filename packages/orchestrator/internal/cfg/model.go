@@ -88,6 +88,7 @@ type Config struct {
 	VolumesRedisURL      string `env:"VOLUMES_REDIS_URL"`
 	VolumesRedisTLSCA    string `env:"VOLUMES_REDIS_TLS_CA_BASE64"`
 	VolumesRedisPassword string `env:"VOLUMES_REDIS_PASSWORD"`
+	VolumesGCSBucket     string `env:"VOLUMES_BUCKET"`
 }
 
 func Parse() (Config, error) {
