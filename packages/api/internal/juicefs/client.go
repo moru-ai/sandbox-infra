@@ -143,15 +143,30 @@ func NewClient(volumeID string, _ int32, config Config) (*Client, error) {
 		return nil, fmt.Errorf("create storage: %w", err)
 	}
 
-	// Create chunk store
+	// Create cache directory for chunk storage
+	cacheDir := filepath.Join(tmpDir, "cache")
+	if err = os.MkdirAll(cacheDir, 0755); err != nil {
+		metaCli.Shutdown()
+		os.RemoveAll(tmpDir)
+		return nil, fmt.Errorf("create cache dir: %w", err)
+	}
+
+	// Create chunk store with cache
 	chunkConf := chunk.Config{
-		BlockSize:  format.BlockSize * 1024, // Convert KiB to bytes
-		Compress:   format.Compression,
-		GetTimeout: 60 * time.Second,
-		PutTimeout: 60 * time.Second,
-		MaxUpload:  20,
-		MaxRetries: 10,
-		BufferSize: 300 << 20, // 300 MiB
+		BlockSize:    format.BlockSize * 1024, // Convert KiB to bytes
+		Compress:     format.Compression,
+		GetTimeout:   60 * time.Second,
+		PutTimeout:   60 * time.Second,
+		MaxUpload:    20,
+		MaxRetries:   10,
+		BufferSize:   300 << 20,  // 300 MiB write buffer
+		CacheDir:     cacheDir,   // Cache directory for chunks
+		CacheSize:    1024,       // 1 GB max cache
+		FreeSpace:    0.1,        // Keep 10% disk free
+		AutoCreate:   true,       // Auto-create cache dir
+		CacheMode:    0600,       // Cache file permissions
+		MaxDownload:  20,         // Max concurrent downloads
+		Prefetch:     1,          // Prefetch 1 chunk ahead
 	}
 	// Use nil registerer to avoid metric conflicts between volumes
 	store := chunk.NewCachedStore(blob, chunkConf, nil)
