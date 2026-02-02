@@ -16,6 +16,7 @@ type BuilderConfig struct {
 	FirecrackerVersionsDir string        `env:"FIRECRACKER_VERSIONS_DIR" envDefault:"/fc-versions"`
 	HostEnvdPath           string        `env:"HOST_ENVD_PATH"           envDefault:"/fc-envd/envd"`
 	HostJuiceFSPath        string        `env:"HOST_JUICEFS_PATH"        envDefault:"/fc-envd/juicefs"`
+	HostLitestreamPath     string        `env:"HOST_LITESTREAM_PATH"     envDefault:"/fc-envd/litestream"`
 	HostKernelsDir         string        `env:"HOST_KERNELS_DIR"         envDefault:"/fc-kernels"`
 	OrchestratorBaseDir    string        `env:"ORCHESTRATOR_BASE_PATH"   envDefault:"/orchestrator"`
 	SandboxDir             string        `env:"SANDBOX_DIR"              envDefault:"/fc-vm"`
@@ -40,6 +41,7 @@ func makePathsAbsolute(c *BuilderConfig) error {
 		&c.FirecrackerVersionsDir,
 		&c.HostEnvdPath,
 		&c.HostJuiceFSPath,
+		&c.HostLitestreamPath,
 		&c.HostKernelsDir,
 		&c.OrchestratorBaseDir,
 		&c.SandboxCacheDir,

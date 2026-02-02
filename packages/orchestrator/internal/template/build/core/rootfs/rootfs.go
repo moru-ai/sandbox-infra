@@ -208,6 +208,14 @@ func additionalOCILayers(
 		}
 	}
 
+	// Add Litestream binary for SQLite replication (optional - skip if not present)
+	if buildContext.BuilderConfig.HostLitestreamPath != "" {
+		litestreamFileData, err := os.ReadFile(buildContext.BuilderConfig.HostLitestreamPath)
+		if err == nil {
+			filesMap["usr/local/bin/litestream"] = oci.File{Bytes: litestreamFileData, Mode: 0o755}
+		}
+	}
+
 	// add templates
 	for _, t := range fileTemplates.Templates() {
 		model := newTemplateModel(buildContext, provisionLogPrefix, provisionResultPath)
