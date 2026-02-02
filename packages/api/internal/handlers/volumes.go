@@ -86,10 +86,12 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 	}
 
 	// Format the JuiceFS volume with SQLite metadata
-	if a.juicefsPool != nil {
+	if a.volumesBucket != "" {
 		formatCfg := juicefs.FormatConfig{
-			VolumeID:   volumeID,
-			PoolConfig: a.juicefsPool.Config(),
+			VolumeID: volumeID,
+			PoolConfig: juicefs.Config{
+				GCSBucket: a.volumesBucket,
+			},
 		}
 		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
 			// Mark volume as deleting to trigger cleanup
@@ -238,10 +240,12 @@ func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, volumeID api.VolumeIdOr
 	}
 
 	// Destroy JuiceFS volume (data + metadata in GCS)
-	if a.juicefsPool != nil {
+	if a.volumesBucket != "" {
 		destroyCfg := juicefs.FormatConfig{
-			VolumeID:   volume.ID,
-			PoolConfig: a.juicefsPool.Config(),
+			VolumeID: volume.ID,
+			PoolConfig: juicefs.Config{
+				GCSBucket: a.volumesBucket,
+			},
 		}
 		// Best effort - don't fail if destroy fails
 		if err := juicefs.DestroyVolume(ctx, destroyCfg, true); err != nil {

@@ -62,7 +62,8 @@ type APIStore struct {
 	accessTokenGenerator *sandbox.AccessTokenGenerator
 	featureFlags         *featureflags.Client
 	clustersPool      *edge.Pool
-	juicefsPool       *juicefs.Pool // For volume operations
+	juicefsPool       *juicefs.Pool  // For volume file operations (disabled until SQLite client implemented)
+	volumesBucket     string         // GCS bucket for volume data/metadata (used by FormatVolume/DestroyVolume)
 	volEventsDelivery events.Delivery[events.VolumeEvent]
 }
 
@@ -165,6 +166,10 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 	// Currently disabled - file operations require SQLite-based client (TODO)
 	// Volume create/delete still work via FormatVolume/DestroyVolume in format.go
 	var juicefsPool *juicefs.Pool
+	if config.VolumesBucket != "" {
+		logger.L().Info(ctx, "Volume operations enabled",
+			zap.String("bucket", config.VolumesBucket))
+	}
 	logger.L().Info(ctx, "Volume file operations disabled (SQLite client not yet implemented)")
 
 	a := &APIStore{
@@ -185,6 +190,7 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		featureFlags:      featureFlags,
 		redisClient:       redisClient,
 		juicefsPool:       juicefsPool,
+		volumesBucket:     config.VolumesBucket,
 		volEventsDelivery: volEventsDelivery,
 	}
 
