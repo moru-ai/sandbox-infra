@@ -267,6 +267,12 @@ variable "volumes_bucket" {
   default = ""
 }
 
+variable "volumes_token_minter_sa" {
+  description = "Service account email for volume token minting (impersonation)"
+  type        = string
+  default     = ""
+}
+
 # Docker reverse proxy
 variable "docker_reverse_proxy_port" {
   type = object({

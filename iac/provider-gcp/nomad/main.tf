@@ -414,8 +414,9 @@ locals {
     shared_chunk_cache_path      = var.shared_chunk_cache_path
 
     # Volume support
-    volumes_redis_url = var.volumes_enabled ? trimspace(data.google_secret_manager_secret_version.volumes_redis_url[0].secret_data) : ""
-    volumes_bucket    = var.volumes_bucket
+    volumes_redis_url       = var.volumes_enabled ? trimspace(data.google_secret_manager_secret_version.volumes_redis_url[0].secret_data) : ""
+    volumes_bucket          = var.volumes_bucket
+    volumes_token_minter_sa = var.volumes_token_minter_sa
   }
 
   orchestrator_job_check = templatefile("${path.module}/jobs/orchestrator.hcl", merge(

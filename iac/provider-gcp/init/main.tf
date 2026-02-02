@@ -77,6 +77,22 @@ resource "google_service_account_key" "google_service_key" {
   service_account_id = google_service_account.infra_instances_service_account.name
 }
 
+# Service account for volume token minting - only has access to volumes bucket
+# Used by orchestrator to mint downscoped tokens for sandbox GCS access
+resource "google_service_account" "volumes_token_minter" {
+  account_id   = "${var.prefix}volumes-token-minter"
+  display_name = "Volumes Token Minter Service Account"
+  description  = "Used to mint downscoped GCS tokens for sandbox volume access"
+}
+
+# Allow infra instances to impersonate the volumes token minter SA
+# This lets orchestrator generate tokens scoped to volumes bucket only
+resource "google_service_account_iam_member" "volumes_token_minter_impersonation" {
+  service_account_id = google_service_account.volumes_token_minter.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+}
+
 
 resource "google_secret_manager_secret" "cloudflare_api_token" {
   secret_id = "${var.prefix}cloudflare-api-token"

@@ -85,10 +85,11 @@ type Config struct {
 	Services                   []string `env:"ORCHESTRATOR_SERVICES"        envDefault:"orchestrator"`
 
 	// Volumes configuration for persistent storage
-	VolumesRedisURL      string `env:"VOLUMES_REDIS_URL"`
-	VolumesRedisTLSCA    string `env:"VOLUMES_REDIS_TLS_CA_BASE64"`
-	VolumesRedisPassword string `env:"VOLUMES_REDIS_PASSWORD"`
-	VolumesGCSBucket     string `env:"VOLUMES_BUCKET"`
+	VolumesRedisURL         string `env:"VOLUMES_REDIS_URL"`
+	VolumesRedisTLSCA       string `env:"VOLUMES_REDIS_TLS_CA_BASE64"`
+	VolumesRedisPassword    string `env:"VOLUMES_REDIS_PASSWORD"`
+	VolumesGCSBucket        string `env:"VOLUMES_BUCKET"`
+	VolumesTokenMinterSA    string `env:"VOLUMES_TOKEN_MINTER_SA"` // SA email for token minting (optional, uses VM SA if empty)
 }
 
 func Parse() (Config, error) {

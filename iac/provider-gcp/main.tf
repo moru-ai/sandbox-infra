@@ -254,6 +254,7 @@ module "nomad" {
   volumes_enabled                  = var.volumes_enabled
   volumes_redis_url_secret_version = module.init.volumes_redis_url_secret_version
   volumes_bucket                   = module.init.volumes_bucket_name
+  volumes_token_minter_sa          = module.init.volumes_token_minter_email
 
   launch_darkly_api_key_secret_name = module.init.launch_darkly_api_key_secret_version.secret
 

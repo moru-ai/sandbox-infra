@@ -420,6 +420,7 @@ func run(config cfg.Config) (success bool) {
 			RedisTLSCA:    config.VolumesRedisTLSCA,
 			RedisPassword: config.VolumesRedisPassword,
 			GCSBucket:     config.VolumesGCSBucket,
+			TokenMinterSA: config.VolumesTokenMinterSA,
 		})
 	}
 

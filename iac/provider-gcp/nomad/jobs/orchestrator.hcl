@@ -96,6 +96,7 @@ EOT
 %{ if volumes_redis_url != "" }
         VOLUMES_REDIS_URL             = "${volumes_redis_url}"
         VOLUMES_BUCKET                = "${volumes_bucket}"
+        VOLUMES_TOKEN_MINTER_SA       = "${volumes_token_minter_sa}"
 %{ endif }
       }
 

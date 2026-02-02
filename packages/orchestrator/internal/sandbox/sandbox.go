@@ -161,6 +161,9 @@ type VolumesConfig struct {
 	// GCSBucket is the GCS bucket name for volume data storage.
 	// Used for minting downscoped tokens.
 	GCSBucket string
+	// TokenMinterSA is the service account email to impersonate for token minting.
+	// If empty, uses the VM's default service account.
+	TokenMinterSA string
 }
 
 type Factory struct {
@@ -191,7 +194,7 @@ func NewFactory(
 func (f *Factory) SetVolumesConfig(cfg *VolumesConfig) {
 	f.volumes = cfg
 	if cfg.GCSBucket != "" {
-		f.tokenMinter = gcstoken.NewMinter(cfg.GCSBucket)
+		f.tokenMinter = gcstoken.NewMinter(cfg.GCSBucket, cfg.TokenMinterSA)
 	}
 }
 

@@ -23,14 +23,18 @@ type Token struct {
 
 // Minter creates downscoped GCS tokens for volume access.
 type Minter struct {
-	bucket     string
-	httpClient *http.Client
+	bucket               string
+	impersonateServiceAccount string // SA email to impersonate (optional)
+	httpClient           *http.Client
 }
 
 // NewMinter creates a new token minter for the given GCS bucket.
-func NewMinter(bucket string) *Minter {
+// If impersonateSA is provided, the minter will impersonate that service account
+// when generating tokens (recommended for security isolation).
+func NewMinter(bucket string, impersonateSA string) *Minter {
 	return &Minter{
-		bucket: bucket,
+		bucket:               bucket,
+		impersonateServiceAccount: impersonateSA,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -45,10 +49,10 @@ func NewMinter(bucket string) *Minter {
 //   - Prefix: /{volumeID}/ (JuiceFS data chunks)
 //   - Prefix: /{volumeID}-meta/ (Litestream metadata)
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
-	// Step 1: Get base token from GCP metadata server
-	baseToken, err := m.getMetadataToken(ctx)
+	// Step 1: Get base token (either via impersonation or directly from metadata)
+	baseToken, err := m.getBaseToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("get metadata token: %w", err)
+		return nil, fmt.Errorf("get base token: %w", err)
 	}
 
 	// Step 2: Create credential access boundary for this volume
@@ -84,6 +88,72 @@ func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Tok
 
 	// Step 3: Exchange for downscoped token via STS
 	return m.exchangeToken(ctx, baseToken, cab)
+}
+
+// getBaseToken gets the token to be downscoped.
+// If impersonation is configured, it generates an access token for the target SA.
+// Otherwise, it uses the VM's default service account token.
+func (m *Minter) getBaseToken(ctx context.Context) (string, error) {
+	if m.impersonateServiceAccount != "" {
+		return m.getImpersonatedToken(ctx)
+	}
+	return m.getMetadataToken(ctx)
+}
+
+// getImpersonatedToken generates an access token by impersonating another service account.
+// This requires the caller to have the iam.serviceAccountTokenCreator role on the target SA.
+func (m *Minter) getImpersonatedToken(ctx context.Context) (string, error) {
+	// First get our own token to authenticate the impersonation request
+	callerToken, err := m.getMetadataToken(ctx)
+	if err != nil {
+		return "", fmt.Errorf("get caller token: %w", err)
+	}
+
+	// Generate access token for the target service account
+	// https://cloud.google.com/iam/docs/reference/credentials/rest/v1/projects.serviceAccounts/generateAccessToken
+	url := fmt.Sprintf(
+		"https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/%s:generateAccessToken",
+		m.impersonateServiceAccount,
+	)
+
+	body := map[string]interface{}{
+		"scope": []string{
+			"https://www.googleapis.com/auth/devstorage.full_control",
+		},
+		"lifetime": "3600s", // 1 hour max
+	}
+	bodyJSON, err := json.Marshal(body)
+	if err != nil {
+		return "", fmt.Errorf("marshal body: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, strings.NewReader(string(bodyJSON)))
+	if err != nil {
+		return "", fmt.Errorf("create request: %w", err)
+	}
+	req.Header.Set("Authorization", "Bearer "+callerToken)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := m.httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("request impersonation: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		respBody, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("impersonation failed with %d: %s", resp.StatusCode, string(respBody))
+	}
+
+	var tokenResp struct {
+		AccessToken string `json:"accessToken"`
+		ExpireTime  string `json:"expireTime"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResp); err != nil {
+		return "", fmt.Errorf("decode response: %w", err)
+	}
+
+	return tokenResp.AccessToken, nil
 }
 
 // getMetadataToken retrieves an access token from the GCP metadata server.

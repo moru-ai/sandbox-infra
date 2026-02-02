@@ -247,11 +247,12 @@ resource "google_storage_bucket" "volumes" {
   labels = var.labels
 }
 
-# Grant infra instances service account access (used by API and orchestrator)
-resource "google_storage_bucket_iam_member" "volumes_infra" {
+# Grant volumes token minter service account access to volumes bucket
+# This SA is impersonated by orchestrator to mint downscoped tokens
+resource "google_storage_bucket_iam_member" "volumes_token_minter" {
   bucket = google_storage_bucket.volumes.name
   role   = "roles/storage.objectAdmin"
-  member = "serviceAccount:${google_service_account.infra_instances_service_account.email}"
+  member = "serviceAccount:${google_service_account.volumes_token_minter.email}"
 }
 
 # GCS bucket for JuiceFS binary versions

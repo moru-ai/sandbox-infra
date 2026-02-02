@@ -92,6 +92,11 @@ output "volumes_bucket_name" {
   value = google_storage_bucket.volumes.name
 }
 
+output "volumes_token_minter_email" {
+  description = "Service account email for minting downscoped volume GCS tokens"
+  value       = google_service_account.volumes_token_minter.email
+}
+
 output "juicefs_versions_bucket_name" {
   value = google_storage_bucket.juicefs_versions.name
 }
