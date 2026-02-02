@@ -207,7 +207,7 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 	)
 
 	cmd.Env = append(os.Environ(),
-		"GOOGLE_APPLICATION_CREDENTIALS="+GCSTokenFile,
+		"LITESTREAM_GCS_TOKEN_FILE="+GCSTokenFile,
 	)
 
 	output, err := cmd.CombinedOutput()
@@ -256,7 +256,7 @@ func (m *Mounter) startLitestream(ctx context.Context) error {
 	// Start Litestream replicate daemon
 	cmd := exec.Command(LitestreamBinary, "replicate", "-config", LitestreamConfigPath)
 	cmd.Env = append(os.Environ(),
-		"GOOGLE_APPLICATION_CREDENTIALS="+GCSTokenFile,
+		"LITESTREAM_GCS_TOKEN_FILE="+GCSTokenFile,
 	)
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
