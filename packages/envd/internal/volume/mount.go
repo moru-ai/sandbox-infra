@@ -112,6 +112,17 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		return fmt.Errorf("restore metadata DB: %w", err)
 	}
 
+	// Step 2b: For fresh volumes, format JuiceFS (creates meta.db)
+	if _, err := os.Stat(MetaDBPath); os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "[volume.mount.fresh] volume_id=%s no existing backup, formatting new volume\n",
+			m.config.VolumeID)
+		if err := m.formatVolume(ctx); err != nil {
+			fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
+				m.config.VolumeID, m.mountPath, err)
+			return fmt.Errorf("format volume: %w", err)
+		}
+	}
+
 	// Step 3: Convert journal mode to DELETE (required after restore)
 	if err := m.convertJournalMode(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
@@ -192,6 +203,7 @@ func (m *Mounter) writeGCSToken() error {
 }
 
 // restoreMetaDB restores the SQLite metadata DB from Litestream replica.
+// For fresh volumes (no backup exists), this is a no-op.
 func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 	replicaURL := fmt.Sprintf("gs://%s/%s-meta", m.config.GCSBucket, m.config.VolumeID)
 
@@ -216,6 +228,40 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "[volume.mount.restore] volume_id=%s output=%s\n",
+		m.config.VolumeID, string(output))
+
+	return nil
+}
+
+// formatVolume initializes a fresh JuiceFS volume with SQLite metadata.
+// This is called when no existing backup was restored (fresh volume).
+func (m *Mounter) formatVolume(ctx context.Context) error {
+	metaURL := fmt.Sprintf("sqlite3://%s", MetaDBPath)
+	dataURL := fmt.Sprintf("gs://%s/%s", m.config.GCSBucket, m.config.VolumeID)
+
+	ctx, cancel := context.WithTimeout(ctx, MountTimeout)
+	defer cancel()
+
+	// juicefs format --storage gs --bucket gs://bucket/volumeID sqlite3:///tmp/meta.db volumeID
+	cmd := exec.CommandContext(ctx, JuiceFSBinary,
+		"format",
+		"--storage", "gs",
+		"--bucket", dataURL,
+		"--no-update",
+		metaURL,
+		m.config.VolumeID, // volume name
+	)
+
+	cmd.Env = append(os.Environ(),
+		"JFS_GCS_TOKEN_FILE="+GCSTokenFile,
+	)
+
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("juicefs format failed: %w\nOutput: %s", err, string(output))
+	}
+
+	fmt.Fprintf(os.Stderr, "[volume.mount.format] volume_id=%s output=%s\n",
 		m.config.VolumeID, string(output))
 
 	return nil
