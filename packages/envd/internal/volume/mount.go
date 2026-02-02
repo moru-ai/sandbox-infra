@@ -412,7 +412,8 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 		"mount",
 		"--no-usage-report",
 		"--no-bgjob",
-		"-d", // daemon mode
+		"-d",             // daemon mode
+		"-o", "allow_other", // allow non-root users to access mount
 		metaURL,
 		m.mountPath,
 	)
