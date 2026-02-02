@@ -38,14 +38,14 @@ type VolumeConfig struct {
 	// MountPath is the path where the volume should be mounted (e.g., "/workspace").
 	MountPath string `json:"mountPath"`
 
-	// RedisDB is the database number for JuiceFS metadata key prefix.
-	RedisDB int `json:"redisDb"`
-
 	// GCSBucket is the bucket name for volume data storage.
 	GCSBucket string `json:"gcsBucket"`
 
-	// ProxyHost is the host address for GCS and Redis proxies (e.g., "10.12.0.1").
-	ProxyHost string `json:"proxyHost"`
+	// GCSToken is the downscoped OAuth2 access token for GCS operations.
+	GCSToken string `json:"gcsToken"`
+
+	// GCSTokenExpiry is the Unix timestamp when the GCS token expires.
+	GCSTokenExpiry int64 `json:"gcsTokenExpiry"`
 }
 
 func (opts *MMDSOpts) Update(sandboxID, templateID, collectorAddress string) {
