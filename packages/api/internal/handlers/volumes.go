@@ -120,6 +120,7 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 	// Create Redis ACL user for volume isolation
 	// User can only access keys with their DB number as Redis hash tag: {redisDb}*
 	// JuiceFS uses keys like {123}setting, {123}i1, {123}d1
+	aclCreated := false
 	if a.volumesRedisClient != nil {
 		aclCmd := fmt.Sprintf("ACL SETUSER db_%d on >%s ~{%d}* +@all", redisDB, password, redisDB)
 		if err := a.volumesRedisClient.Do(ctx, "ACL", "SETUSER", fmt.Sprintf("db_%d", redisDB), "on", ">"+password, fmt.Sprintf("~{%d}*", redisDB), "+@all").Err(); err != nil {
@@ -127,16 +128,22 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 			// This happens with managed Redis (e.g., GCP Memorystore) that doesn't allow ACL management
 			logger.L().Warn(ctx, "Failed to create Redis ACL user, continuing without per-volume isolation", zap.Error(err), zap.String("volume_id", volumeID))
 		} else {
+			aclCreated = true
 			logger.L().Info(ctx, "Created Redis ACL user", zap.String("volume_id", volumeID), zap.String("acl_cmd", aclCmd))
 		}
 	}
 
 	// Format the JuiceFS volume if pool is configured
 	if a.juicefsPool != nil {
+		// Only use per-volume password if ACL was successfully created
+		volumePassword := ""
+		if aclCreated {
+			volumePassword = password
+		}
 		formatCfg := juicefs.FormatConfig{
 			VolumeID:   volumeID,
 			RedisDB:    redisDB,
-			Password:   password, // Use per-volume ACL credentials
+			Password:   volumePassword,
 			PoolConfig: a.juicefsPool.Config(),
 		}
 		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
