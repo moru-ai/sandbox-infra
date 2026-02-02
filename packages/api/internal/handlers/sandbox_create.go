@@ -237,7 +237,7 @@ func (a *APIStore) PostSandboxes(c *gin.Context) {
 		volumeConfig = &types.VolumeConfig{
 			VolumeID:  volume.ID,
 			MountPath: *body.VolumeMountPath,
-			RedisDB:   int(volume.RedisDb),
+			RedisDB:   0, // Deprecated - SQLite metadata now stored in GCS
 		}
 	}
 

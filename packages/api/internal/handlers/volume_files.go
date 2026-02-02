@@ -89,7 +89,8 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 	}
 
 	// Get JuiceFS client for this volume
-	client, err := a.juicefsPool.Get(ctx, volume.ID, volume.RedisDb)
+	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
+	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
@@ -172,7 +173,8 @@ func (a *APIStore) GetVolumesVolumeIDFilesDownload(c *gin.Context, volumeID stri
 	path := filepath.Clean(params.Path)
 
 	// Get JuiceFS client for this volume
-	client, err := a.juicefsPool.Get(ctx, volume.ID, volume.RedisDb)
+	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
+	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
@@ -237,7 +239,8 @@ func (a *APIStore) PutVolumesVolumeIDFilesUpload(c *gin.Context, volumeID string
 	path := filepath.Clean(params.Path)
 
 	// Get JuiceFS client for this volume
-	client, err := a.juicefsPool.Get(ctx, volume.ID, volume.RedisDb)
+	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
+	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
@@ -306,7 +309,8 @@ func (a *APIStore) DeleteVolumesVolumeIDFiles(c *gin.Context, volumeID string, p
 	}
 
 	// Get JuiceFS client for this volume
-	client, err := a.juicefsPool.Get(ctx, volume.ID, volume.RedisDb)
+	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
+	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return

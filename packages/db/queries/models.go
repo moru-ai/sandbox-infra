@@ -203,14 +203,12 @@ type UsersTeam struct {
 }
 
 type Volume struct {
-	ID                     string
-	TeamID                 uuid.UUID
-	Name                   string
-	Status                 string
-	RedisDb                int32
-	RedisPasswordEncrypted []byte
-	TotalSizeBytes         *int64
-	TotalFileCount         *int64
-	CreatedAt              time.Time
-	UpdatedAt              time.Time
+	ID             string
+	TeamID         uuid.UUID
+	Name           string
+	Status         string
+	TotalSizeBytes *int64
+	TotalFileCount *int64
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }

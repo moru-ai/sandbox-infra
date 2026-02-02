@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -14,7 +13,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
-	"github.com/moru-ai/sandbox-infra/packages/api/internal/crypto"
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
 	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/events"
@@ -72,82 +70,29 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 		return
 	}
 
-	// Allocate Redis DB number
-	redisDB, err := a.sqlcDB.AllocateRedisDB(ctx)
-	if err != nil {
-		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to allocate Redis DB")
-		return
-	}
-
 	// Generate volume ID
 	volumeID := volumeIDPrefix + id.Generate()
 
-	// Generate secure random password using crypto/rand
-	password, err := crypto.GeneratePassword()
-	if err != nil {
-		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to generate password")
-		return
-	}
-
-	// Encrypt password for storage
-	var encryptedPassword []byte
-	if a.volumesEncryptor != nil {
-		encryptedPassword, err = a.volumesEncryptor.Encrypt([]byte(password))
-		if err != nil {
-			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to encrypt password")
-			return
-		}
-	} else {
-		// Fallback: store plaintext (not recommended for production)
-		logger.L().Warn(ctx, "Storing volume password in plaintext - encryption not configured")
-		encryptedPassword = []byte(password)
-	}
-
-	// Create volume record
+	// Create volume record with status 'creating'
 	volume, err := a.sqlcDB.CreateVolume(ctx, queries.CreateVolumeParams{
-		ID:                     volumeID,
-		TeamID:                 team.ID,
-		Name:                   req.Name,
-		Status:                 "creating",
-		RedisDb:                redisDB,
-		RedisPasswordEncrypted: encryptedPassword,
+		ID:     volumeID,
+		TeamID: team.ID,
+		Name:   req.Name,
+		Status: "creating",
 	})
 	if err != nil {
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to create volume")
 		return
 	}
 
-	// Create Redis ACL user for volume isolation
-	// User can only access keys with their DB number as Redis hash tag: {redisDb}*
-	// JuiceFS uses keys like {123}setting, {123}i1, {123}d1
-	aclCreated := false
-	if a.volumesRedisClient != nil {
-		aclCmd := fmt.Sprintf("ACL SETUSER db_%d on >%s ~{%d}* +@all", redisDB, password, redisDB)
-		if err := a.volumesRedisClient.Do(ctx, "ACL", "SETUSER", fmt.Sprintf("db_%d", redisDB), "on", ">"+password, fmt.Sprintf("~{%d}*", redisDB), "+@all").Err(); err != nil {
-			// ACL creation failed - log warning and continue without per-volume isolation
-			// This happens with managed Redis (e.g., GCP Memorystore) that doesn't allow ACL management
-			logger.L().Warn(ctx, "Failed to create Redis ACL user, continuing without per-volume isolation", zap.Error(err), zap.String("volume_id", volumeID))
-		} else {
-			aclCreated = true
-			logger.L().Info(ctx, "Created Redis ACL user", zap.String("volume_id", volumeID), zap.String("acl_cmd", aclCmd))
-		}
-	}
-
-	// Format the JuiceFS volume if pool is configured
+	// Format the JuiceFS volume with SQLite metadata
 	if a.juicefsPool != nil {
-		// Only use per-volume password if ACL was successfully created
-		volumePassword := ""
-		if aclCreated {
-			volumePassword = password
-		}
 		formatCfg := juicefs.FormatConfig{
 			VolumeID:   volumeID,
-			RedisDB:    redisDB,
-			Password:   volumePassword,
 			PoolConfig: a.juicefsPool.Config(),
 		}
 		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
-			// Mark volume as deleting to trigger cleanup (not failed - failed would leave it stuck)
+			// Mark volume as deleting to trigger cleanup
 			_, _ = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
 				ID:     volumeID,
 				Status: "deleting",
@@ -292,38 +237,18 @@ func (a *APIStore) DeleteVolumesIdOrName(c *gin.Context, volumeID api.VolumeIdOr
 		return
 	}
 
-	// Delete Redis ACL user (best effort)
-	if a.volumesRedisClient != nil {
-		aclUser := fmt.Sprintf("db_%d", volume.RedisDb)
-		if err := a.volumesRedisClient.Do(ctx, "ACL", "DELUSER", aclUser).Err(); err != nil {
-			logger.L().Warn(ctx, "Failed to delete Redis ACL user", zap.Error(err), zap.String("volume_id", volume.ID), zap.String("acl_user", aclUser))
-		} else {
-			logger.L().Info(ctx, "Deleted Redis ACL user", zap.String("volume_id", volume.ID), zap.String("acl_user", aclUser))
-		}
-	}
-
-	// Destroy JuiceFS volume if pool is configured
+	// Destroy JuiceFS volume (data + metadata in GCS)
 	if a.juicefsPool != nil {
-		// Decrypt password for per-volume ACL authentication
-		var password string
-		if a.volumesEncryptor != nil && len(volume.RedisPasswordEncrypted) > 0 {
-			decrypted, decErr := a.volumesEncryptor.Decrypt(volume.RedisPasswordEncrypted)
-			if decErr != nil {
-				logger.L().Warn(ctx, "Failed to decrypt volume password for destroy",
-					zap.Error(decErr), zap.String("volume_id", volume.ID))
-			} else {
-				password = string(decrypted)
-			}
-		}
 		destroyCfg := juicefs.FormatConfig{
-			VolumeID:            volume.ID,
-			RedisDB:             volume.RedisDb,
-			Password:            password, // Use per-volume ACL credentials
-			PoolConfig:          a.juicefsPool.Config(),
-			MetadataRedisClient: a.volumesRedisClient, // For safe metadata cleanup
+			VolumeID:   volume.ID,
+			PoolConfig: a.juicefsPool.Config(),
 		}
 		// Best effort - don't fail if destroy fails
-		_ = juicefs.DestroyVolume(ctx, destroyCfg, true)
+		if err := juicefs.DestroyVolume(ctx, destroyCfg, true); err != nil {
+			logger.L().Warn(ctx, "Failed to destroy volume data",
+				zap.Error(err),
+				zap.String("volume_id", volume.ID))
+		}
 	}
 
 	// Delete the record

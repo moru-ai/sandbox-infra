@@ -40,7 +40,7 @@ func (q *Queries) GetSandboxRun(ctx context.Context, sandboxID string) (SandboxR
 }
 
 const getVolume = `-- name: GetVolume :one
-SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+SELECT id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
 WHERE id = $1
 `
 
@@ -52,8 +52,6 @@ func (q *Queries) GetVolume(ctx context.Context, id string) (Volume, error) {
 		&i.TeamID,
 		&i.Name,
 		&i.Status,
-		&i.RedisDb,
-		&i.RedisPasswordEncrypted,
 		&i.TotalSizeBytes,
 		&i.TotalFileCount,
 		&i.CreatedAt,
@@ -63,7 +61,7 @@ func (q *Queries) GetVolume(ctx context.Context, id string) (Volume, error) {
 }
 
 const getVolumeByName = `-- name: GetVolumeByName :one
-SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+SELECT id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
 WHERE team_id = $1 AND name = $2
 `
 
@@ -80,8 +78,6 @@ func (q *Queries) GetVolumeByName(ctx context.Context, arg GetVolumeByNameParams
 		&i.TeamID,
 		&i.Name,
 		&i.Status,
-		&i.RedisDb,
-		&i.RedisPasswordEncrypted,
 		&i.TotalSizeBytes,
 		&i.TotalFileCount,
 		&i.CreatedAt,
@@ -91,7 +87,7 @@ func (q *Queries) GetVolumeByName(ctx context.Context, arg GetVolumeByNameParams
 }
 
 const getVolumesByStatus = `-- name: GetVolumesByStatus :many
-SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
+SELECT id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at FROM "public"."volumes"
 WHERE status = $1
 ORDER BY created_at ASC
 `
@@ -110,8 +106,6 @@ func (q *Queries) GetVolumesByStatus(ctx context.Context, status string) ([]Volu
 			&i.TeamID,
 			&i.Name,
 			&i.Status,
-			&i.RedisDb,
-			&i.RedisPasswordEncrypted,
 			&i.TotalSizeBytes,
 			&i.TotalFileCount,
 			&i.CreatedAt,
@@ -196,7 +190,7 @@ func (q *Queries) ListSandboxRuns(ctx context.Context, arg ListSandboxRunsParams
 }
 
 const listVolumes = `-- name: ListVolumes :many
-SELECT id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+SELECT id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at
 FROM "public"."volumes"
 WHERE team_id = $1
   AND ($2::text[] IS NULL OR status = ANY($2::text[]))
@@ -224,8 +218,6 @@ func (q *Queries) ListVolumes(ctx context.Context, arg ListVolumesParams) ([]Vol
 			&i.TeamID,
 			&i.Name,
 			&i.Status,
-			&i.RedisDb,
-			&i.RedisPasswordEncrypted,
 			&i.TotalSizeBytes,
 			&i.TotalFileCount,
 			&i.CreatedAt,

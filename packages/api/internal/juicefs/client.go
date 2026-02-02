@@ -25,18 +25,8 @@ import (
 
 // Config holds configuration for JuiceFS connections.
 type Config struct {
-	// RedisURL is the base connection URL for Redis metadata (e.g., redis://host:6379)
-	// The database number will be appended based on the volume's redis_db
-	RedisURL string
-
-	// RedisPassword is the password for Redis authentication
-	RedisPassword string
-
-	// GCSBucket is the GCS bucket name for data storage
+	// GCSBucket is the GCS bucket name for data and metadata storage
 	GCSBucket string
-
-	// GCSProject is the GCP project ID (optional, uses default credentials)
-	GCSProject string
 }
 
 // FileInfo represents metadata about a file or directory.
@@ -64,84 +54,10 @@ type Client struct {
 }
 
 // NewClient creates a new JuiceFS client for a volume.
-// It initializes connections to Redis (metadata) and GCS (data storage).
+// TODO: Implement SQLite-based client for volume file operations.
+// Currently disabled - volume file operations return 503.
 func NewClient(volumeID string, redisDB int32, config Config) (*Client, error) {
-	c := &Client{
-		volumeID: volumeID,
-		redisDB:  redisDB,
-		config:   config,
-	}
-
-	// Build Redis URL with database number
-	// Format: redis://:password@host:port/db
-	redisURL := fmt.Sprintf("%s/%d", config.RedisURL, redisDB)
-
-	// Create metadata client configuration
-	metaConf := meta.DefaultConf()
-	metaConf.Retries = 10
-	metaConf.ReadOnly = false
-	metaConf.NoBGJob = true // No background jobs for API server usage
-
-	// Create metadata client
-	c.metaCli = meta.NewClient(redisURL, metaConf)
-
-	// Load volume format from metadata
-	format, err := c.metaCli.Load(true)
-	if err != nil {
-		return nil, fmt.Errorf("load volume format: %w", err)
-	}
-
-	// Create GCS object storage
-	// Use gs:// scheme with bucket name, then add volume prefix wrapper
-	baseBucketURL := fmt.Sprintf("gs://%s/", config.GCSBucket)
-	volumePrefix := volumeID + "/"
-	baseBlob, err := object.CreateStorage("gs", baseBucketURL, "", "", "")
-	if err != nil {
-		return nil, fmt.Errorf("create GCS storage: %w", err)
-	}
-	c.blob = object.WithPrefix(baseBlob, volumePrefix)
-
-	// Create chunk configuration with sensible defaults for API server usage
-	chunkConf := &chunk.Config{
-		BlockSize:   format.BlockSize * 1024,
-		Compress:    format.Compression,
-		HashPrefix:  format.HashPrefix,
-		MaxUpload:   4,
-		MaxDownload: 4,
-		BufferSize:  64 << 20, // 64 MiB
-		GetTimeout:  time.Minute,
-		PutTimeout:  time.Minute * 5,
-		MaxRetries:  10,
-	}
-
-	// Create chunk store
-	c.store = chunk.NewCachedStore(c.blob, *chunkConf, nil)
-
-	// Register metadata message handlers
-	c.metaCli.OnMsg(meta.DeleteSlice, func(args ...interface{}) error {
-		return c.store.Remove(args[0].(uint64), int(args[1].(uint32)))
-	})
-
-	// Create metadata session
-	if err := c.metaCli.NewSession(true); err != nil {
-		return nil, fmt.Errorf("create meta session: %w", err)
-	}
-
-	// Create VFS configuration
-	vfsConf := &vfs.Config{
-		Meta:   metaConf,
-		Format: *format,
-		Chunk:  chunkConf,
-	}
-
-	// Create filesystem
-	c.jfs, err = fs.NewFileSystem(vfsConf, c.metaCli, c.store, nil)
-	if err != nil {
-		c.metaCli.CloseSession()
-		return nil, fmt.Errorf("create filesystem: %w", err)
-	}
-
-	return c, nil
+	return nil, fmt.Errorf("JuiceFS client not implemented for SQLite metadata (volume file operations disabled)")
 }
 
 // Close releases resources associated with this client.

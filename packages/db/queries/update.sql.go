@@ -82,7 +82,7 @@ SET total_size_bytes = $1,
     total_file_count = $2,
     updated_at = NOW()
 WHERE id = $3
-RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+RETURNING id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at
 `
 
 type UpdateVolumeStatsParams struct {
@@ -99,8 +99,6 @@ func (q *Queries) UpdateVolumeStats(ctx context.Context, arg UpdateVolumeStatsPa
 		&i.TeamID,
 		&i.Name,
 		&i.Status,
-		&i.RedisDb,
-		&i.RedisPasswordEncrypted,
 		&i.TotalSizeBytes,
 		&i.TotalFileCount,
 		&i.CreatedAt,
@@ -114,7 +112,7 @@ UPDATE "public"."volumes"
 SET status = $1,
     updated_at = NOW()
 WHERE id = $2
-RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+RETURNING id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at
 `
 
 type UpdateVolumeStatusParams struct {
@@ -130,8 +128,6 @@ func (q *Queries) UpdateVolumeStatus(ctx context.Context, arg UpdateVolumeStatus
 		&i.TeamID,
 		&i.Name,
 		&i.Status,
-		&i.RedisDb,
-		&i.RedisPasswordEncrypted,
 		&i.TotalSizeBytes,
 		&i.TotalFileCount,
 		&i.CreatedAt,

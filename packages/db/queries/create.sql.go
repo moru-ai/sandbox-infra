@@ -13,17 +13,6 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/db/types"
 )
 
-const allocateRedisDB = `-- name: AllocateRedisDB :one
-SELECT nextval('volumes_redis_db_seq')::INT AS redis_db
-`
-
-func (q *Queries) AllocateRedisDB(ctx context.Context) (int32, error) {
-	row := q.db.QueryRow(ctx, allocateRedisDB)
-	var redis_db int32
-	err := row.Scan(&redis_db)
-	return redis_db, err
-}
-
 const createSandboxRun = `-- name: CreateSandboxRun :one
 INSERT INTO "public"."sandbox_runs" (
     sandbox_id,
@@ -87,26 +76,20 @@ INSERT INTO "public"."volumes" (
     id,
     team_id,
     name,
-    status,
-    redis_db,
-    redis_password_encrypted
+    status
 ) VALUES (
     $1,
     $2,
     $3,
-    $4,
-    $5,
-    $6
-) RETURNING id, team_id, name, status, redis_db, redis_password_encrypted, total_size_bytes, total_file_count, created_at, updated_at
+    $4
+) RETURNING id, team_id, name, status, total_size_bytes, total_file_count, created_at, updated_at
 `
 
 type CreateVolumeParams struct {
-	ID                     string
-	TeamID                 uuid.UUID
-	Name                   string
-	Status                 string
-	RedisDb                int32
-	RedisPasswordEncrypted []byte
+	ID     string
+	TeamID uuid.UUID
+	Name   string
+	Status string
 }
 
 func (q *Queries) CreateVolume(ctx context.Context, arg CreateVolumeParams) (Volume, error) {
@@ -115,8 +98,6 @@ func (q *Queries) CreateVolume(ctx context.Context, arg CreateVolumeParams) (Vol
 		arg.TeamID,
 		arg.Name,
 		arg.Status,
-		arg.RedisDb,
-		arg.RedisPasswordEncrypted,
 	)
 	var i Volume
 	err := row.Scan(
@@ -124,8 +105,6 @@ func (q *Queries) CreateVolume(ctx context.Context, arg CreateVolumeParams) (Vol
 		&i.TeamID,
 		&i.Name,
 		&i.Status,
-		&i.RedisDb,
-		&i.RedisPasswordEncrypted,
 		&i.TotalSizeBytes,
 		&i.TotalFileCount,
 		&i.CreatedAt,
