@@ -123,16 +123,12 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 	if a.volumesRedisClient != nil {
 		aclCmd := fmt.Sprintf("ACL SETUSER db_%d on >%s ~{%d}* +@all", redisDB, password, redisDB)
 		if err := a.volumesRedisClient.Do(ctx, "ACL", "SETUSER", fmt.Sprintf("db_%d", redisDB), "on", ">"+password, fmt.Sprintf("~{%d}*", redisDB), "+@all").Err(); err != nil {
-			logger.L().Error(ctx, "Failed to create Redis ACL user", zap.Error(err), zap.String("volume_id", volumeID))
-			// Mark as deleting to trigger cleanup
-			_, _ = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
-				ID:     volumeID,
-				Status: "deleting",
-			})
-			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to create Redis ACL user")
-			return
+			// ACL creation failed - log warning and continue without per-volume isolation
+			// This happens with managed Redis (e.g., GCP Memorystore) that doesn't allow ACL management
+			logger.L().Warn(ctx, "Failed to create Redis ACL user, continuing without per-volume isolation", zap.Error(err), zap.String("volume_id", volumeID))
+		} else {
+			logger.L().Info(ctx, "Created Redis ACL user", zap.String("volume_id", volumeID), zap.String("acl_cmd", aclCmd))
 		}
-		logger.L().Info(ctx, "Created Redis ACL user", zap.String("volume_id", volumeID), zap.String("acl_cmd", aclCmd))
 	}
 
 	// Format the JuiceFS volume if pool is configured
