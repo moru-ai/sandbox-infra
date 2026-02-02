@@ -87,3 +87,27 @@ func CloseCleanly(client redis.UniversalClient) error {
 
 	return nil
 }
+
+// NewVolumesRedisClient creates a Redis client for volumes operations.
+// It supports TLS with InsecureSkipVerify for Memorystore Redis instances.
+func NewVolumesRedisClient(ctx context.Context, addr string, useTLS bool) (redis.UniversalClient, error) {
+	opts := &redis.Options{
+		Addr:         addr,
+		MinIdleConns: 1,
+	}
+
+	if useTLS {
+		opts.TLSConfig = &tls.Config{
+			InsecureSkipVerify: true, // Memorystore uses Google-managed CA
+			MinVersion:         tls.VersionTLS12,
+		}
+	}
+
+	client := redis.NewClient(opts)
+
+	if _, err := client.Ping(ctx).Result(); err != nil {
+		return nil, fmt.Errorf("failed to ping redis: %w", err)
+	}
+
+	return client, nil
+}

@@ -189,14 +189,14 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		}
 
 		// Initialize volumes Redis client for ACL operations
-		// Parse the URL to extract host:port (VolumesRedisURL may be in URL format like rediss://host:port)
+		// Parse the URL to extract host:port and detect TLS (VolumesRedisURL may be in URL format like rediss://host:port)
 		redisAddr := config.VolumesRedisURL
+		useTLS := false
 		if parsedURL, parseErr := url.Parse(config.VolumesRedisURL); parseErr == nil && parsedURL.Host != "" {
 			redisAddr = parsedURL.Host
+			useTLS = parsedURL.Scheme == "rediss"
 		}
-		volumesRedisClient, err = factories.NewRedisClient(ctx, factories.RedisConfig{
-			RedisURL: redisAddr,
-		})
+		volumesRedisClient, err = factories.NewVolumesRedisClient(ctx, redisAddr, useTLS)
 		if err != nil {
 			logger.L().Fatal(ctx, "Initializing volumes Redis client failed", zap.Error(err))
 		}
