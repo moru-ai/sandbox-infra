@@ -147,6 +147,12 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		return fmt.Errorf("mount JuiceFS: %w", err)
 	}
 
+	// Step 6: Fix ownership so sandbox user can write to volume
+	if err := os.Chown(m.mountPath, 1001, 1001); err != nil {
+		fmt.Fprintf(os.Stderr, "[volume.mount.warning] chown failed: %v\n", err)
+		// Continue anyway - mount may still work for some use cases
+	}
+
 	// Verify mount is accessible
 	if err := m.verifyMount(); err != nil {
 		// Cleanup on verification failure
@@ -248,13 +254,11 @@ func (m *Mounter) formatVolume(ctx context.Context) error {
 	defer cancel()
 
 	// juicefs format --storage gs --bucket gs://bucket/volumeID sqlite3:///tmp/meta.db volumeID
-	// --force: Allow formatting even if bucket has existing data (handles transition from Redis to SQLite)
 	cmd := exec.CommandContext(ctx, JuiceFSBinary,
 		"format",
 		"--storage", "gs",
 		"--bucket", dataURL,
 		"--no-update",
-		"--force",
 		metaURL,
 		volumeName, // volume name (sanitized)
 	)
