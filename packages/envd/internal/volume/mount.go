@@ -147,9 +147,10 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		return fmt.Errorf("mount JuiceFS: %w", err)
 	}
 
-	// Step 6: Fix ownership so sandbox user can write to volume
-	if err := os.Chown(m.mountPath, 1001, 1001); err != nil {
-		fmt.Fprintf(os.Stderr, "[volume.mount.warning] chown failed: %v\n", err)
+	// Step 6: Fix permissions so sandbox user can write to volume
+	// Use chmod 777 instead of chown since JuiceFS FUSE may not support chown from outside
+	if err := os.Chmod(m.mountPath, 0o777); err != nil {
+		fmt.Fprintf(os.Stderr, "[volume.mount.warning] chmod failed: %v\n", err)
 		// Continue anyway - mount may still work for some use cases
 	}
 
