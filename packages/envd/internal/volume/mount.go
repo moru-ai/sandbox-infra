@@ -248,11 +248,13 @@ func (m *Mounter) formatVolume(ctx context.Context) error {
 	defer cancel()
 
 	// juicefs format --storage gs --bucket gs://bucket/volumeID sqlite3:///tmp/meta.db volumeID
+	// --force: Allow formatting even if bucket has existing data (handles transition from Redis to SQLite)
 	cmd := exec.CommandContext(ctx, JuiceFSBinary,
 		"format",
 		"--storage", "gs",
 		"--bucket", dataURL,
 		"--no-update",
+		"--force",
 		metaURL,
 		volumeName, // volume name (sanitized)
 	)
@@ -412,8 +414,7 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 		"mount",
 		"--no-usage-report",
 		"--no-bgjob",
-		"--all-squash", "1001:1001", // map all users to sandbox user for write access
-		"-d",                // daemon mode
+		"-d",             // daemon mode
 		"-o", "allow_other", // allow non-root users to access mount
 		metaURL,
 		m.mountPath,
