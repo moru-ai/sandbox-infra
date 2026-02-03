@@ -147,13 +147,6 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		return fmt.Errorf("mount JuiceFS: %w", err)
 	}
 
-	// Step 6: Fix permissions so sandbox user can write to volume
-	// Use chmod 777 instead of chown since JuiceFS FUSE may not support chown from outside
-	if err := os.Chmod(m.mountPath, 0o777); err != nil {
-		fmt.Fprintf(os.Stderr, "[volume.mount.warning] chmod failed: %v\n", err)
-		// Continue anyway - mount may still work for some use cases
-	}
-
 	// Verify mount is accessible
 	if err := m.verifyMount(); err != nil {
 		// Cleanup on verification failure
@@ -419,7 +412,8 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 		"mount",
 		"--no-usage-report",
 		"--no-bgjob",
-		"-d",             // daemon mode
+		"--all-squash", "1001:1001", // map all users to sandbox user for write access
+		"-d",                // daemon mode
 		"-o", "allow_other", // allow non-root users to access mount
 		metaURL,
 		m.mountPath,
