@@ -76,7 +76,16 @@ func (a *API) PostInit(w http.ResponseWriter, r *http.Request) {
 				GCSTokenExpiry: derefInt64(initRequest.Volume.GcsTokenExpiry, 0),
 			}
 
-			logger.Info().Msgf("Mounting volume %s at %s", volumeConfig.VolumeID, volumeConfig.MountPath)
+			// Debug: log token info
+			tokenLen := len(volumeConfig.GCSToken)
+			tokenPrefix := ""
+			if tokenLen > 10 {
+				tokenPrefix = volumeConfig.GCSToken[:10] + "..."
+			} else if tokenLen > 0 {
+				tokenPrefix = "[token too short]"
+			}
+			logger.Info().Msgf("Mounting volume %s at %s (bucket=%s, token_len=%d, token_prefix=%s)",
+				volumeConfig.VolumeID, volumeConfig.MountPath, volumeConfig.GCSBucket, tokenLen, tokenPrefix)
 
 			if host.DefaultVolumeMounterFactory == nil {
 				logger.Error().Msg("Volume mount requested but no mounter factory registered")
