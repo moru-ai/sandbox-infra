@@ -41,25 +41,43 @@ func NewMinter(bucket string, impersonateSA string) *Minter {
 	}
 }
 
-// MintDownscopedToken creates a token for volume operations.
-// NOTE: Currently returns base token without downscoping because litestream's
-// GCS client doesn't handle STS-downscoped tokens correctly (EOF errors).
-// TODO: Investigate litestream compatibility with downscoped tokens or use
-// separate service accounts per volume for isolation.
+// MintDownscopedToken creates a downscoped token for volume operations.
+// The token is scoped to the volumes bucket with minimal permissions:
+//   - objectViewer: list + get (for litestream restore)
+//   - objectCreator: create (for litestream replicate and juicefs write)
+//
+// Note: No delete permission. No volume isolation via CAB (litestream list
+// operations fail with prefix conditions). Time-limited to 1 hour.
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
-	// Get base token (either via impersonation or directly from metadata)
+	// Step 1: Get base token (either via impersonation or directly from metadata)
 	baseToken, err := m.getBaseToken(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get base token: %w", err)
 	}
 
-	// Return base token directly without downscoping
-	// Downscoping via STS causes EOF errors in litestream's GCS client
-	return &Token{
-		AccessToken: baseToken,
-		ExpiresIn:   3600, // 1 hour (same as metadata token)
-		ExpiresAt:   time.Now().Add(time.Hour),
-	}, nil
+	// Step 2: Create credential access boundary with minimal permissions
+	// Using viewer + creator instead of objectAdmin to exclude delete
+	bucketResource := fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket)
+
+	cab := CredentialAccessBoundary{
+		AccessBoundary: AccessBoundary{
+			AccessBoundaryRules: []AccessBoundaryRule{
+				{
+					// objectViewer: storage.objects.list + storage.objects.get
+					AvailablePermissions: []string{"inRole:roles/storage.objectViewer"},
+					AvailableResource:    bucketResource,
+				},
+				{
+					// objectCreator: storage.objects.create
+					AvailablePermissions: []string{"inRole:roles/storage.objectCreator"},
+					AvailableResource:    bucketResource,
+				},
+			},
+		},
+	}
+
+	// Step 3: Exchange for downscoped token via STS
+	return m.exchangeToken(ctx, baseToken, cab)
 }
 
 // getBaseToken gets the token to be downscoped.
