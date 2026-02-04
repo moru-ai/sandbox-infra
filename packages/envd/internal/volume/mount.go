@@ -210,9 +210,28 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, MountTimeout)
 	defer cancel()
 
+	// Debug: Check token file
+	tokenData, tokenErr := os.ReadFile(GCSTokenFile)
+	if tokenErr != nil {
+		fmt.Fprintf(os.Stderr, "[volume.restore.debug] token_file_error=%v\n", tokenErr)
+	} else {
+		tokenLen := len(tokenData)
+		tokenPreview := string(tokenData)
+		if len(tokenPreview) > 50 {
+			tokenPreview = tokenPreview[:50] + "..."
+		}
+		fmt.Fprintf(os.Stderr, "[volume.restore.debug] token_file=%s token_len=%d token_preview=%s\n",
+			GCSTokenFile, tokenLen, tokenPreview)
+	}
+
+	fmt.Fprintf(os.Stderr, "[volume.restore.debug] volume_id=%s replica_url=%s\n",
+		m.config.VolumeID, replicaURL)
+
 	// litestream restore -if-replica-exists -o /tmp/meta.db gs://bucket/volumeID-meta
+	// Add -v for verbose output
 	cmd := exec.CommandContext(ctx, LitestreamBinary,
 		"restore",
+		"-v",
 		"-if-replica-exists",
 		"-o", MetaDBPath,
 		replicaURL,
@@ -222,8 +241,12 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 		"LITESTREAM_GCS_TOKEN_FILE="+GCSTokenFile,
 	)
 
+	fmt.Fprintf(os.Stderr, "[volume.restore.debug] cmd=%v\n", cmd.Args)
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "[volume.restore.failed] volume_id=%s error=%v full_output=%s\n",
+			m.config.VolumeID, err, string(output))
 		return fmt.Errorf("litestream restore failed: %w\nOutput: %s", err, string(output))
 	}
 
