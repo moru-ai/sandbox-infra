@@ -41,13 +41,12 @@ func NewMinter(bucket string, impersonateSA string) *Minter {
 	}
 }
 
-// MintDownscopedToken creates a downscoped token for accessing the volumes bucket.
-// The token is scoped to storage.objectAdmin on the entire bucket.
+// MintDownscopedToken creates a downscoped token scoped to a specific volume's paths.
+// The token allows access to:
+//   - gs://{bucket}/{volumeID}/* (JuiceFS data)
+//   - gs://{bucket}/{volumeID}-meta/* (Litestream metadata)
 //
-// TODO: Add prefix-based CAB conditions to scope to specific volume paths.
-// Currently using bucket-level access because:
-// - Litestream needs storage.objects.list which doesn't work well with CAB prefix conditions
-// - The token is still time-limited (1 hour) and bucket-scoped
+// Uses CAB prefix conditions to isolate volumes from each other.
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
 	// Step 1: Get base token (either via impersonation or directly from metadata)
 	baseToken, err := m.getBaseToken(ctx)
@@ -55,13 +54,28 @@ func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Tok
 		return nil, fmt.Errorf("get base token: %w", err)
 	}
 
-	// Step 2: Create credential access boundary for the bucket
+	// Step 2: Create credential access boundary scoped to this volume's paths
+	// Use a single rule with OR condition for both data and metadata prefixes
+	bucketResource := fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket)
+
+	// CEL expression to match both volume data and metadata paths
+	// volumeID is like "vol-abc123", so we match:
+	// - vol-abc123/ (data)
+	// - vol-abc123-meta/ (metadata)
+	celExpression := fmt.Sprintf(
+		"resource.name.startsWith('projects/_/buckets/%s/objects/%s/') || resource.name.startsWith('projects/_/buckets/%s/objects/%s-meta/')",
+		m.bucket, volumeID, m.bucket, volumeID,
+	)
+
 	cab := CredentialAccessBoundary{
 		AccessBoundary: AccessBoundary{
 			AccessBoundaryRules: []AccessBoundaryRule{
 				{
 					AvailablePermissions: []string{"inRole:roles/storage.objectAdmin"},
-					AvailableResource:    fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket),
+					AvailableResource:    bucketResource,
+					AvailabilityCondition: &AvailabilityCondition{
+						Expression: celExpression,
+					},
 				},
 			},
 		},
