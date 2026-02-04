@@ -285,6 +285,11 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 	fmt.Fprintf(os.Stderr, "[volume.restore.debug] volume_id=%s replica_url=%s\n",
 		m.config.VolumeID, replicaURL)
 
+	// Clean up any existing meta.db from a previous failed attempt (e.g., /init retry)
+	if err := os.Remove(MetaDBPath); err != nil && !os.IsNotExist(err) {
+		fmt.Fprintf(os.Stderr, "[volume.restore.debug] failed to remove existing meta.db: %v\n", err)
+	}
+
 	// litestream restore -if-replica-exists -o /tmp/meta.db gs://bucket/volumeID-meta
 	cmd := exec.CommandContext(ctx, LitestreamBinary,
 		"restore",
