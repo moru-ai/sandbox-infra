@@ -14,7 +14,7 @@ import (
 	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/storage"
 )
 
-const hashingVersion = "v20"
+const hashingVersion = "v21"
 
 const minimalCachedTemplateVersion = 2
 
