@@ -213,40 +213,57 @@ func (m *Mounter) writeGCSToken() error {
 // waitForGCSConnectivity waits for network connectivity to GCS.
 // This helps avoid transient EOF errors when the VM network is still initializing.
 func (m *Mounter) waitForGCSConnectivity(ctx context.Context) error {
-	const maxRetries = 5
-	const retryDelay = 500 * time.Millisecond
+	const maxRetries = 10
+	const initialDelay = 200 * time.Millisecond
+	const requestTimeout = 3 * time.Second
 
 	gcsURL := "https://storage.googleapis.com/storage/v1/b/" + m.config.GCSBucket
 
+	// HTTP client with timeout
+	client := &http.Client{Timeout: requestTimeout}
+
+	var lastErr error
+	delay := initialDelay
+
 	for i := 0; i < maxRetries; i++ {
-		req, err := http.NewRequestWithContext(ctx, http.MethodHead, gcsURL, nil)
+		reqCtx, cancel := context.WithTimeout(ctx, requestTimeout)
+		req, err := http.NewRequestWithContext(reqCtx, http.MethodHead, gcsURL, nil)
 		if err != nil {
+			cancel()
 			return fmt.Errorf("create request: %w", err)
 		}
 		req.Header.Set("Authorization", "Bearer "+m.config.GCSToken)
 
-		resp, err := http.DefaultClient.Do(req)
+		resp, err := client.Do(req)
+		cancel()
+
 		if err == nil {
 			resp.Body.Close()
-			fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d status=%d\n",
+			fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d status=%d ok\n",
 				m.config.VolumeID, i+1, resp.StatusCode)
 			// Any response (even 403/404) means network is working
 			return nil
 		}
 
-		fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d error=%v\n",
-			m.config.VolumeID, i+1, err)
+		lastErr = err
+		fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d delay=%v error=%v\n",
+			m.config.VolumeID, i+1, delay, err)
 
 		if i < maxRetries-1 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case <-time.After(retryDelay):
+			case <-time.After(delay):
+			}
+			// Exponential backoff: 200ms, 400ms, 800ms, 1s, 1s, 1s...
+			delay = delay * 2
+			if delay > time.Second {
+				delay = time.Second
 			}
 		}
 	}
 
-	return fmt.Errorf("GCS connectivity check failed after %d attempts", maxRetries)
+	return fmt.Errorf("GCS connectivity check failed after %d attempts: %w", maxRetries, lastErr)
 }
 
 // restoreMetaDB restores the SQLite metadata DB from Litestream replica.
