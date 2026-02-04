@@ -4,6 +4,7 @@ package volume
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -105,6 +106,13 @@ func (m *Mounter) Mount(ctx context.Context) error {
 		return fmt.Errorf("write GCS token: %w", err)
 	}
 
+	// Step 1b: Quick GCS connectivity check (3 retries, 500ms delay)
+	if err := m.checkGCSConnectivity(ctx); err != nil {
+		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
+			m.config.VolumeID, m.mountPath, err)
+		return fmt.Errorf("GCS connectivity check: %w", err)
+	}
+
 	// Step 2: Restore metadata database from Litestream (if replica exists)
 	if err := m.restoreMetaDB(ctx); err != nil {
 		fmt.Fprintf(os.Stderr, "[volume.mount.failed] volume_id=%s mount_path=%s error=%v\n",
@@ -200,6 +208,52 @@ func (m *Mounter) writeGCSToken() error {
 		return fmt.Errorf("write token file: %w", err)
 	}
 	return nil
+}
+
+// checkGCSConnectivity verifies GCS is reachable before attempting mount.
+// Uses 3 retries with 500ms delay to handle brief network initialization delays.
+func (m *Mounter) checkGCSConnectivity(ctx context.Context) error {
+	const maxRetries = 3
+	const retryDelay = 500 * time.Millisecond
+	const requestTimeout = 5 * time.Second
+
+	gcsURL := "https://storage.googleapis.com/storage/v1/b/" + m.config.GCSBucket
+	client := &http.Client{Timeout: requestTimeout}
+
+	var lastErr error
+	for i := 0; i < maxRetries; i++ {
+		reqCtx, cancel := context.WithTimeout(ctx, requestTimeout)
+		req, err := http.NewRequestWithContext(reqCtx, http.MethodHead, gcsURL, nil)
+		if err != nil {
+			cancel()
+			return fmt.Errorf("create request: %w", err)
+		}
+		req.Header.Set("Authorization", "Bearer "+m.config.GCSToken)
+
+		resp, err := client.Do(req)
+		cancel()
+
+		if err == nil {
+			resp.Body.Close()
+			fmt.Fprintf(os.Stderr, "[volume.mount.gcs] volume_id=%s attempt=%d status=%d ok\n",
+				m.config.VolumeID, i+1, resp.StatusCode)
+			return nil
+		}
+
+		lastErr = err
+		fmt.Fprintf(os.Stderr, "[volume.mount.gcs] volume_id=%s attempt=%d error=%v\n",
+			m.config.VolumeID, i+1, err)
+
+		if i < maxRetries-1 {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(retryDelay):
+			}
+		}
+	}
+
+	return fmt.Errorf("GCS unreachable after %d attempts: %w", maxRetries, lastErr)
 }
 
 // restoreMetaDB restores the SQLite metadata DB from Litestream replica.
