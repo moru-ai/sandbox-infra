@@ -73,44 +73,19 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 	// Generate volume ID
 	volumeID := volumeIDPrefix + id.Generate()
 
-	// Create volume record with status 'creating'
+	// Create volume record with status 'available'
+	// Note: JuiceFS metadata initialization is handled by envd during first mount.
+	// envd uses litestream restore -if-replica-exists which returns success for empty
+	// buckets, then juicefs format creates fresh metadata. This eliminates the
+	// API/litestream format mismatch that caused 401 errors.
 	volume, err := a.sqlcDB.CreateVolume(ctx, queries.CreateVolumeParams{
 		ID:     volumeID,
 		TeamID: team.ID,
 		Name:   req.Name,
-		Status: "creating",
-	})
-	if err != nil {
-		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to create volume")
-		return
-	}
-
-	// Format the JuiceFS volume with SQLite metadata
-	if a.volumesBucket != "" {
-		formatCfg := juicefs.FormatConfig{
-			VolumeID: volumeID,
-			PoolConfig: juicefs.Config{
-				GCSBucket: a.volumesBucket,
-			},
-		}
-		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
-			// Mark volume as deleting to trigger cleanup
-			_, _ = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
-				ID:     volumeID,
-				Status: "deleting",
-			})
-			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to format volume: "+err.Error())
-			return
-		}
-	}
-
-	// Update status to available
-	volume, err = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
-		ID:     volumeID,
 		Status: "available",
 	})
 	if err != nil {
-		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to update volume status")
+		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to create volume")
 		return
 	}
 
