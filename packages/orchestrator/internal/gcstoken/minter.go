@@ -41,13 +41,10 @@ func NewMinter(bucket string, impersonateSA string) *Minter {
 	}
 }
 
-// MintDownscopedToken creates a downscoped token that allows access to the
-// volumes bucket. The token is scoped to storage.objectAdmin on the bucket.
-//
-// Note: We don't use CAB prefix conditions because storage.objects.list
-// operations don't have a specific object resource, making prefix-based
-// conditions ineffective. The token is still time-limited (1 hour) and
-// scoped to only the volumes bucket.
+// MintDownscopedToken creates a downscoped token scoped to a specific volume's paths.
+// The token allows access to:
+//   - gs://{bucket}/{volumeID}/ (JuiceFS data)
+//   - gs://{bucket}/{volumeID}-meta (Litestream metadata)
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
 	// Step 1: Get base token (either via impersonation or directly from metadata)
 	baseToken, err := m.getBaseToken(ctx)
@@ -55,18 +52,34 @@ func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Tok
 		return nil, fmt.Errorf("get base token: %w", err)
 	}
 
-	// Step 2: Create credential access boundary for the bucket
-	// We scope to the entire bucket (not prefixes) because:
-	// - Litestream needs storage.objects.list for restore operations
-	// - GCP CAB conditions apply to object resources, not list operations
-	// - The token is still time-limited and bucket-scoped
+	// Step 2: Create credential access boundary scoped to this volume's paths
+	// Two rules: one for data ({volumeID}/) and one for metadata ({volumeID}-meta)
+	bucketResource := fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket)
+
 	cab := CredentialAccessBoundary{
 		AccessBoundary: AccessBoundary{
 			AccessBoundaryRules: []AccessBoundaryRule{
 				{
+					// Rule for JuiceFS data: gs://{bucket}/{volumeID}/
 					AvailablePermissions: []string{"inRole:roles/storage.objectAdmin"},
-					AvailableResource:    fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket),
-					// No AvailabilityCondition - allow full bucket access
+					AvailableResource:    bucketResource,
+					AvailabilityCondition: &AvailabilityCondition{
+						Expression: fmt.Sprintf(
+							"resource.name.startsWith('projects/_/buckets/%s/objects/%s/')",
+							m.bucket, volumeID,
+						),
+					},
+				},
+				{
+					// Rule for Litestream metadata: gs://{bucket}/{volumeID}-meta
+					AvailablePermissions: []string{"inRole:roles/storage.objectAdmin"},
+					AvailableResource:    bucketResource,
+					AvailabilityCondition: &AvailabilityCondition{
+						Expression: fmt.Sprintf(
+							"resource.name.startsWith('projects/_/buckets/%s/objects/%s-meta')",
+							m.bucket, volumeID,
+						),
+					},
 				},
 			},
 		},
