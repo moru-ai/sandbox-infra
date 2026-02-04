@@ -228,10 +228,8 @@ func (m *Mounter) restoreMetaDB(ctx context.Context) error {
 		m.config.VolumeID, replicaURL)
 
 	// litestream restore -if-replica-exists -o /tmp/meta.db gs://bucket/volumeID-meta
-	// Add -v for verbose output
 	cmd := exec.CommandContext(ctx, LitestreamBinary,
 		"restore",
-		"-v",
 		"-if-replica-exists",
 		"-o", MetaDBPath,
 		replicaURL,
