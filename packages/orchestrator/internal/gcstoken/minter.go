@@ -41,12 +41,13 @@ func NewMinter(bucket string, impersonateSA string) *Minter {
 	}
 }
 
-// MintDownscopedToken creates a downscoped token scoped to a specific volume's paths.
-// The token allows access to:
-//   - gs://{bucket}/{volumeID}/* (JuiceFS data)
-//   - gs://{bucket}/{volumeID}-meta/* (Litestream metadata)
+// MintDownscopedToken creates a downscoped token for volume operations.
+// The token is scoped to the volumes bucket with minimal permissions:
+//   - objectViewer: list + get (for litestream restore)
+//   - objectCreator: create (for litestream replicate and juicefs write)
 //
-// Uses CAB prefix conditions to isolate volumes from each other.
+// Note: No delete permission. No volume isolation via CAB (litestream list
+// operations fail with prefix conditions). Time-limited to 1 hour.
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
 	// Step 1: Get base token (either via impersonation or directly from metadata)
 	baseToken, err := m.getBaseToken(ctx)
@@ -54,28 +55,22 @@ func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Tok
 		return nil, fmt.Errorf("get base token: %w", err)
 	}
 
-	// Step 2: Create credential access boundary scoped to this volume's paths
-	// Use a single rule with OR condition for both data and metadata prefixes
+	// Step 2: Create credential access boundary with minimal permissions
+	// Using viewer + creator instead of objectAdmin to exclude delete
 	bucketResource := fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket)
-
-	// CEL expression to match both volume data and metadata paths
-	// volumeID is like "vol-abc123", so we match:
-	// - vol-abc123/ (data)
-	// - vol-abc123-meta/ (metadata)
-	celExpression := fmt.Sprintf(
-		"resource.name.startsWith('projects/_/buckets/%s/objects/%s/') || resource.name.startsWith('projects/_/buckets/%s/objects/%s-meta/')",
-		m.bucket, volumeID, m.bucket, volumeID,
-	)
 
 	cab := CredentialAccessBoundary{
 		AccessBoundary: AccessBoundary{
 			AccessBoundaryRules: []AccessBoundaryRule{
 				{
-					AvailablePermissions: []string{"inRole:roles/storage.objectAdmin"},
+					// objectViewer: storage.objects.list + storage.objects.get
+					AvailablePermissions: []string{"inRole:roles/storage.objectViewer"},
 					AvailableResource:    bucketResource,
-					AvailabilityCondition: &AvailabilityCondition{
-						Expression: celExpression,
-					},
+				},
+				{
+					// objectCreator: storage.objects.create
+					AvailablePermissions: []string{"inRole:roles/storage.objectCreator"},
+					AvailableResource:    bucketResource,
 				},
 			},
 		},
