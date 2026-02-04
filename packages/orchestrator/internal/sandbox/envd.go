@@ -172,7 +172,7 @@ func (s *Sandbox) initEnvd(ctx context.Context) (e error) {
 			logger.WithSandboxID(s.Runtime.SandboxID),
 			logger.WithEnvdVersion(s.Config.Envd.Version),
 			zap.Int("status_code", response.StatusCode),
-			zap.String("response_body", utils.Truncate(string(body), 100)),
+			zap.String("response_body", utils.Truncate(string(body), 500)),
 		)
 
 		return fmt.Errorf("unexpected status code: %d", response.StatusCode)
