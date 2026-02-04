@@ -85,26 +85,8 @@ func (a *APIStore) PostVolumes(c *gin.Context) {
 		return
 	}
 
-	// Create GCS bucket paths for volume data and metadata
-	// Note: JuiceFS metadata initialization is handled by envd during first mount.
-	// This just creates marker files to establish the paths.
-	if a.volumesBucket != "" {
-		formatCfg := juicefs.FormatConfig{
-			VolumeID: volumeID,
-			PoolConfig: juicefs.Config{
-				GCSBucket: a.volumesBucket,
-			},
-		}
-		if err := juicefs.FormatVolume(ctx, formatCfg); err != nil {
-			// Mark volume as deleting to trigger cleanup
-			_, _ = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
-				ID:     volumeID,
-				Status: "deleting",
-			})
-			a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to create volume paths: "+err.Error())
-			return
-		}
-	}
+	// Note: GCS bucket paths are created by envd during first mount.
+	// No GCS operations needed here - just update status to available.
 
 	// Update status to available
 	volume, err = a.sqlcDB.UpdateVolumeStatus(ctx, queries.UpdateVolumeStatusParams{
