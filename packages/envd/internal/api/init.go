@@ -65,6 +65,48 @@ func (a *API) PostInit(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+
+		// Mount volume synchronously if configured in the request
+		if initRequest.Volume != nil && initRequest.Volume.VolumeId != nil {
+			volumeConfig := &host.VolumeConfig{
+				VolumeID:       *initRequest.Volume.VolumeId,
+				MountPath:      derefString(initRequest.Volume.MountPath, "/workspace"),
+				GCSBucket:      derefString(initRequest.Volume.GcsBucket, ""),
+				GCSToken:       derefString(initRequest.Volume.GcsToken, ""),
+				GCSTokenExpiry: derefInt64(initRequest.Volume.GcsTokenExpiry, 0),
+			}
+
+			logger.Info().Msgf("Mounting volume %s at %s", volumeConfig.VolumeID, volumeConfig.MountPath)
+
+			if host.DefaultVolumeMounterFactory == nil {
+				logger.Error().Msg("Volume mount requested but no mounter factory registered")
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte("volume mount not available"))
+				return
+			}
+
+			mounter := host.DefaultVolumeMounterFactory(volumeConfig)
+			ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+			defer cancel()
+
+			if err := mounter.Mount(ctx); err != nil {
+				logger.Error().Msgf("Failed to mount volume %s at %s: %v",
+					volumeConfig.VolumeID, volumeConfig.MountPath, err)
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(fmt.Sprintf("volume mount failed: %v", err)))
+				return
+			}
+
+			logger.Info().Msgf("Successfully mounted volume %s at %s",
+				volumeConfig.VolumeID, volumeConfig.MountPath)
+
+			// Store env vars for the volume
+			a.defaults.EnvVars.Store("MORU_VOLUME_ID", volumeConfig.VolumeID)
+			a.defaults.EnvVars.Store("MORU_VOLUME_MOUNT_PATH", volumeConfig.MountPath)
+
+			// Store the volume config for graceful shutdown
+			host.CurrentVolumeConfig = volumeConfig
+		}
 	}
 
 	go func() { //nolint:contextcheck // TODO: fix this later
@@ -77,6 +119,22 @@ func (a *API) PostInit(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "")
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// derefString returns the dereferenced string value or the default if nil.
+func derefString(s *string, def string) string {
+	if s == nil {
+		return def
+	}
+	return *s
+}
+
+// derefInt64 returns the dereferenced int64 value or the default if nil.
+func derefInt64(i *int64, def int64) int64 {
+	if i == nil {
+		return def
+	}
+	return *i
 }
 
 func (a *API) SetData(logger zerolog.Logger, data PostInitJSONBody) error {

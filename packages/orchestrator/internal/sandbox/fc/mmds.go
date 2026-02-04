@@ -7,8 +7,8 @@ type MmdsMetadata struct {
 
 	LogsCollectorAddress string `json:"address"`
 
-	// Volume configuration for persistent storage (optional).
-	Volume *MmdsVolumeConfig `json:"volume,omitempty"`
+	// Note: Volume configuration is now passed via /init request to envd instead of MMDS.
+	// This eliminates the timing gap between sandbox creation and volume availability.
 }
 
 // MmdsVolumeConfig contains volume configuration for envd to mount.

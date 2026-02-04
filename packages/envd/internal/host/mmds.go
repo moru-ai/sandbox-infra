@@ -25,9 +25,6 @@ type MMDSOpts struct {
 	SandboxID            string `json:"instanceID"`
 	TemplateID           string `json:"envID"`
 	LogsCollectorAddress string `json:"address"`
-
-	// Volume configuration for persistent storage (optional).
-	Volume *VolumeConfig `json:"volume,omitempty"`
 }
 
 // VolumeConfig contains volume configuration for mounting.
@@ -182,21 +179,9 @@ func PollForMMDSOpts(ctx context.Context, mmdsChan chan<- *MMDSOpts, envVars *ut
 				fmt.Fprintf(os.Stderr, "error writing template ID file: %v\n", err)
 			}
 
-			// Mount volume if configured
-			if mmdsOpts.Volume != nil && DefaultVolumeMounterFactory != nil {
-				mounter := DefaultVolumeMounterFactory(mmdsOpts.Volume)
-				if err := mounter.Mount(ctx); err != nil {
-					fmt.Fprintf(os.Stderr, "error mounting volume %s at %s: %v\n",
-						mmdsOpts.Volume.VolumeID, mmdsOpts.Volume.MountPath, err)
-				} else {
-					fmt.Fprintf(os.Stderr, "mounted volume %s at %s\n",
-						mmdsOpts.Volume.VolumeID, mmdsOpts.Volume.MountPath)
-					envVars.Store("MORU_VOLUME_ID", mmdsOpts.Volume.VolumeID)
-					envVars.Store("MORU_VOLUME_MOUNT_PATH", mmdsOpts.Volume.MountPath)
-					// Store the volume config for graceful shutdown
-					CurrentVolumeConfig = mmdsOpts.Volume
-				}
-			}
+			// Note: Volume mounting is now done synchronously in the /init handler
+			// before this function is called. This eliminates the timing gap between
+			// sandbox creation and volume availability.
 
 			if mmdsOpts.LogsCollectorAddress != "" {
 				mmdsChan <- mmdsOpts

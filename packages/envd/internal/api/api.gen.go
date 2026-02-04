@@ -158,6 +158,24 @@ type PostInitJSONBody struct {
 
 	// Timestamp The current timestamp in RFC3339 format
 	Timestamp *time.Time `json:"timestamp,omitempty"`
+
+	// Volume Volume configuration for persistent storage mount
+	Volume *struct {
+		// GcsBucket GCS bucket for volume data
+		GcsBucket *string `json:"gcsBucket,omitempty"`
+
+		// GcsToken Downscoped OAuth2 access token for GCS
+		GcsToken *string `json:"gcsToken,omitempty"`
+
+		// GcsTokenExpiry Unix timestamp when token expires
+		GcsTokenExpiry *int64 `json:"gcsTokenExpiry,omitempty"`
+
+		// MountPath Path to mount volume (e.g., "/workspace/data")
+		MountPath *string `json:"mountPath,omitempty"`
+
+		// VolumeId Volume identifier (e.g., "vol_abc123")
+		VolumeId *string `json:"volumeId,omitempty"`
+	} `json:"volume,omitempty"`
 }
 
 // PostFilesMultipartRequestBody defines body for PostFiles for multipart/form-data ContentType.

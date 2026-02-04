@@ -59,9 +59,35 @@ paths:
                 defaultWorkdir:
                   type: string
                   description: The default working directory to use for operations
+                volume:
+                  type: object
+                  description: Volume configuration for persistent storage mount
+                  properties:
+                    volumeId:
+                      type: string
+                      description: Volume identifier (e.g., "vol_abc123")
+                    mountPath:
+                      type: string
+                      description: Path to mount volume (e.g., "/workspace/data")
+                    gcsBucket:
+                      type: string
+                      description: GCS bucket for volume data
+                    gcsToken:
+                      type: string
+                      description: Downscoped OAuth2 access token for GCS
+                    gcsTokenExpiry:
+                      type: integer
+                      format: int64
+                      description: Unix timestamp when token expires
       responses:
         "204":
           description: Env vars set, the time and metadata is synced with the host
+        "500":
+          description: Internal server error (e.g., volume mount failed)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 
   /envs:
     get:

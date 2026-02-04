@@ -132,6 +132,10 @@ type Sandbox struct {
 	// It was used to store the config to allow API restarts
 	APIStoredConfig *orchestrator.SandboxConfig
 
+	// volumeInitConfig stores the volume config with minted GCS token for use in initEnvd.
+	// This is set during ResumeSandbox if a volume is configured.
+	volumeInitConfig *InitVolumeConfig
+
 	exit *utils.ErrorOnce
 
 	stop utils.Lazy[error]
@@ -538,17 +542,17 @@ func (f *Factory) ResumeSandbox(
 
 	telemetry.ReportEvent(ctx, "got snapfile")
 
-	// Convert volume config to MMDS format if present
-	// ProxyHost is the vEth IP (host side of veth pair), which the sandbox can reach
-	var volumeConfig *fc.MmdsVolumeConfig
+	// Prepare volume config for passing to envd via /init request
+	// Volume is now mounted synchronously in envd during /init instead of async via MMDS
+	var volumeInitConfig *InitVolumeConfig
 	if config.Volume != nil && f.volumes != nil {
 		vethIP := ips.slot.VethIP().String()
-		volumeConfig = &fc.MmdsVolumeConfig{
+
+		// Prepare volume init config for passing to envd via /init request
+		volumeInitConfig = &InitVolumeConfig{
 			VolumeID:  config.Volume.GetVolumeId(),
 			MountPath: config.Volume.GetMountPath(),
-			RedisDB:   int(config.Volume.GetRedisDb()),
 			GCSBucket: config.Volume.GetGcsBucket(),
-			ProxyHost: vethIP,
 		}
 
 		// Mint downscoped GCS token for this volume
@@ -560,8 +564,8 @@ func (f *Factory) ResumeSandbox(
 					zap.String("volume_id", config.Volume.GetVolumeId()),
 				)
 			} else {
-				volumeConfig.GCSToken = token.AccessToken
-				volumeConfig.GCSTokenExpiry = token.ExpiresAt.Unix()
+				volumeInitConfig.GCSToken = token.AccessToken
+				volumeInitConfig.GCSTokenExpiry = token.ExpiresAt.Unix()
 				logger.L().Info(ctx, "minted downscoped GCS token",
 					zap.String("volume_id", config.Volume.GetVolumeId()),
 					zap.Int("expires_in_seconds", token.ExpiresIn),
@@ -622,7 +626,6 @@ func (f *Factory) ResumeSandbox(
 		snapfile,
 		fcUffd.Ready(),
 		ips.slot,
-		volumeConfig,
 	)
 	if fcStartErr != nil {
 		return nil, fmt.Errorf("failed to start FC: %w", fcStartErr)
@@ -660,6 +663,8 @@ func (f *Factory) ResumeSandbox(
 		cleanup: cleanup,
 
 		APIStoredConfig: apiConfigToStore,
+
+		volumeInitConfig: volumeInitConfig,
 
 		exit: exit,
 	}

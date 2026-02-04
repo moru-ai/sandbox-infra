@@ -39,6 +39,7 @@ func doRequestWithInfiniteRetries(
 	hyperloopIP string,
 	defaultUser *string,
 	defaultWorkdir *string,
+	volume *InitVolumeConfig,
 ) (*http.Response, int64, error) {
 	requestCount := int64(0)
 	for {
@@ -51,6 +52,7 @@ func doRequestWithInfiniteRetries(
 			Timestamp:      &now,
 			DefaultUser:    defaultUser,
 			DefaultWorkdir: defaultWorkdir,
+			Volume:         volume,
 		}
 
 		body, err := json.Marshal(jsonBody)
@@ -91,12 +93,27 @@ func doRequestWithInfiniteRetries(
 }
 
 type PostInitJSONBody struct {
-	EnvVars        *map[string]string `json:"envVars"`
-	AccessToken    *string            `json:"accessToken,omitempty"`
-	HyperloopIP    *string            `json:"hyperloopIP,omitempty"`
-	Timestamp      *time.Time         `json:"timestamp,omitempty"`
-	DefaultUser    *string            `json:"defaultUser,omitempty"`
-	DefaultWorkdir *string            `json:"defaultWorkdir,omitempty"`
+	EnvVars        *map[string]string    `json:"envVars"`
+	AccessToken    *string               `json:"accessToken,omitempty"`
+	HyperloopIP    *string               `json:"hyperloopIP,omitempty"`
+	Timestamp      *time.Time            `json:"timestamp,omitempty"`
+	DefaultUser    *string               `json:"defaultUser,omitempty"`
+	DefaultWorkdir *string               `json:"defaultWorkdir,omitempty"`
+	Volume         *InitVolumeConfig     `json:"volume,omitempty"`
+}
+
+// InitVolumeConfig is the volume configuration sent to envd in the /init request.
+type InitVolumeConfig struct {
+	// VolumeID is the volume identifier (e.g., "vol_abc123").
+	VolumeID string `json:"volumeId"`
+	// MountPath is the path where the volume should be mounted (e.g., "/workspace/data").
+	MountPath string `json:"mountPath"`
+	// GCSBucket is the GCS bucket for volume data.
+	GCSBucket string `json:"gcsBucket"`
+	// GCSToken is the downscoped OAuth2 access token for GCS.
+	GCSToken string `json:"gcsToken"`
+	// GCSTokenExpiry is the Unix timestamp when the token expires.
+	GCSTokenExpiry int64 `json:"gcsTokenExpiry"`
 }
 
 func (s *Sandbox) initEnvd(ctx context.Context) (e error) {
@@ -128,6 +145,7 @@ func (s *Sandbox) initEnvd(ctx context.Context) (e error) {
 		hyperloopIP,
 		s.Config.Envd.DefaultUser,
 		s.Config.Envd.DefaultWorkdir,
+		s.volumeInitConfig,
 	)
 	if err != nil {
 		envdInitCalls.Add(ctx, count, metric.WithAttributes(attributesFail...))
