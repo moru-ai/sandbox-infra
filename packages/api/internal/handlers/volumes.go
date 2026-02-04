@@ -27,7 +27,7 @@ import (
 // - Min 1 char, max 63 chars
 var volumeNamePattern = regexp.MustCompile(`^[a-z]([a-z0-9-]{0,61}[a-z0-9])?$`)
 
-const volumeIDPrefix = "vol_"
+const volumeIDPrefix = "vol-"
 
 // PostVolumes creates a new volume (idempotent by name).
 func (a *APIStore) PostVolumes(c *gin.Context) {
