@@ -87,6 +87,9 @@ func (a *API) PostInit(w http.ResponseWriter, r *http.Request) {
 			logger.Info().Msgf("Mounting volume %s at %s (bucket=%s, token_len=%d, token_prefix=%s)",
 				volumeConfig.VolumeID, volumeConfig.MountPath, volumeConfig.GCSBucket, tokenLen, tokenPrefix)
 
+			// Network diagnostics: test multiple endpoints to see what's working
+			testNetworkConnectivity(logger)
+
 			if host.DefaultVolumeMounterFactory == nil {
 				logger.Error().Msg("Volume mount requested but no mounter factory registered")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -273,4 +276,43 @@ func getIPFamily(address string) (txeh.IPFamily, error) {
 // maxTimeInPast before the hostTime or more than maxTimeInFuture after the hostTime.
 func shouldSetSystemTime(sandboxTime, hostTime time.Time) bool {
 	return sandboxTime.Before(hostTime.Add(-maxTimeInPast)) || sandboxTime.After(hostTime.Add(maxTimeInFuture))
+}
+
+// testNetworkConnectivity tests connectivity to multiple endpoints and logs results.
+// This helps diagnose whether network issues during /init are specific to GCS or general.
+func testNetworkConnectivity(logger zerolog.Logger) {
+	endpoints := []struct {
+		name string
+		url  string
+	}{
+		{"google-dns", "https://8.8.8.8"},
+		{"google-www", "https://www.google.com"},
+		{"gcs-api", "https://storage.googleapis.com"},
+		{"cloudflare", "https://1.1.1.1"},
+	}
+
+	client := &http.Client{Timeout: 2 * time.Second}
+
+	logger.Info().Msg("[network-diag] Starting network connectivity test")
+
+	for _, ep := range endpoints {
+		start := time.Now()
+		req, err := http.NewRequest(http.MethodHead, ep.url, nil)
+		if err != nil {
+			logger.Warn().Msgf("[network-diag] %s: failed to create request: %v", ep.name, err)
+			continue
+		}
+
+		resp, err := client.Do(req)
+		elapsed := time.Since(start)
+
+		if err != nil {
+			logger.Warn().Msgf("[network-diag] %s: FAILED after %v: %v", ep.name, elapsed, err)
+		} else {
+			resp.Body.Close()
+			logger.Info().Msgf("[network-diag] %s: OK status=%d elapsed=%v", ep.name, resp.StatusCode, elapsed)
+		}
+	}
+
+	logger.Info().Msg("[network-diag] Network connectivity test completed")
 }

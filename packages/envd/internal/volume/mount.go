@@ -214,7 +214,7 @@ func (m *Mounter) writeGCSToken() error {
 // This helps avoid transient EOF errors when the VM network is still initializing.
 func (m *Mounter) waitForGCSConnectivity(ctx context.Context) error {
 	const maxRetries = 10
-	const initialDelay = 200 * time.Millisecond
+	const retryDelay = 500 * time.Millisecond
 	const requestTimeout = 3 * time.Second
 
 	gcsURL := "https://storage.googleapis.com/storage/v1/b/" + m.config.GCSBucket
@@ -223,7 +223,6 @@ func (m *Mounter) waitForGCSConnectivity(ctx context.Context) error {
 	client := &http.Client{Timeout: requestTimeout}
 
 	var lastErr error
-	delay := initialDelay
 
 	for i := 0; i < maxRetries; i++ {
 		reqCtx, cancel := context.WithTimeout(ctx, requestTimeout)
@@ -246,19 +245,14 @@ func (m *Mounter) waitForGCSConnectivity(ctx context.Context) error {
 		}
 
 		lastErr = err
-		fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d delay=%v error=%v\n",
-			m.config.VolumeID, i+1, delay, err)
+		fmt.Fprintf(os.Stderr, "[volume.mount.connectivity] volume_id=%s attempt=%d error=%v\n",
+			m.config.VolumeID, i+1, err)
 
 		if i < maxRetries-1 {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
-			case <-time.After(delay):
-			}
-			// Exponential backoff: 200ms, 400ms, 800ms, 1s, 1s, 1s...
-			delay = delay * 2
-			if delay > time.Second {
-				delay = time.Second
+			case <-time.After(retryDelay):
 			}
 		}
 	}
