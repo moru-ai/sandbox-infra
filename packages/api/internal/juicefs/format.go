@@ -27,14 +27,48 @@ func gcsPathsForVolume(bucket, volumeID string) (dataPrefix, metaPrefix string) 
 	return
 }
 
-// FormatVolume is a no-op. JuiceFS metadata initialization is now handled by envd
-// during first mount using litestream restore + juicefs format.
+// FormatVolume creates the GCS bucket paths for a new volume.
+// This creates marker files to establish the paths for JuiceFS data and Litestream metadata.
 //
-// Previous behavior: This created an empty SQLite metadata file and uploaded it to GCS.
-// Problem: envd uses litestream to restore metadata, which expects LTX files, not raw SQLite.
-// Solution: Let envd handle initialization - litestream restore -if-replica-exists returns
-// success for empty buckets, then juicefs format creates fresh metadata.
+// JuiceFS metadata initialization is handled by envd during first mount:
+// - litestream restore -if-replica-exists returns success for empty bucket
+// - juicefs format creates fresh SQLite metadata
+// - Litestream starts replicating to GCS
 func FormatVolume(ctx context.Context, cfg FormatConfig) error {
+	dataPrefix, metaPrefix := gcsPathsForVolume(cfg.PoolConfig.GCSBucket, cfg.VolumeID)
+
+	gcsClient, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("create GCS client: %w", err)
+	}
+	defer gcsClient.Close()
+
+	bucket := gcsClient.Bucket(cfg.PoolConfig.GCSBucket)
+
+	// Create marker files to establish bucket paths
+	// GCS doesn't support empty folders, so we use .keep files
+	markers := []string{
+		dataPrefix + ".keep",
+		metaPrefix + ".keep",
+	}
+
+	for _, marker := range markers {
+		obj := bucket.Object(marker)
+		writer := obj.NewWriter(ctx)
+		if _, err := writer.Write([]byte{}); err != nil {
+			writer.Close()
+			return fmt.Errorf("write marker %s: %w", marker, err)
+		}
+		if err := writer.Close(); err != nil {
+			return fmt.Errorf("close marker %s: %w", marker, err)
+		}
+	}
+
+	logger.L().Info(ctx, "Volume paths created",
+		zap.String("volume_id", cfg.VolumeID),
+		zap.String("data_prefix", dataPrefix),
+		zap.String("meta_prefix", metaPrefix))
+
 	return nil
 }
 
