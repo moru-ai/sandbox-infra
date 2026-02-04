@@ -126,18 +126,6 @@ func (s *Sandbox) initEnvd(ctx context.Context) (e error) {
 		span.End()
 	}()
 
-	// When volume is configured, add a delay to allow VM network stack to fully initialize.
-	// Without this delay, the envd may try to connect to GCS before network is ready,
-	// resulting in EOF errors during TLS handshake.
-	if s.volumeInitConfig != nil {
-		const networkInitDelay = 300 * time.Millisecond
-		logger.L().Info(ctx, "waiting for VM network initialization before volume mount",
-			logger.WithSandboxID(s.Runtime.SandboxID),
-			zap.Duration("delay", networkInitDelay),
-		)
-		time.Sleep(networkInitDelay)
-	}
-
 	attributes := []attribute.KeyValue{telemetry.WithEnvdVersion(s.Config.Envd.Version), attribute.Int64("timeout_ms", s.internalConfig.EnvdInitRequestTimeout.Milliseconds())}
 	attributesFail := append(attributes, attribute.Bool("success", false))
 	attributesSuccess := append(attributes, attribute.Bool("success", true))

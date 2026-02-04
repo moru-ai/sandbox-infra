@@ -177,6 +177,7 @@ type Factory struct {
 	featureFlags *featureflags.Client
 	volumes      *VolumesConfig
 	tokenMinter  *gcstoken.Minter
+	sandboxes    *Map
 }
 
 func NewFactory(
@@ -184,12 +185,14 @@ func NewFactory(
 	networkPool *network.Pool,
 	devicePool *nbd.DevicePool,
 	featureFlags *featureflags.Client,
+	sandboxes *Map,
 ) *Factory {
 	return &Factory{
 		config:       config,
 		networkPool:  networkPool,
 		devicePool:   devicePool,
 		featureFlags: featureFlags,
+		sandboxes:    sandboxes,
 	}
 }
 
@@ -682,11 +685,22 @@ func (f *Factory) ResumeSandbox(
 
 	telemetry.ReportEvent(execCtx, "waiting for envd")
 
+	// Register sandbox before WaitForEnvd so TCP firewall proxy can find it.
+	// This is needed because initEnvd may make outbound connections (e.g., GCS for volume mount)
+	// that go through the TCP firewall proxy, which looks up sandboxes by source address.
+	if f.sandboxes != nil {
+		f.sandboxes.Insert(sbx)
+	}
+
 	err = sbx.WaitForEnvd(
 		ctx,
 		f.config.EnvdTimeout,
 	)
 	if err != nil {
+		// Remove from map on failure
+		if f.sandboxes != nil {
+			f.sandboxes.Remove(sbx.Runtime.SandboxID)
+		}
 		return nil, fmt.Errorf("failed to wait for sandbox start: %w", err)
 	}
 

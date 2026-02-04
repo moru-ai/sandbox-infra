@@ -216,7 +216,7 @@ func buildTemplate(
 		return fmt.Errorf("failed to create build metrics: %w", err)
 	}
 
-	sandboxFactory := sandbox.NewFactory(c.BuilderConfig, networkPool, devicePool, featureFlags)
+	sandboxFactory := sandbox.NewFactory(c.BuilderConfig, networkPool, devicePool, featureFlags, nil)
 
 	builder := build.NewBuilder(
 		builderConfig,

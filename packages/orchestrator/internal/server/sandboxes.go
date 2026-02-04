@@ -189,7 +189,9 @@ func (s *Server) Create(ctx context.Context, req *orchestrator.SandboxCreateRequ
 		return nil, status.Errorf(codes.Internal, "failed to create sandbox: %s", err)
 	}
 
-	s.sandboxes.Insert(sbx)
+	// Note: sandbox is already inserted into the map by Factory.ResumeSandbox
+	// before WaitForEnvd is called, so TCP firewall proxy can find it.
+
 	go func() {
 		ctx, childSpan := tracer.Start(context.WithoutCancel(ctx), "sandbox-create-stop", trace.WithNewRoot())
 		defer childSpan.End()
