@@ -42,12 +42,12 @@ func NewMinter(bucket string, impersonateSA string) *Minter {
 }
 
 // MintDownscopedToken creates a downscoped token for volume operations.
-// The token is scoped to the volumes bucket with minimal permissions:
-//   - objectViewer: list + get (for litestream restore)
-//   - objectCreator: create (for litestream replicate and juicefs write)
+// The token is scoped to the specific volume prefix with minimal permissions:
+//   - objectAdmin: list + get + create (restricted to volumeID/ and volumeID-meta/ prefixes)
 //
-// Note: No delete permission. No volume isolation via CAB (litestream list
-// operations fail with prefix conditions). Time-limited to 1 hour.
+// Uses CAB availabilityCondition with:
+//   - resource.name.startsWith() for GET/PUT operations
+//   - api.getAttribute('storage.googleapis.com/objectListPrefix') for LIST operations
 func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Token, error) {
 	// Step 1: Get base token (either via impersonation or directly from metadata)
 	baseToken, err := m.getBaseToken(ctx)
@@ -56,21 +56,30 @@ func (m *Minter) MintDownscopedToken(ctx context.Context, volumeID string) (*Tok
 	}
 
 	// Step 2: Create credential access boundary with minimal permissions
-	// Using viewer + creator instead of objectAdmin to exclude delete
+	// Using objectAdmin with CEL condition to restrict to volume prefix
 	bucketResource := fmt.Sprintf("//storage.googleapis.com/projects/_/buckets/%s", m.bucket)
+
+	// Build CEL condition for volume isolation
+	// - resource.name.startsWith() for GET/PUT operations
+	// - api.getAttribute('storage.googleapis.com/objectListPrefix') for LIST operations
+	prefixCondition := fmt.Sprintf(
+		"resource.name.startsWith('projects/_/buckets/%s/objects/%s/') || "+
+			"resource.name.startsWith('projects/_/buckets/%s/objects/%s-meta/') || "+
+			"api.getAttribute('storage.googleapis.com/objectListPrefix', '').startsWith('%s/') || "+
+			"api.getAttribute('storage.googleapis.com/objectListPrefix', '').startsWith('%s-meta/')",
+		m.bucket, volumeID, m.bucket, volumeID, volumeID, volumeID,
+	)
 
 	cab := CredentialAccessBoundary{
 		AccessBoundary: AccessBoundary{
 			AccessBoundaryRules: []AccessBoundaryRule{
 				{
-					// objectViewer: storage.objects.list + storage.objects.get
-					AvailablePermissions: []string{"inRole:roles/storage.objectViewer"},
+					AvailablePermissions: []string{"inRole:roles/storage.objectAdmin"},
 					AvailableResource:    bucketResource,
-				},
-				{
-					// objectCreator: storage.objects.create
-					AvailablePermissions: []string{"inRole:roles/storage.objectCreator"},
-					AvailableResource:    bucketResource,
+					AvailabilityCondition: &AvailabilityCondition{
+						Title:      "Volume isolation",
+						Expression: prefixCondition,
+					},
 				},
 			},
 		},
@@ -250,5 +259,6 @@ type AccessBoundaryRule struct {
 
 // AvailabilityCondition is a CEL expression that further restricts access.
 type AvailabilityCondition struct {
+	Title      string `json:"title,omitempty"`
 	Expression string `json:"expression"`
 }
