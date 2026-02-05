@@ -10,7 +10,7 @@ replace (
 )
 
 // JuiceFS fork with GCS endpoint patch and API fixes
-replace github.com/juicedata/juicefs => github.com/moru-ai/juicefs v1.3.1-moru.2
+replace github.com/juicedata/juicefs => github.com/moru-ai/juicefs v1.3.1-moru.5
 
 // JuiceFS dependency replacements (required for compatibility)
 replace (
@@ -47,6 +47,7 @@ tool (
 )
 
 require (
+	cloud.google.com/go/storage v1.50.0
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/bsm/redislock v0.9.4
 	github.com/caarlos0/env/v11 v11.3.1
@@ -86,6 +87,7 @@ require (
 	golang.org/x/net v0.47.0
 	golang.org/x/sync v0.18.0
 	golang.org/x/time v0.11.0
+	google.golang.org/api v0.214.0
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
 )
@@ -98,7 +100,6 @@ require (
 	cloud.google.com/go/compute/metadata v0.8.0 // indirect
 	cloud.google.com/go/iam v1.2.2 // indirect
 	cloud.google.com/go/monitoring v1.21.2 // indirect
-	cloud.google.com/go/storage v1.50.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.14.0 // indirect
@@ -417,7 +418,6 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/tools v0.38.0 // indirect
 	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
-	google.golang.org/api v0.214.0 // indirect
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250908214217-97024824d090 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090 // indirect
