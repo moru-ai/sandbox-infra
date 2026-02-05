@@ -189,8 +189,9 @@ func (m *Mounter) Unmount(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, MountTimeout)
 	defer cancel()
 
-	// Step 1: Unmount JuiceFS
-	cmd := exec.CommandContext(ctx, JuiceFSBinary, "umount", m.mountPath)
+	// Step 1: Unmount JuiceFS with --flush to wait for all data to be uploaded to GCS
+	// Without --flush, umount returns before uploads complete, causing data loss
+	cmd := exec.CommandContext(ctx, JuiceFSBinary, "umount", "--flush", m.mountPath)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("juicefs umount failed: %w\nOutput: %s", err, string(output))
@@ -444,6 +445,9 @@ func (m *Mounter) checkpointWAL(ctx context.Context) error {
 	return nil
 }
 
+// CacheDir is the directory for JuiceFS local cache.
+const CacheDir = "/tmp/jfscache"
+
 // mountJuiceFS mounts the JuiceFS filesystem using SQLite metadata.
 func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 	metaURL := fmt.Sprintf("sqlite3://%s", MetaDBPath)
@@ -451,12 +455,20 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, MountTimeout)
 	defer cancel()
 
+	// Create cache directory
+	if err := os.MkdirAll(CacheDir, 0755); err != nil {
+		return fmt.Errorf("create cache dir: %w", err)
+	}
+
 	cmd := exec.CommandContext(ctx, JuiceFSBinary,
 		"mount",
 		"--no-usage-report",
 		"--no-bgjob",
-		"-d",             // daemon mode
+		"-d",                // daemon mode
 		"-o", "allow_other", // allow non-root users to access mount
+		"--writeback",       // enable writeback mode for faster writes
+		"--cache-dir", CacheDir,
+		"--cache-size", "1024", // 1GB cache
 		metaURL,
 		m.mountPath,
 	)
