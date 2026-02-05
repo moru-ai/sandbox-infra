@@ -25,8 +25,9 @@ const (
 	// RestoreTimeout is the maximum time to wait for litestream restore
 	RestoreTimeout = 2 * time.Minute
 
-	// ReplicateTimeout is the maximum time to wait for litestream replicate to sync
-	ReplicateTimeout = 10 * time.Second
+	// ReplicateTimeout is the maximum time to wait for litestream replicate -once to complete
+	// With -once flag, litestream exits after syncing, so this is a safety timeout
+	ReplicateTimeout = 30 * time.Second
 
 	// ReplicateSyncInterval is the sync interval for litestream replicate
 	ReplicateSyncInterval = "100ms"
@@ -114,10 +115,15 @@ func restoreMetaDB(ctx context.Context, volumeID string, gcsBucket string) (*Res
 // convertJournalMode sets the SQLite journal mode to DELETE.
 // This is required after litestream restore because JuiceFS cannot use WAL mode.
 func convertJournalMode(ctx context.Context, metaDBPath string) error {
+	return setJournalMode(ctx, metaDBPath, "DELETE")
+}
+
+// setJournalMode sets the SQLite journal mode to the specified mode (WAL or DELETE).
+func setJournalMode(ctx context.Context, metaDBPath, mode string) error {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, SQLite3Binary, metaDBPath, "PRAGMA journal_mode=DELETE;")
+	cmd := exec.CommandContext(ctx, SQLite3Binary, metaDBPath, fmt.Sprintf("PRAGMA journal_mode=%s;", mode))
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -128,18 +134,22 @@ func convertJournalMode(ctx context.Context, metaDBPath string) error {
 			err, stdout.String(), stderr.String())
 	}
 
-	logger.L().Debug(ctx, "Converted journal mode to DELETE",
+	logger.L().Debug(ctx, "Set journal mode",
 		zap.String("path", metaDBPath),
+		zap.String("mode", mode),
 		zap.String("result", stdout.String()))
 
 	return nil
 }
 
 // syncViaLitestream syncs the local meta.db back to GCS using litestream replicate.
-// This runs litestream replicate briefly (with short sync-interval), waits for sync,
-// then stops the process.
+// Database must be in WAL mode (which it is after litestream restore).
+// This runs litestream replicate -once which syncs and exits.
 func syncViaLitestream(ctx context.Context, volumeID, metaDBPath, gcsBucket string) error {
 	replicaURL := fmt.Sprintf("gs://%s/%s-meta", gcsBucket, volumeID)
+
+	// Database is already in WAL mode (from litestream restore)
+	// No mode conversion needed - JuiceFS works with WAL mode
 
 	// Create a temporary litestream config file
 	tmpDir := filepath.Dir(metaDBPath)
@@ -157,31 +167,28 @@ func syncViaLitestream(ctx context.Context, volumeID, metaDBPath, gcsBucket stri
 	}
 	defer os.Remove(configPath)
 
-	// Start litestream replicate
-	cmd := exec.Command(LitestreamBinary, "replicate", "-config", configPath)
+	// Run litestream replicate with -once flag (syncs once and exits)
+	ctx, cancel := context.WithTimeout(ctx, ReplicateTimeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, LitestreamBinary, "replicate", "-config", configPath, "-once")
 
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
-	logger.L().Debug(ctx, "Starting litestream replicate for sync",
+	logger.L().Debug(ctx, "Running litestream replicate -once for sync",
 		zap.String("volume_id", volumeID),
 		zap.String("config", configPath))
 
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("start litestream replicate: %w", err)
-	}
-
-	// Wait for initial sync (give it time to sync changes)
-	time.Sleep(ReplicateTimeout)
-
-	// Stop litestream gracefully
-	if cmd.Process != nil {
-		if err := cmd.Process.Signal(os.Interrupt); err != nil {
-			// Process may have already exited, try kill
-			cmd.Process.Kill()
+	if err := cmd.Run(); err != nil {
+		// Context timeout is OK - litestream may have synced already
+		if ctx.Err() == context.DeadlineExceeded {
+			logger.L().Warn(ctx, "Litestream replicate timed out, sync may be incomplete",
+				zap.String("volume_id", volumeID),
+				zap.String("stderr", stderr.String()))
+		} else {
+			return fmt.Errorf("litestream replicate failed: %w\nstderr: %s", err, stderr.String())
 		}
-		// Wait for process to exit
-		cmd.Wait()
 	}
 
 	logger.L().Info(ctx, "Synced metadata via litestream",

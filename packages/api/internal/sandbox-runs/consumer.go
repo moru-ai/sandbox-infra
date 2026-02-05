@@ -161,6 +161,12 @@ func (c *Consumer) handleCreated(ctx context.Context, event events.SandboxEvent)
 		buildID = nil
 	}
 
+	// Extract volume_id from event data (set by orchestrator when sandbox has volume)
+	var volumeID *string
+	if vid, ok := event.EventData["volume_id"].(string); ok && vid != "" {
+		volumeID = &vid
+	}
+
 	_, err := c.db.CreateSandboxRun(ctx, queries.CreateSandboxRunParams{
 		SandboxID:  event.SandboxID,
 		TeamID:     event.SandboxTeamID,
@@ -168,6 +174,7 @@ func (c *Consumer) handleCreated(ctx context.Context, event events.SandboxEvent)
 		BuildID:    buildID,
 		TimeoutAt:  nil, // We don't have timeout info in the created event
 		Metadata:   nil,
+		VolumeID:   volumeID,
 	})
 	if err != nil {
 		// Check for unique constraint violation (duplicate sandbox_id)

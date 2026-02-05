@@ -227,6 +227,12 @@ func (s *Server) Create(ctx context.Context, req *orchestrator.SandboxCreateRequ
 	}
 
 	teamID, buildId, eventData := s.prepareSandboxEventData(ctx, sbx)
+
+	// Include volume_id in event data for sandbox_runs tracking
+	if volumeProto != nil {
+		eventData["volume_id"] = volumeProto.GetVolumeId()
+	}
+
 	go s.sbxEventsService.Publish(
 		context.WithoutCancel(ctx),
 		teamID,

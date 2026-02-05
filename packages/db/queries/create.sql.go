@@ -21,7 +21,8 @@ INSERT INTO "public"."sandbox_runs" (
     build_id,
     status,
     timeout_at,
-    metadata
+    metadata,
+    volume_id
 ) VALUES (
     $1,
     $2,
@@ -29,7 +30,8 @@ INSERT INTO "public"."sandbox_runs" (
     $4,
     'running',
     $5,
-    $6
+    $6,
+    $7
 ) RETURNING id, sandbox_id, team_id, template_id, build_id, status, end_reason, created_at, updated_at, ended_at, timeout_at, metadata, volume_id, volume_mount_path
 `
 
@@ -40,6 +42,7 @@ type CreateSandboxRunParams struct {
 	BuildID    *string
 	TimeoutAt  *time.Time
 	Metadata   types.JSONBStringMap
+	VolumeID   *string
 }
 
 func (q *Queries) CreateSandboxRun(ctx context.Context, arg CreateSandboxRunParams) (SandboxRun, error) {
@@ -50,6 +53,7 @@ func (q *Queries) CreateSandboxRun(ctx context.Context, arg CreateSandboxRunPara
 		arg.BuildID,
 		arg.TimeoutAt,
 		arg.Metadata,
+		arg.VolumeID,
 	)
 	var i SandboxRun
 	err := row.Scan(

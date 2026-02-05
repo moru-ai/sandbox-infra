@@ -82,11 +82,8 @@ func NewClient(volumeID string, _ int32, config Config) (*Client, error) {
 	sqlitePath := restoreResult.MetaDBPath
 	tmpDir := filepath.Dir(sqlitePath)
 
-	// Convert journal mode from WAL to DELETE (required for JuiceFS)
-	if err := convertJournalMode(ctx, sqlitePath); err != nil {
-		cleanupVolumeDir(volumeID)
-		return nil, fmt.Errorf("convert journal mode: %w", err)
-	}
+	// Keep WAL mode - JuiceFS works fine with WAL mode (sandbox proves this)
+	// Litestream requires WAL mode to track incremental changes
 
 	logger.L().Info(ctx, "Restored volume metadata via litestream",
 		zap.String("volume_id", volumeID),
@@ -192,7 +189,6 @@ func NewClient(volumeID string, _ int32, config Config) (*Client, error) {
 }
 
 // Close releases resources associated with this client.
-// It syncs metadata to GCS before closing.
 func (c *Client) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -203,11 +199,6 @@ func (c *Client) Close() error {
 	c.closed = true
 
 	var errs []error
-
-	// Sync metadata to GCS before closing
-	if err := c.syncToGCSLocked(); err != nil {
-		errs = append(errs, fmt.Errorf("sync to GCS: %w", err))
-	}
 
 	if c.metaCli != nil {
 		if err := c.metaCli.CloseSession(); err != nil {
@@ -437,17 +428,25 @@ func (c *Client) Upload(ctx context.Context, path string, content io.Reader) (in
 		}
 	}
 
-	// Create file
+	// Try to create file first; if it exists, open and truncate it
 	f, errno := c.jfs.Create(mctx, path, 0o644, 0o022)
-	if errno != 0 {
-		return 0, fmt.Errorf("create file: %s", errno)
-	}
-	defer f.Close(mctx)
+	if errno == syscall.EEXIST {
+		// File exists, open it for writing and truncate
+		f, errno = c.jfs.Open(mctx, path, vfs.MODE_MASK_W)
+		if errno != 0 {
+			return 0, fmt.Errorf("open existing file: %s", errno)
+		}
+		defer f.Close(mctx)
 
-	// Truncate to 0 to handle overwrites (Create doesn't truncate existing files)
-	errno = c.jfs.Truncate(mctx, path, 0)
-	if errno != 0 {
-		return 0, fmt.Errorf("truncate file: %s", errno)
+		// Truncate to 0 to overwrite
+		errno = c.jfs.Truncate(mctx, path, 0)
+		if errno != 0 {
+			return 0, fmt.Errorf("truncate file: %s", errno)
+		}
+	} else if errno != 0 {
+		return 0, fmt.Errorf("create file: %s", errno)
+	} else {
+		defer f.Close(mctx)
 	}
 
 	// Write content
@@ -479,7 +478,7 @@ func (c *Client) Upload(ctx context.Context, path string, content io.Reader) (in
 		return totalWritten, fmt.Errorf("flush: %s", errno)
 	}
 
-	// Sync metadata to GCS after write
+	// Sync metadata to GCS so sandbox can see the changes
 	if err := c.syncToGCSLocked(); err != nil {
 		logger.L().Warn(ctx, "Failed to sync metadata to GCS after upload",
 			zap.Error(err),
@@ -522,7 +521,7 @@ func (c *Client) Delete(ctx context.Context, path string, recursive bool) error 
 		}
 	}
 
-	// Sync metadata to GCS after delete
+	// Sync metadata to GCS so sandbox can see the changes
 	if err := c.syncToGCSLocked(); err != nil {
 		logger.L().Warn(ctx, "Failed to sync metadata to GCS after delete",
 			zap.Error(err),
