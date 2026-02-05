@@ -54,6 +54,15 @@ FROM alpine:${ALPINE_VERSION}
 
 COPY --from=builder /build/api/bin/api .
 
+# Install sqlite3 for journal mode conversion (WAL -> DELETE after litestream restore)
+RUN apk add --no-cache sqlite
+
+# Install litestream from moru-ai fork (for volume metadata restore/replicate)
+ARG LITESTREAM_VERSION=v0.5.6-moru.1
+RUN wget -q -O /usr/local/bin/litestream \
+    "https://github.com/moru-ai/litestream/releases/download/${LITESTREAM_VERSION}/litestream-linux" && \
+    chmod +x /usr/local/bin/litestream
+
 # Set Gin server to the production mode
 ENV GIN_MODE=release
 

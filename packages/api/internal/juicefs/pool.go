@@ -7,10 +7,15 @@ import (
 	"fmt"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
+
+	"github.com/moru-ai/sandbox-infra/packages/shared/pkg/logger"
 )
 
 // Pool manages a pool of JuiceFS clients, one per volume.
 // Clients are cached and reused to avoid repeated initialization.
+// Cache is invalidated when volume mount state changes (sandbox starts/stops).
 type Pool struct {
 	config Config
 
@@ -64,6 +69,27 @@ func (p *Pool) Get(ctx context.Context, volumeID string, _ int32) (*Client, erro
 	}
 
 	return client, nil
+}
+
+// InvalidateVolume removes a volume's cached client.
+// This should be called when a sandbox starts or stops with the volume attached,
+// as the volume's metadata may have changed.
+func (p *Pool) InvalidateVolume(volumeID string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if pc, ok := p.clients[volumeID]; ok {
+		// Close the client (best effort - ignore errors during invalidation)
+		if err := pc.client.Close(); err != nil {
+			logger.L().Warn(context.Background(), "Error closing invalidated volume client",
+				zap.String("volume_id", volumeID),
+				zap.Error(err))
+		}
+		delete(p.clients, volumeID)
+
+		logger.L().Info(context.Background(), "Invalidated volume client cache",
+			zap.String("volume_id", volumeID))
+	}
 }
 
 // Config returns the pool's configuration.

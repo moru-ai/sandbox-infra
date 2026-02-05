@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/moru-ai/sandbox-infra/packages/api/internal/api"
+	"github.com/moru-ai/sandbox-infra/packages/api/internal/juicefs"
 	"github.com/moru-ai/sandbox-infra/packages/db/queries"
 )
 
@@ -92,6 +93,11 @@ func (a *APIStore) GetVolumesVolumeIDFiles(c *gin.Context, volumeID string, para
 	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
 	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
+		// Handle fresh volumes that haven't been mounted yet
+		if errors.Is(err, juicefs.ErrVolumeNotInitialized) {
+			a.sendAPIStoreError(c, http.StatusPreconditionFailed, "Volume not initialized - mount to a sandbox first")
+			return
+		}
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
 	}
@@ -176,6 +182,11 @@ func (a *APIStore) GetVolumesVolumeIDFilesDownload(c *gin.Context, volumeID stri
 	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
 	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
+		// Handle fresh volumes that haven't been mounted yet
+		if errors.Is(err, juicefs.ErrVolumeNotInitialized) {
+			a.sendAPIStoreError(c, http.StatusPreconditionFailed, "Volume not initialized - mount to a sandbox first")
+			return
+		}
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
 	}
@@ -229,6 +240,17 @@ func (a *APIStore) PutVolumesVolumeIDFilesUpload(c *gin.Context, volumeID string
 		return
 	}
 
+	// Check if volume is attached to a running sandbox (write conflict)
+	isAttached, err := a.sqlcDB.IsVolumeAttached(ctx, &volume.ID)
+	if err != nil {
+		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to check volume status")
+		return
+	}
+	if isAttached {
+		a.sendAPIStoreError(c, http.StatusConflict, "Cannot modify volume while attached to sandbox")
+		return
+	}
+
 	// Validate path
 	if !strings.HasPrefix(params.Path, "/") {
 		a.sendAPIStoreError(c, http.StatusBadRequest, "Path must be absolute")
@@ -242,6 +264,11 @@ func (a *APIStore) PutVolumesVolumeIDFilesUpload(c *gin.Context, volumeID string
 	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
 	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
+		// Handle fresh volumes that haven't been mounted yet
+		if errors.Is(err, juicefs.ErrVolumeNotInitialized) {
+			a.sendAPIStoreError(c, http.StatusPreconditionFailed, "Volume not initialized - mount to a sandbox first")
+			return
+		}
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
 	}
@@ -293,6 +320,17 @@ func (a *APIStore) DeleteVolumesVolumeIDFiles(c *gin.Context, volumeID string, p
 		return
 	}
 
+	// Check if volume is attached to a running sandbox (write conflict)
+	isAttached, err := a.sqlcDB.IsVolumeAttached(ctx, &volume.ID)
+	if err != nil {
+		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to check volume status")
+		return
+	}
+	if isAttached {
+		a.sendAPIStoreError(c, http.StatusConflict, "Cannot modify volume while attached to sandbox")
+		return
+	}
+
 	// Validate path
 	if !strings.HasPrefix(params.Path, "/") {
 		a.sendAPIStoreError(c, http.StatusBadRequest, "Path must be absolute")
@@ -312,6 +350,11 @@ func (a *APIStore) DeleteVolumesVolumeIDFiles(c *gin.Context, volumeID string, p
 	// Note: redisDB parameter is deprecated, passing 0 (code won't reach here due to nil check above)
 	client, err := a.juicefsPool.Get(ctx, volume.ID, 0)
 	if err != nil {
+		// Handle fresh volumes that haven't been mounted yet
+		if errors.Is(err, juicefs.ErrVolumeNotInitialized) {
+			a.sendAPIStoreError(c, http.StatusPreconditionFailed, "Volume not initialized - mount to a sandbox first")
+			return
+		}
 		a.sendAPIStoreError(c, http.StatusInternalServerError, "Failed to connect to volume: "+err.Error())
 		return
 	}

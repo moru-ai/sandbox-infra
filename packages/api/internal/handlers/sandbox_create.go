@@ -268,6 +268,12 @@ func (a *APIStore) PostSandboxes(c *gin.Context) {
 		return
 	}
 
+	// Invalidate volume client cache when sandbox attaches a volume
+	// This ensures API sees fresh metadata after sandbox mounts the volume
+	if volumeConfig != nil && a.juicefsPool != nil {
+		a.juicefsPool.InvalidateVolume(volumeConfig.VolumeID)
+	}
+
 	c.JSON(http.StatusCreated, &sbx)
 }
 

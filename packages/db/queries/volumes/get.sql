@@ -18,3 +18,11 @@ LIMIT @query_limit;
 SELECT * FROM "public"."volumes"
 WHERE status = @status
 ORDER BY created_at ASC;
+
+-- name: IsVolumeAttached :one
+-- Returns true if the volume is currently attached to a running sandbox
+SELECT EXISTS (
+    SELECT 1 FROM "public"."sandbox_runs"
+    WHERE volume_id = @volume_id
+    AND status = 'running'
+) AS is_attached;

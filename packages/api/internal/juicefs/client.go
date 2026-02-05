@@ -16,7 +16,6 @@ import (
 	"syscall"
 	"time"
 
-	"cloud.google.com/go/storage"
 	"github.com/juicedata/juicefs/pkg/chunk"
 	"github.com/juicedata/juicefs/pkg/fs"
 	"github.com/juicedata/juicefs/pkg/meta"
@@ -60,57 +59,36 @@ type Client struct {
 	closed bool
 }
 
+// ErrVolumeNotInitialized is returned when a fresh volume has not been mounted to a sandbox yet.
+var ErrVolumeNotInitialized = fmt.Errorf("volume not initialized - mount to a sandbox first")
+
 // NewClient creates a new JuiceFS client for a volume.
-// Downloads SQLite metadata from GCS and initializes JuiceFS for file operations.
+// Uses litestream restore to reconstruct SQLite metadata from LTX files in GCS.
 func NewClient(volumeID string, _ int32, config Config) (*Client, error) {
 	ctx := context.Background()
 
-	// Create temporary directory for SQLite file
-	tmpDir, err := os.MkdirTemp("", "juicefs-client-*")
+	// Restore metadata from litestream
+	restoreResult, err := restoreMetaDB(ctx, volumeID, config.GCSBucket)
 	if err != nil {
-		return nil, fmt.Errorf("create temp dir: %w", err)
+		return nil, fmt.Errorf("restore metadata: %w", err)
 	}
 
-	sqlitePath := filepath.Join(tmpDir, "meta.db")
-
-	// Download SQLite metadata from GCS
-	gcsClient, err := storage.NewClient(ctx)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		return nil, fmt.Errorf("create GCS client: %w", err)
-	}
-	defer gcsClient.Close()
-
-	_, metaPrefix := gcsPathsForVolume(config.GCSBucket, volumeID)
-	bucket := gcsClient.Bucket(config.GCSBucket)
-	metaObj := bucket.Object(metaPrefix + "meta.db")
-
-	reader, err := metaObj.NewReader(ctx)
-	if err != nil {
-		os.RemoveAll(tmpDir)
-		if err == storage.ErrObjectNotExist {
-			return nil, fmt.Errorf("volume metadata not found: %s", volumeID)
-		}
-		return nil, fmt.Errorf("download metadata: %w", err)
+	// Fresh volumes must be mounted to a sandbox first to initialize JuiceFS metadata
+	if restoreResult.IsFreshVolume {
+		cleanupVolumeDir(volumeID)
+		return nil, ErrVolumeNotInitialized
 	}
 
-	sqliteFile, err := os.Create(sqlitePath)
-	if err != nil {
-		reader.Close()
-		os.RemoveAll(tmpDir)
-		return nil, fmt.Errorf("create sqlite file: %w", err)
+	sqlitePath := restoreResult.MetaDBPath
+	tmpDir := filepath.Dir(sqlitePath)
+
+	// Convert journal mode from WAL to DELETE (required for JuiceFS)
+	if err := convertJournalMode(ctx, sqlitePath); err != nil {
+		cleanupVolumeDir(volumeID)
+		return nil, fmt.Errorf("convert journal mode: %w", err)
 	}
 
-	if _, err = io.Copy(sqliteFile, reader); err != nil {
-		sqliteFile.Close()
-		reader.Close()
-		os.RemoveAll(tmpDir)
-		return nil, fmt.Errorf("write sqlite file: %w", err)
-	}
-	sqliteFile.Close()
-	reader.Close()
-
-	logger.L().Info(ctx, "Downloaded volume metadata",
+	logger.L().Info(ctx, "Restored volume metadata via litestream",
 		zap.String("volume_id", volumeID),
 		zap.String("path", sqlitePath))
 
@@ -251,7 +229,7 @@ func (c *Client) Close() error {
 	return nil
 }
 
-// SyncToGCS uploads the current SQLite metadata to GCS.
+// SyncToGCS syncs the current SQLite metadata to GCS via litestream.
 // This should be called after write operations to persist changes.
 func (c *Client) SyncToGCS() error {
 	c.mu.Lock()
@@ -259,7 +237,8 @@ func (c *Client) SyncToGCS() error {
 	return c.syncToGCSLocked()
 }
 
-// syncToGCSLocked uploads SQLite metadata to GCS (must hold lock).
+// syncToGCSLocked syncs SQLite metadata to GCS via litestream (must hold lock).
+// Uses litestream replicate to ensure compatibility with sandbox's Litestream daemon.
 func (c *Client) syncToGCSLocked() error {
 	if c.sqlitePath == "" {
 		return nil
@@ -267,34 +246,13 @@ func (c *Client) syncToGCSLocked() error {
 
 	ctx := context.Background()
 
-	gcsClient, err := storage.NewClient(ctx)
-	if err != nil {
-		return fmt.Errorf("create GCS client: %w", err)
-	}
-	defer gcsClient.Close()
-
-	_, metaPrefix := gcsPathsForVolume(c.config.GCSBucket, c.volumeID)
-	bucket := gcsClient.Bucket(c.config.GCSBucket)
-	metaObj := bucket.Object(metaPrefix + "meta.db")
-
-	// Read local SQLite file
-	sqliteFile, err := os.Open(c.sqlitePath)
-	if err != nil {
-		return fmt.Errorf("open sqlite file: %w", err)
-	}
-	defer sqliteFile.Close()
-
-	// Upload to GCS
-	writer := metaObj.NewWriter(ctx)
-	if _, err = io.Copy(writer, sqliteFile); err != nil {
-		writer.Close()
-		return fmt.Errorf("upload metadata: %w", err)
-	}
-	if err = writer.Close(); err != nil {
-		return fmt.Errorf("close GCS writer: %w", err)
+	// Use litestream replicate to sync metadata to GCS
+	// This ensures compatibility with the sandbox's Litestream daemon
+	if err := syncViaLitestream(ctx, c.volumeID, c.sqlitePath, c.config.GCSBucket); err != nil {
+		return fmt.Errorf("litestream sync: %w", err)
 	}
 
-	logger.L().Debug(ctx, "Synced metadata to GCS",
+	logger.L().Debug(ctx, "Synced metadata to GCS via litestream",
 		zap.String("volume_id", c.volumeID))
 
 	return nil

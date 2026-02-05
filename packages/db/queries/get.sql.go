@@ -121,6 +121,22 @@ func (q *Queries) GetVolumesByStatus(ctx context.Context, status string) ([]Volu
 	return items, nil
 }
 
+const isVolumeAttached = `-- name: IsVolumeAttached :one
+SELECT EXISTS (
+    SELECT 1 FROM "public"."sandbox_runs"
+    WHERE volume_id = $1
+    AND status = 'running'
+) AS is_attached
+`
+
+// Returns true if the volume is currently attached to a running sandbox
+func (q *Queries) IsVolumeAttached(ctx context.Context, volumeID *string) (bool, error) {
+	row := q.db.QueryRow(ctx, isVolumeAttached, volumeID)
+	var is_attached bool
+	err := row.Scan(&is_attached)
+	return is_attached, err
+}
+
 const listSandboxRuns = `-- name: ListSandboxRuns :many
 SELECT
     sr.sandbox_id,

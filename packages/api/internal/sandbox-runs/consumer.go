@@ -23,21 +23,42 @@ const (
 	claimTime = 5 * time.Minute
 )
 
+// VolumeInvalidator is called when a sandbox with a volume terminates
+// to invalidate the volume's cached JuiceFS client.
+type VolumeInvalidator func(volumeID string)
+
 type Consumer struct {
-	redis      redis.UniversalClient
-	db         *sqlcdb.Client
-	consumerID string
+	redis             redis.UniversalClient
+	db                *sqlcdb.Client
+	consumerID        string
+	volumeInvalidator VolumeInvalidator
 }
 
-func NewConsumer(redisClient redis.UniversalClient, db *sqlcdb.Client) *Consumer {
+// ConsumerOption configures the Consumer.
+type ConsumerOption func(*Consumer)
+
+// WithVolumeInvalidator sets a callback to invalidate volume cache on sandbox termination.
+func WithVolumeInvalidator(invalidator VolumeInvalidator) ConsumerOption {
+	return func(c *Consumer) {
+		c.volumeInvalidator = invalidator
+	}
+}
+
+func NewConsumer(redisClient redis.UniversalClient, db *sqlcdb.Client, opts ...ConsumerOption) *Consumer {
 	hostname, _ := os.Hostname()
 	consumerID := hostname + "-" + time.Now().Format("20060102150405")
 
-	return &Consumer{
+	c := &Consumer{
 		redis:      redisClient,
 		db:         db,
 		consumerID: consumerID,
 	}
+
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	return c
 }
 
 func (c *Consumer) Run(ctx context.Context) {
@@ -167,6 +188,18 @@ func (c *Consumer) handleCreated(ctx context.Context, event events.SandboxEvent)
 func (c *Consumer) handleKilled(ctx context.Context, event events.SandboxEvent) error {
 	logger.L().Debug(ctx, "Processing sandbox killed event",
 		logger.WithSandboxID(event.SandboxID))
+
+	// Invalidate volume cache if sandbox had a volume attached
+	// We need to do this before marking the run as ended
+	if c.volumeInvalidator != nil {
+		sandboxRun, err := c.db.GetSandboxRun(ctx, event.SandboxID)
+		if err == nil && sandboxRun.VolumeID != nil && *sandboxRun.VolumeID != "" {
+			logger.L().Debug(ctx, "Invalidating volume cache on sandbox kill",
+				logger.WithSandboxID(event.SandboxID),
+				zap.String("volume_id", *sandboxRun.VolumeID))
+			c.volumeInvalidator(*sandboxRun.VolumeID)
+		}
+	}
 
 	endReason := "killed"
 	if reason, ok := event.EventData["end_reason"].(string); ok && reason != "" {

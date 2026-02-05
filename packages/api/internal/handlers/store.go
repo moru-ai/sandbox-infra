@@ -149,12 +149,6 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 	// Start the periodic sync of template builds statuses
 	go templateManager.BuildsStatusPeriodicalSync(ctx)
 
-	// Start sandbox runs consumer (writes sandbox events to PostgreSQL)
-	if redisClient != nil {
-		sandboxRunsConsumer := sandboxruns.NewConsumer(redisClient, sqlcDB)
-		go sandboxRunsConsumer.Run(ctx)
-	}
-
 	// Initialize volume events delivery for Redis Streams
 	var volEventsDelivery events.Delivery[events.VolumeEvent]
 	if redisClient != nil {
@@ -163,7 +157,7 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 	}
 
 	// JuiceFS pool for volume file operations (list, download, upload, delete)
-	// Uses SQLite metadata downloaded from GCS for each volume
+	// Uses litestream restore to get SQLite metadata from GCS for each volume
 	var juicefsPool *juicefs.Pool
 	if config.VolumesBucket != "" {
 		juicefsPool = juicefs.NewPool(juicefs.Config{
@@ -173,6 +167,17 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 			zap.String("bucket", config.VolumesBucket))
 	} else {
 		logger.L().Info(ctx, "Volume file operations disabled (no VOLUMES_BUCKET configured)")
+	}
+
+	// Start sandbox runs consumer (writes sandbox events to PostgreSQL)
+	// Pass juicefsPool so it can invalidate cache when sandbox with volume terminates
+	if redisClient != nil {
+		var consumerOpts []sandboxruns.ConsumerOption
+		if juicefsPool != nil {
+			consumerOpts = append(consumerOpts, sandboxruns.WithVolumeInvalidator(juicefsPool.InvalidateVolume))
+		}
+		sandboxRunsConsumer := sandboxruns.NewConsumer(redisClient, sqlcDB, consumerOpts...)
+		go sandboxRunsConsumer.Run(ctx)
 	}
 
 	a := &APIStore{
