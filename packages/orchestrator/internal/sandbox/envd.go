@@ -93,13 +93,13 @@ func doRequestWithInfiniteRetries(
 }
 
 type PostInitJSONBody struct {
-	EnvVars        *map[string]string    `json:"envVars"`
-	AccessToken    *string               `json:"accessToken,omitempty"`
-	HyperloopIP    *string               `json:"hyperloopIP,omitempty"`
-	Timestamp      *time.Time            `json:"timestamp,omitempty"`
-	DefaultUser    *string               `json:"defaultUser,omitempty"`
-	DefaultWorkdir *string               `json:"defaultWorkdir,omitempty"`
-	Volume         *InitVolumeConfig     `json:"volume,omitempty"`
+	EnvVars        *map[string]string `json:"envVars"`
+	AccessToken    *string            `json:"accessToken,omitempty"`
+	HyperloopIP    *string            `json:"hyperloopIP,omitempty"`
+	Timestamp      *time.Time         `json:"timestamp,omitempty"`
+	DefaultUser    *string            `json:"defaultUser,omitempty"`
+	DefaultWorkdir *string            `json:"defaultWorkdir,omitempty"`
+	Volume         *InitVolumeConfig  `json:"volume,omitempty"`
 }
 
 // InitVolumeConfig is the volume configuration sent to envd in the /init request.

@@ -61,10 +61,10 @@ type APIStore struct {
 	clickhouseStore      clickhouse.Clickhouse
 	accessTokenGenerator *sandbox.AccessTokenGenerator
 	featureFlags         *featureflags.Client
-	clustersPool      *edge.Pool
-	juicefsPool       *juicefs.Pool  // For volume file operations (disabled until SQLite client implemented)
-	volumesBucket     string         // GCS bucket for volume data/metadata (used by FormatVolume/DestroyVolume)
-	volEventsDelivery events.Delivery[events.VolumeEvent]
+	clustersPool         *edge.Pool
+	juicefsPool          *juicefs.Pool // For volume file operations (disabled until SQLite client implemented)
+	volumesBucket        string        // GCS bucket for volume data/metadata (used by FormatVolume/DestroyVolume)
+	volEventsDelivery    events.Delivery[events.VolumeEvent]
 }
 
 func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) *APIStore {
@@ -194,12 +194,12 @@ func NewAPIStore(ctx context.Context, tel *telemetry.Client, config cfg.Config) 
 		templateSpawnCounter: templateSpawnCounter,
 		clickhouseStore:      clickhouseStore,
 		accessTokenGenerator: accessTokenGenerator,
-		clustersPool:      clustersPool,
-		featureFlags:      featureFlags,
-		redisClient:       redisClient,
-		juicefsPool:       juicefsPool,
-		volumesBucket:     config.VolumesBucket,
-		volEventsDelivery: volEventsDelivery,
+		clustersPool:         clustersPool,
+		featureFlags:         featureFlags,
+		redisClient:          redisClient,
+		juicefsPool:          juicefsPool,
+		volumesBucket:        config.VolumesBucket,
+		volEventsDelivery:    volEventsDelivery,
 	}
 
 	// Wait till there's at least one, otherwise we can't create sandboxes yet

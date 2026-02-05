@@ -672,6 +672,7 @@ func (r GetHealthResponse) StatusCode() int {
 type PostInitResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON500      *Error
 }
 
 // Status returns HTTPResponse.Status
@@ -928,6 +929,16 @@ func ParsePostInitResponse(rsp *http.Response) (*PostInitResponse, error) {
 	response := &PostInitResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
 	}
 
 	return response, nil

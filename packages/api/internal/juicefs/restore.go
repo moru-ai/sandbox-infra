@@ -50,7 +50,7 @@ type RestoreResult struct {
 func restoreMetaDB(ctx context.Context, volumeID string, gcsBucket string) (*RestoreResult, error) {
 	// Create temp directory for this volume
 	tmpDir := filepath.Join("/tmp/juicefs-api", volumeID)
-	if err := os.MkdirAll(tmpDir, 0755); err != nil {
+	if err := os.MkdirAll(tmpDir, 0o755); err != nil {
 		return nil, fmt.Errorf("create temp dir: %w", err)
 	}
 
@@ -162,7 +162,7 @@ func syncViaLitestream(ctx context.Context, volumeID, metaDBPath, gcsBucket stri
         sync-interval: %s
 `, metaDBPath, replicaURL, ReplicateSyncInterval)
 
-	if err := os.WriteFile(configPath, []byte(config), 0644); err != nil {
+	if err := os.WriteFile(configPath, []byte(config), 0o644); err != nil {
 		return fmt.Errorf("write litestream config: %w", err)
 	}
 	defer os.Remove(configPath)

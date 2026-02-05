@@ -23,9 +23,9 @@ type Token struct {
 
 // Minter creates downscoped GCS tokens for volume access.
 type Minter struct {
-	bucket               string
+	bucket                    string
 	impersonateServiceAccount string // SA email to impersonate (optional)
-	httpClient           *http.Client
+	httpClient                *http.Client
 }
 
 // NewMinter creates a new token minter for the given GCS bucket.
@@ -33,7 +33,7 @@ type Minter struct {
 // when generating tokens (recommended for security isolation).
 func NewMinter(bucket string, impersonateSA string) *Minter {
 	return &Minter{
-		bucket:               bucket,
+		bucket:                    bucket,
 		impersonateServiceAccount: impersonateSA,
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,

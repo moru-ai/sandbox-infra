@@ -456,7 +456,7 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 	defer cancel()
 
 	// Create cache directory
-	if err := os.MkdirAll(CacheDir, 0755); err != nil {
+	if err := os.MkdirAll(CacheDir, 0o755); err != nil {
 		return fmt.Errorf("create cache dir: %w", err)
 	}
 
@@ -466,7 +466,7 @@ func (m *Mounter) mountJuiceFS(ctx context.Context) error {
 		"--no-bgjob",
 		"-d",                // daemon mode
 		"-o", "allow_other", // allow non-root users to access mount
-		"--writeback",       // enable writeback mode for faster writes
+		"--writeback", // enable writeback mode for faster writes
 		"--cache-dir", CacheDir,
 		"--cache-size", "1024", // 1GB cache
 		metaURL,
