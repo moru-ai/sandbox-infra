@@ -709,8 +709,8 @@ github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826/go.mod h1:TaXosZuwd
 github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe/go.mod h1:wL8QJuTMNUDYhXwkmfOly8iTdp5TEcJFWZD2D7SIkUc=
 github.com/morikuni/aec v1.0.0 h1:nP9CBfwrvYnBRgY6qfDQkygYDmYwOilePFkwzv4dU8A=
 github.com/morikuni/aec v1.0.0/go.mod h1:BbKIizmSmc5MMPqRYbxO4ZU0S0+P200+tUnFx7PXmsc=
-github.com/moru-ai/juicefs v1.3.1-moru.5 h1:ezc9IGBt0wVslKQ5Rvv/KoOkiMpV/4/+6HkpVx+KFuQ=
-github.com/moru-ai/juicefs v1.3.1-moru.5/go.mod h1:k4P7pooShgxLVdHtetrENdCMFnHTyQUYxLchOOidN3E=
+github.com/moru-ai/juicefs v1.3.1-moru.4 h1:6SULIrw6KdHOGF7e62fVnLtEMw9w9+O+wRc+hBVy32Y=
+github.com/moru-ai/juicefs v1.3.1-moru.4/go.mod h1:k4P7pooShgxLVdHtetrENdCMFnHTyQUYxLchOOidN3E=
 github.com/mozillazg/go-httpheader v0.2.1 h1:geV7TrjbL8KXSyvghnFm+NyTux/hxwueTSrwhe88TQQ=
 github.com/mozillazg/go-httpheader v0.2.1/go.mod h1:jJ8xECTlalr6ValeXYdOF8fFUISeBAdw6E61aqQma60=
 github.com/muesli/smartcrop v0.3.0 h1:JTlSkmxWg/oQ1TcLDoypuirdE8Y/jzNirQeLkxpA6Oc=

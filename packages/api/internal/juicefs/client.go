@@ -118,6 +118,10 @@ func NewClient(volumeID string, _ int32, config Config) (*Client, error) {
 		return nil, fmt.Errorf("create storage: %w", err)
 	}
 
+	// Add prefix for volume-specific path (same pattern as CLI's mount.go)
+	// This ensures chunk operations go to gs://bucket/volumeName/chunks/...
+	blob = object.WithPrefix(blob, format.Name+"/")
+
 	// Create cache directory for chunk storage
 	cacheDir := filepath.Join(tmpDir, "cache")
 	if err = os.MkdirAll(cacheDir, 0755); err != nil {

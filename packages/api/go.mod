@@ -10,7 +10,7 @@ replace (
 )
 
 // JuiceFS fork with GCS endpoint patch and API fixes
-replace github.com/juicedata/juicefs => github.com/moru-ai/juicefs v1.3.1-moru.5
+replace github.com/juicedata/juicefs => github.com/moru-ai/juicefs v1.3.1-moru.4
 
 // JuiceFS dependency replacements (required for compatibility)
 replace (
